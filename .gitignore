@@ -1,2 +1,10 @@
 .env
-node_modules
+node_modules/
+
+_pycache_/
+*.pyc
+venv/
+env/
+
+.DS_Store
+Thumbs.db
