@@ -1,27 +1,81 @@
 @import "tailwindcss";
+@import "flowbite/src/themes/default";
+@plugin "flowbite/plugin";
+@source "../../node_modules/flowbite";
 
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-@import "flowbite/src/themes/default";
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap');
 
-/* MINIMAL THEME
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-@import "flowbite/src/themes/minimal";
-*/
 
-/* ENTERPRISE THEME
-@import url('https://fonts.googleapis.com/css2?family=Shantell+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-@import "flowbite/src/themes/enterprise";
-*/
+@theme {
+  /* Colores base */
+  --color-cream:          #FFF8EE;
+  --color-cream2:         #FFF0D6;
+  --color-orange:         #FF6B35;
+  --color-orange2:        #FF8C5A;
+  --color-orange-light:   #FFE8DC;
+  --color-green:          #7EC8A0;
+  --color-green-light:    #E4F7ED;
+  --color-yellow:         #FFD166;
+  --color-yellow-light:   #FFF3CC;
+  --color-pink:           #FFB3C6;
+  --color-pink-light:     #FFF0F4;
+  --color-teal:           #6DC5C5;
+  --color-teal-light:     #E0F5F5;
+  --color-purple-light:   #EDE0FF;
+  --color-dark:           #2D2016;
+  --color-brand-text:     #4A3728;
+  --color-muted:          #9C8070;
+  --color-border:         #F0DEC8;
+ 
+  /* Tipografía */
+  --font-sans:    'Nunito', sans-serif;
+  --font-display: 'Fredoka One', cursive;
+ 
+  /* Border radius custom */
+  --radius-card:  1rem;    /* 16px */
+  --radius-modal: 1.25rem; /* 20px */
+  --radius-btn:   0.875rem;/* 14px */
+  --radius-input: 0.6875rem;/* 11px */
+  --radius-badge: 0.5rem;  /* 8px */
+}
 
-/* PLAYFUL THEME
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap');
-@import "flowbite/src/themes/playful";
-*/
-
-/* MONO THEME
-@import "flowbite/src/themes/mono";
-*/
-
-@plugin "flowbite/plugin";
-@source "../../node_modules/flowbite";
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-cream);
+  color: var(--color-brand-text);
+}
+ 
+/* Scrollbar personalizado */
+::-webkit-scrollbar        { width: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--color-border); border-radius: 2px; }
+ 
+/* Animación del dot de estado */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+.animate-pulse-dot { animation: pulse-dot 2s infinite; }
+ 
+/* Gradiente del navbar (no expresable como clase Tailwind sin @theme) */
+.bg-nav-grad {
+  background: linear-gradient(135deg, #A8E6CF 0%, #D4F0A0 50%, #FFD166 100%);
+}
+ 
+/* Select con flecha personalizada */
+select.custom-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239C8070' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 2.25rem;
+  background-color: var(--color-cream);
+}
+select.custom-select:focus {
+  border-color: var(--color-orange);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+  background-color: white;
+}

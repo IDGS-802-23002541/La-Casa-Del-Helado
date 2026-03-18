@@ -10,6 +10,7 @@ from proveedores import proveedores_bp
 from venta import venta_bp
 from recetas import receta_bp
 from usuarios import usuarios_bp
+from compras import compra_bp
 
 app = Flask(__name__)
 app.register_blueprint(autenticacion_bp)
@@ -22,6 +23,7 @@ app.register_blueprint(proveedores_bp)
 app.register_blueprint(venta_bp)
 app.register_blueprint(receta_bp)
 app.register_blueprint(usuarios_bp)
+app.register_blueprint(compra_bp)
 
 
 
