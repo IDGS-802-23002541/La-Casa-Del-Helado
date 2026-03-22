@@ -80,3 +80,111 @@
 .mf-val.email   { color: var(--blue); text-decoration: underline; font-weight: 400; }
 .modal-divider  { height: 1px; background: var(--border); margin: 14px 0; }
 .modal-footer   { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+
+/* ── Layout principal ── */
+.app-body {
+  display: grid;
+  grid-template-columns: 220px 1fr 380px; /* sidebar | contenido | panel */
+  min-height: calc(100vh - 70px);
+}
+
+/* ── Panel derecho ── */
+.right-panel {
+  background: #ffffff;
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header del panel */
+.panel-hdr-dark {
+  background: var(--dark);
+  color: white;
+  padding: 20px;
+}
+
+.panel-hdr-dark h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.panel-hdr-dark p {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Cuerpo del formulario */
+.panel-body {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Footer (botones) */
+.panel-footer {
+  padding: 15px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+}
+
+/* Inputs */
+.fg {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.fg input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* Botones */
+.btn-save {
+  flex: 1;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  flex: 1;
+  background: #ccc;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* 🔥 FORZAR LAYOUT COMPLETO */
+.app-body.has-panel {
+  display: grid;
+  grid-template-columns: 220px 1fr 360px;
+  height: calc(100vh - 70px);
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: #f5f5f5;
+  padding: 15px;
+}
+
+/* MAIN */
+.main {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* PANEL DERECHO */
+.right-panel {
+  background: #ffffff;
+  border-left: 2px solid #eee;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+}

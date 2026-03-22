@@ -36,12 +36,6 @@
       ⏸ Inactivos
     </a>
 
-    <div class="sb-logout">
-      <a href="#">
-        <button class="btn-logout">🚪 Cerrar sesión</button>
-      </a>
-    </div>
-
   </aside>
 
   <!-- MAIN -->
@@ -106,6 +100,53 @@
     </table>
 
   </main>
+
+  <!-- PANEL DERECHO -->
+  <aside class="right-panel">
+
+    <h3>
+      {{ 'Editar Proveedor' if proveedor_editar else 'Nuevo Proveedor' }}
+    </h3>
+
+    <form method="POST" action="{{ url_for('proveedores.guardar') }}">
+
+      <input type="hidden" name="id"
+             value="{{ proveedor_editar.id if proveedor_editar else 0 }}">
+
+      <label>Razón Social</label>
+      <input type="text" name="razonSocial"
+             value="{{ proveedor_editar.razonSocial if proveedor_editar else '' }}">
+
+      <label>Correo</label>
+      <input type="email" name="correo"
+             value="{{ proveedor_editar.correo if proveedor_editar else '' }}">
+
+      <label>Teléfono</label>
+      <input type="text" name="telefono"
+             value="{{ proveedor_editar.telefono if proveedor_editar else '' }}">
+
+      <label>Dirección</label>
+      <input type="text" name="direccion"
+             value="{{ proveedor_editar.direccion if proveedor_editar else '' }}">
+
+      <label>Estatus</label>
+      <select name="estatus">
+        <option value="Activo"
+          {% if proveedor_editar and proveedor_editar.estatus == 'Activo' %}selected{% endif %}>
+          Activo
+        </option>
+        <option value="Inactivo"
+          {% if proveedor_editar and proveedor_editar.estatus == 'Inactivo' %}selected{% endif %}>
+          Inactivo
+        </option>
+      </select>
+
+      <br><br>
+      <button type="submit">Guardar</button>
+
+    </form>
+
+  </aside>
 
 </div>
 {% endblock %}
