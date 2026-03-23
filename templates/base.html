@@ -5,42 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>{% block title %}La Casa del Helado{% endblock %}</title>
-
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link
+      rel="stylesheet"
+      href="{{url_for('static',filename='dist/output.css')}}"
+    />
+  <link rel="stylesheet" href="{{ url_for('static', filename='src/input.css') }}">
 
   {% block extra_css %}{% endblock %}
 </head>
 <body>
-
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <a href="{{ url_for('index') }}" class="nav-brand">
-      <div class="nav-brand-avatar">🍦</div>
-      <span class="nav-brand-name">La Casa del Helado</span>
-    </a>
-
-  <div class="nav-links">
-  <a href="{{ url_for('index') }}"
-     class="nav-link {% if active_page == 'inicio' %}active{% endif %}">
-    Inicio
-  </a>
-
-  <a href="{{ url_for('proveedores.index') }}"
-     class="nav-link {% if active_page == 'proveedores' %}active{% endif %}">
-    Proveedores
-  </a>
-</div>
-
-    <div class="nav-right">
-      <span class="nav-date">
-        📅 {{ fecha_hoy }}
-      </span>
-
-      <div class="nav-user-avatar" title="{{ current_user.nombre if current_user else '' }}">
-        {{ current_user.nombre[0] | upper if current_user else '?' }}
-      </div>
-    </div>
-  </nav>
 
   <!-- CUERPO -->
   {% block body %}{% endblock %}
@@ -70,6 +43,7 @@
       setTimeout(() => t.classList.remove('show'), 3200);
     }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
 
   {% block extra_js %}{% endblock %}
 

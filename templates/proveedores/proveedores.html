@@ -1,10 +1,19 @@
 {% extends "base.html" %} {% block title %}Proveedores — La Casa del Helado{%
-endblock %} {% block extra_css %}
+endblock %} 
+
+{% block extra_css %}
 <link
   rel="stylesheet"
   href="{{ url_for('static', filename='css/proveedores.css') }}"
 />
-{% endblock %} {% block body %}
+{% endblock %} 
+
+
+{% block body %}
+  <!-- NAV BAR -->
+  {% block navbar %}
+    {% include 'navbar.html' %}
+  {% endblock %}
 <div class="app-body has-panel">
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -144,8 +153,7 @@ endblock %} {% block extra_css %}
           if
           proveedor_editar
           and
-          proveedor_editar.estatus=""
-          ="Activo"
+          proveedor_editar.estatus=="Activo"
           %}selected{%
           endif
           %}
@@ -158,8 +166,7 @@ endblock %} {% block extra_css %}
           if
           proveedor_editar
           and
-          proveedor_editar.estatus=""
-          ="Inactivo"
+          proveedor_editar.estatus=="Inactivo"
           %}selected{%
           endif
           %}
