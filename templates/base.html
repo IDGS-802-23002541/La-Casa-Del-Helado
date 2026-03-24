@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{% block title %}La Casa del Helado{% endblock %}</title>
+  <link
+      rel="stylesheet"
+      href="{{url_for('static',filename='dist/output.css')}}"
+    />
+  <link rel="stylesheet" href="{{ url_for('static', filename='src/input.css') }}">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- CUERPO -->
+  {% block body %}{% endblock %}
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- FLASH MESSAGES -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        {% for category, message in messages %}
+          showToast({{ message|tojson }}, {{ category|tojson }});
+        {%endfor %}
+      });
+    </script>
+  {% endif %}
+{% endwith %}
+
+  <!-- JS GLOBAL -->
+  <script>
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3200);
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
+
+  {% block extra_js %}{% endblock %}
+
+</body>
+</html>

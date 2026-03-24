@@ -1,5 +1,183 @@
-{% extends "layout.html" %} {% block container %}
+{% extends "base.html" %} {% block title %}Proveedores — La Casa del Helado{%
+endblock %} 
 
-<p class="text-amber-600">PROOVEDORES :D</p>
+{% block extra_css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/proveedores.css') }}"
+/>
+{% endblock %} 
 
+
+{% block body %}
+  <!-- NAV BAR -->
+  {% block navbar %}
+    {% include 'navbar.html' %}
+  {% endblock %}
+<div class="app-body has-panel">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-section">Gestión</div>
+    <a href="{{ url_for('proveedores.index') }}" class="sb-item active">
+      🏭 Proveedor
+      <span class="sb-badge">{{ total }}</span>
+    </a>
+
+    <div class="sb-divider"></div>
+    <div class="sb-section">Filtrar por estatus</div>
+
+    <a
+      href="{{ url_for('proveedores.index', q=busqueda) }}"
+      class="sb-item {{ 'active-teal' if not estatus_activo }}"
+    >
+      📋 Todos
+    </a>
+
+    <a
+      href="{{ url_for('proveedores.index', estatus='Activo', q=busqueda) }}"
+      class="sb-item {{ 'active-teal' if estatus_activo == 'Activo' }}"
+    >
+      ✅ Activos
+    </a>
+
+    <a
+      href="{{ url_for('proveedores.index', estatus='Inactivo', q=busqueda) }}"
+      class="sb-item {{ 'active-teal' if estatus_activo == 'Inactivo' }}"
+    >
+      ⏸ Inactivos
+    </a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-hdr">
+      <div>
+        <h1>Proveedor</h1>
+        <p>Administración de proveedores</p>
+      </div>
+
+      <a href="{{ url_for('proveedores.index') }}" class="btn-primary">
+        + Nuevo
+      </a>
+    </div>
+
+    <!-- BUSCADOR -->
+    <form method="GET" action="{{ url_for('proveedores.index') }}">
+      <input type="text" name="q" value="{{ busqueda }}" />
+      <button type="submit">Buscar</button>
+    </form>
+
+    <!-- TABLA -->
+    <table>
+      <thead>
+        <tr>
+          <th>Razón Social</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th>Dirección</th>
+          <th>Estatus</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for p in proveedores %}
+        <tr>
+          <td>{{ p.razonSocial }}</td>
+          <td>{{ p.correo }}</td>
+          <td>{{ p.telefono }}</td>
+          <td>{{ p.direccion }}</td>
+          <td>{{ p.estatus }}</td>
+
+          <td>
+            <a href="{{ url_for('proveedores.index', edit=p.id) }}"> Editar </a>
+
+            <form
+              method="POST"
+              action="{{ url_for('proveedores.toggle_estatus', id=p.id) }}"
+              style="display: inline"
+            >
+              <button type="submit">Cambiar estado</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+
+  <!-- PANEL DERECHO -->
+  <aside class="right-panel">
+    <h3>{{ 'Editar Proveedor' if proveedor_editar else 'Nuevo Proveedor' }}</h3>
+
+    <form method="POST" action="{{ url_for('proveedores.guardar') }}">
+      <input
+        type="hidden"
+        name="id"
+        value="{{ proveedor_editar.id if proveedor_editar else 0 }}"
+      />
+
+      <label>Razón Social</label>
+      <input
+        type="text"
+        name="razonSocial"
+        value="{{ proveedor_editar.razonSocial if proveedor_editar else '' }}"
+      />
+
+      <label>Correo</label>
+      <input
+        type="email"
+        name="correo"
+        value="{{ proveedor_editar.correo if proveedor_editar else '' }}"
+      />
+
+      <label>Teléfono</label>
+      <input
+        type="text"
+        name="telefono"
+        value="{{ proveedor_editar.telefono if proveedor_editar else '' }}"
+      />
+
+      <label>Dirección</label>
+      <input
+        type="text"
+        name="direccion"
+        value="{{ proveedor_editar.direccion if proveedor_editar else '' }}"
+      />
+
+      <label>Estatus</label>
+      <select name="estatus">
+        <option
+          value="Activo"
+          {%
+          if
+          proveedor_editar
+          and
+          proveedor_editar.estatus=="Activo"
+          %}selected{%
+          endif
+          %}
+        >
+          Activo
+        </option>
+        <option
+          value="Inactivo"
+          {%
+          if
+          proveedor_editar
+          and
+          proveedor_editar.estatus=="Inactivo"
+          %}selected{%
+          endif
+          %}
+        >
+          Inactivo
+        </option>
+      </select>
+
+      <br /><br />
+      <button type="submit">Guardar</button>
+    </form>
+  </aside>
+</div>
 {% endblock %}
