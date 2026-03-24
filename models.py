@@ -1,5 +1,6 @@
 from flask_security import UserMixin, RoleMixin
 from flask_sqlalchemy import SQLAlchemy
+import datetime 
 
 db= SQLAlchemy()    
 
@@ -37,8 +38,6 @@ class Usuario(db.Model, UserMixin):
     rol = db.relationship('Rol', backref='usuarios')
     persona = db.relationship('Persona', backref='usuario')
 
-    roles = db.relationship('Rol', foreign_keys=[idRol], viewonly=True)
-
     @property
     def roles(self):
         return [self.rol] if self.rol else []
@@ -47,3 +46,18 @@ class Usuario(db.Model, UserMixin):
     def active(self):
         return self.estatus
     
+
+class Proveedor(db.Model):
+    __tablename__ = 'proveedor'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    razonSocial = db.Column(db.String(100), nullable=False)
+    correo = db.Column(db.String(100), nullable=False, unique=True)
+    telefono = db.Column(db.String(15), nullable=False)
+    direccion = db.Column(db.String(200), nullable=False)
+    estatus = db.Column(db.String(20), default='Activo')
+
+    # compras = db.relationship('Compra', backref='proveedor', lazy=True)
+
+    def __repr__(self):
+        return f'<Proveedor {self.razonSocial}>'
