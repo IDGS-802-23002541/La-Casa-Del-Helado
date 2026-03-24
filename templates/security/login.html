@@ -1,0 +1,49 @@
+{% extends "layout.html" %} {% block container %}
+{% import "_macros.html" as macros %}
+
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+  <div class="w-full max-w-4xl min-h-[520px] rounded-3xl overflow-hidden shadow-2xl flex">
+
+    <!-- Panel izquierdo -->
+    <div class="w-1/2 relative flex items-center justify-center"
+         style="background: linear-gradient(135deg, #f9c5d1 0%, #fde8c8 40%, #c8edd9 100%);">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" 
+           alt="La Casa del Helado"
+           class="w-72 h-72 object-contain" />
+    </div>
+
+    <!-- Panel derecho -->
+    <div class="w-1/2 flex items-center justify-center" style="background-color: #f5f0e8;">
+      <div class="bg-white rounded-2xl shadow-md px-10 py-10 w-80 flex flex-col items-center">
+
+        <div class="w-20 h-20 rounded-full flex items-center justify-center mb-4"
+             style="background-color: #fde8f0;">
+          <span class="text-4xl">🍦</span>
+        </div>
+
+        <h1 class="text-2xl font-bold text-gray-800 mb-1">La casa del Helado</h1>
+        <p class="text-gray-500 text-sm mb-6">Bienvenido</p>
+
+        <!-- Mensajes flash -->
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="w-full mb-4 px-4 py-2 rounded-lg bg-red-100 text-red-600 text-sm text-center">
+              {{ messages[0] }}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method='POST' action="{{url_for('auth.login_post')}}" class="w-full">
+          {{macros.campoNuevo(form.nombreUsuario, class="border border-gray-300 rounded px-2 py-1 w-full")}}
+          {{macros.campoNuevo(form.password, class="border border-gray-300 rounded px-2 py-1 w-full", type="password") }}
+          <button type="submit" class="w-full py-2 rpunded text-white mt-2" style="background-color: #f5a623;">
+            Ingresar
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
