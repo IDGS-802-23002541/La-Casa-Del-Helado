@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Solicitud de Producción — La Casa del Helado{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/soli_produccion.css') }}">
+{% endblock %}
+
+{% block body %}
+{% include 'navbar_mostrador.html' %}
+
+<div class="page">
+  <div class="card">
+    
+    <div class="card-header">
+      <div class="card-title">Solicitud de Producción</div>
+      <div class="card-subtitle">Registra los productos para el turno de: {{ current_user.nombre if current_user.is_authenticated else 'Invitado' }}</div>
+    </div>
+
+    <div class="card-body">
+      
+      <div class="section-label">Añadir Producto</div>
+      <form action="{{ url_for('SolicitudProduccion.agregar_item') }}" method="POST" class="linea-row" style="background: #fef9f3; padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border);">
+        <div></div> <div>
+          <select name="idProducto" required>
+            <option value="">— Producto —</option>
+            {% for p in productos %}
+            <option value="{{ p.id }}">{{ p.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <input type="text" name="sabor" placeholder="Sabor (ej. Nuez)" required>
+        </div>
+        <div>
+          <input type="number" name="cantidad" min="1" value="1" required>
+        </div>
+        <button type="submit" class="btn-enviar" style="padding: 8px; font-size: 18px;">+</button>
+      </form>
+
+      <div class="section-label">Detalle de la Solicitud</div>
+      <div class="lineas-list">
+        
+        <div class="linea-row" style="margin-bottom: 5px; opacity: 0.6;">
+          <div></div>
+          <div class="col-header">Producto</div>
+          <div class="col-header">Sabor</div>
+          <div class="col-header">Cant.</div>
+          <div></div>
+        </div>
+
+        {% if carrito_produccion %}
+          {% for item in carrito_produccion %}
+          <div class="linea-row">
+            <div class="linea-num">{{ loop.index }}</div>
+            <input type="text" value="{{ item.nombre_prod }}" readonly>
+            <input type="text" value="{{ item.sabor }}" readonly>
+            <input type="number" value="{{ item.cantidad }}" readonly>
+            <a href="{{ url_for('SolicitudProduccion.quitar_item', index=loop.index0) }}" class="btn-remove-linea">×</a>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px;">
+            Aún no hay productos en la lista.
+          </p>
+        {% endif %}
+      </div>
+
+      {% if carrito_produccion %}
+      <form action="{{ url_for('SolicitudProduccion.finalizar_solicitud') }}" method="POST" class="observaciones-section">
+        <div class="section-label">Observaciones Generales</div>
+        <textarea name="observaciones" placeholder="Indicaciones especiales para producción..."></textarea>
+        
+        <div class="card-footer">
+          <a href="{{ url_for('SolicitudProduccion.limpiar_carrito') }}" class="btn-cancelar">Vaciar lista</a>
+          <button type="submit" class="btn-enviar">Enviar Solicitud Final</button>
+        </div>
+      </form>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

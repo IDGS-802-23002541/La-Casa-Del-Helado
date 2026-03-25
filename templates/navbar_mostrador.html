@@ -1,0 +1,36 @@
+<nav class="nav-mostrador">
+  <div class="nav-top">
+    <div class="nav-brand">
+      <div class="brand-logo">🍦</div>
+      <div class="brand-text">
+        <span class="brand-title">La Casa del Helado</span>
+        <span class="brand-subtitle">PUNTO DE VENTA</span>
+      </div>
+    </div>
+
+    <div class="nav-status">
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        Turno activo — {{ current_user.nombre if current_user else 'Yasmin M.' }}
+      </div>
+    </div>
+
+    <div class="nav-user-info">
+      <span class="nav-time">03:47</span>
+      <button class="btn-cerrar-turno">Cerrar turno</button>
+      <div class="user-avatar-circle">YM</div>
+    </div>
+  </div>
+
+  <div class="nav-bottom">
+    <a href="#" class="nav-tab">
+      <span class="tab-icon">🛒</span> Punto de Venta
+    </a>
+    <a href="" class="nav-tab">
+      <span class="tab-icon">📦</span> Compras Proveedores
+    </a>
+   <a href="{{ url_for('SolicitudProduccion.solicitud_produccion') }}" class="nav-tab active">
+    <span class="tab-icon">🏭</span> Solicitud Producción
+</a>
+  </div>
+</nav>
