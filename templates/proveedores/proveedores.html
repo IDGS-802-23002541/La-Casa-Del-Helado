@@ -1,5 +1,6 @@
-{% extends "base.html" %} {% block title %}Proveedores — La Casa del Helado{%
-endblock %} 
+{% extends "base.html" %} 
+
+{% block title %}Proveedores — La Casa del Helado{% endblock %} 
 
 {% block extra_css %}
 <link
@@ -10,64 +11,34 @@ endblock %}
 
 
 {% block body %}
-  <!-- NAV BAR -->
   {% block navbar %}
     {% include 'navbar.html' %}
   {% endblock %}
+
 <div class="app-body has-panel">
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sb-section">Gestión</div>
-    <a href="{{ url_for('proveedores.index') }}" class="sb-item active">
+    <a href="{{ url_for('proveedores.proveedoresTabla') }}" class="sb-item active">
       🏭 Proveedor
-      <span class="sb-badge">{{ total }}</span>
-    </a>
-
-    <div class="sb-divider"></div>
-    <div class="sb-section">Filtrar por estatus</div>
-
-    <a
-      href="{{ url_for('proveedores.index', q=busqueda) }}"
-      class="sb-item {{ 'active-teal' if not estatus_activo }}"
-    >
-      📋 Todos
-    </a>
-
-    <a
-      href="{{ url_for('proveedores.index', estatus='Activo', q=busqueda) }}"
-      class="sb-item {{ 'active-teal' if estatus_activo == 'Activo' }}"
-    >
-      ✅ Activos
-    </a>
-
-    <a
-      href="{{ url_for('proveedores.index', estatus='Inactivo', q=busqueda) }}"
-      class="sb-item {{ 'active-teal' if estatus_activo == 'Inactivo' }}"
-    >
-      ⏸ Inactivos
+      <span class="sb-badge">{{ proveedores|length }}</span>
     </a>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
     <div class="page-hdr">
       <div>
         <h1>Proveedor</h1>
         <p>Administración de proveedores</p>
       </div>
-
-      <a href="{{ url_for('proveedores.index') }}" class="btn-primary">
-        + Nuevo
-      </a>
     </div>
 
-    <!-- BUSCADOR -->
-    <form method="GET" action="{{ url_for('proveedores.index') }}">
-      <input type="text" name="q" value="{{ busqueda }}" />
-      <button type="submit">Buscar</button>
+    <form method="GET" action="{{ url_for('proveedores.proveedoresTabla') }}" style="display: flex; gap: 10px; margin-bottom: 20px;">
+      <input type="text" name="q" value="{{ busqueda or '' }}" placeholder="Buscar por razón social..." style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #ddd;" />
+      <button type="submit" class="btn-primary" style="white-space: nowrap;">
+        Buscar
+      </button>
     </form>
 
-    <!-- TABLA -->
     <table>
       <thead>
         <tr>
@@ -83,22 +54,44 @@ endblock %}
       <tbody>
         {% for p in proveedores %}
         <tr>
-          <td>{{ p.razonSocial }}</td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="background: {{ p.avatar_color }}; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.8rem;">
+                    {{ p.razonSocial[0] | upper }}
+                </div>
+                {{ p.razonSocial }}
+            </div>
+          </td>
           <td>{{ p.correo }}</td>
           <td>{{ p.telefono }}</td>
           <td>{{ p.direccion }}</td>
-          <td>{{ p.estatus }}</td>
+          <td>
+            <span class="badge {{ 'bg-success' if p.estatus == 'Activo' else 'bg-danger' }}">
+                {{ p.estatus }}
+            </span>
+          </td>
 
           <td>
-            <a href="{{ url_for('proveedores.index', edit=p.id) }}"> Editar </a>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <a href="{{ url_for('proveedores.proveedorModificar', id=p.id) }}" 
+                 class="btn-edit-pill" 
+                 style="background-color: #e3f2fd; color: #1976d2; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: 0.3s;">
+                ✏️ Editar
+              </a>
 
-            <form
-              method="POST"
-              action="{{ url_for('proveedores.toggle_estatus', id=p.id) }}"
-              style="display: inline"
-            >
-              <button type="submit">Cambiar estado</button>
-            </form>
+              <form
+                method="POST"
+                action="{{ url_for('proveedores.proveedorToggle') }}"
+                style="display: inline"
+              >
+                <input type="hidden" name="id" value="{{ p.id }}">
+                <button type="submit" 
+                        class="btn-toggle-pill" 
+                        style="background-color: #f5f5f5; color: #616161; padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: 0.3s;">
+                  {{ '🚫 Desactivar' if p.estatus == 'Activo' else '✅ Activar' }}
+                </button>
+              </form>
+            </div>
           </td>
         </tr>
         {% endfor %}
@@ -106,78 +99,62 @@ endblock %}
     </table>
   </main>
 
-  <!-- PANEL DERECHO -->
-  <aside class="right-panel">
-    <h3>{{ 'Editar Proveedor' if proveedor_editar else 'Nuevo Proveedor' }}</h3>
+  <aside class="right-panel" style="padding: 0; overflow: hidden;">
+    
+    <div class="panel-hdr-dark">
+        <h3 style="color: white; margin: 0;">{{ 'Editar Proveedor' if modo == 'editar' else 'Registrar Proveedor' }}</h3>
+        <p style="color: rgba(255,255,255,0.8); margin: 5px 0 0; font-size: 12px;">Completa los campos para registrar un proveedor</p>
+    </div>
+    
+    <div class="panel-body" style="padding: 20px;">
+        {% set url_destino = url_for('proveedores.proveedorModificar', id=proveedor.id) if modo == 'editar' else url_for('proveedores.proveedorNuevo') %}
+        
+        <form method="POST" action="{{ url_destino }}">
+          
+          <div class="fg">
+            <label class="mf-label">Razón Social *</label>
+            <input type="text" name="razonSocial" value="{{ proveedor.razonSocial if proveedor else '' }}" required placeholder="" />
+          </div>
 
-    <form method="POST" action="{{ url_for('proveedores.guardar') }}">
-      <input
-        type="hidden"
-        name="id"
-        value="{{ proveedor_editar.id if proveedor_editar else 0 }}"
-      />
+          <div class="fg">
+            <label class="mf-label">Correo electrónico *</label>
+            <input type="email" name="correo" value="{{ proveedor.correo if proveedor else '' }}" required placeholder="" />
+          </div>
 
-      <label>Razón Social</label>
-      <input
-        type="text"
-        name="razonSocial"
-        value="{{ proveedor_editar.razonSocial if proveedor_editar else '' }}"
-      />
+          <div class="fg">
+            <label class="mf-label">Teléfono *</label>
+            <input type="text" name="telefono" value="{{ proveedor.telefono if proveedor else '' }}" required placeholder="" />
+          </div>
 
-      <label>Correo</label>
-      <input
-        type="email"
-        name="correo"
-        value="{{ proveedor_editar.correo if proveedor_editar else '' }}"
-      />
+          <div class="fg">
+            <label class="mf-label">Dirección *</label>
+            <input type="text" name="direccion" value="{{ proveedor.direccion if proveedor else '' }}" required placeholder="" />
+          </div>
 
-      <label>Teléfono</label>
-      <input
-        type="text"
-        name="telefono"
-        value="{{ proveedor_editar.telefono if proveedor_editar else '' }}"
-      />
+          <div class="fg">
+            <label class="mf-label">Estatus</label>
+            <select name="estatus" style="padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
+              <option value="Activo" {{ 'selected' if proveedor and proveedor.estatus == 'Activo' }}>Activo</option>
+              <option value="Inactivo" {{ 'selected' if proveedor and proveedor.estatus == 'Inactivo' }}>Inactivo</option>
+            </select>
+          </div>
 
-      <label>Dirección</label>
-      <input
-        type="text"
-        name="direccion"
-        value="{{ proveedor_editar.direccion if proveedor_editar else '' }}"
-      />
+          <br>
+          
+          <div style="display: flex; gap: 10px;">
+              <button type="submit" class="btn-save" style="background-color: #ff7043; flex: 1; font-weight: bold;">
+                {{ 'Actualizar' if modo == 'editar' else 'Guardar' }}
+              </button>
 
-      <label>Estatus</label>
-      <select name="estatus">
-        <option
-          value="Activo"
-          {%
-          if
-          proveedor_editar
-          and
-          proveedor_editar.estatus=="Activo"
-          %}selected{%
-          endif
-          %}
-        >
-          Activo
-        </option>
-        <option
-          value="Inactivo"
-          {%
-          if
-          proveedor_editar
-          and
-          proveedor_editar.estatus=="Inactivo"
-          %}selected{%
-          endif
-          %}
-        >
-          Inactivo
-        </option>
-      </select>
+              <a href="{{ url_for('proveedores.proveedoresTabla') }}" 
+                 class="btn-cancel" 
+                 style="flex: 1; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; background-color: #eee; color: #333; border-radius: 6px; font-size: 13px;">
+                Cancelar
+              </a>
+          </div>
 
-      <br /><br />
-      <button type="submit">Guardar</button>
-    </form>
+        </form>
+    </div>
   </aside>
 </div>
 {% endblock %}
