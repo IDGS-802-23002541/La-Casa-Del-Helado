@@ -14,14 +14,15 @@
     
     <div class="card-header">
       <div class="card-title">Solicitud de Producción</div>
-      <div class="card-subtitle">Registra los productos para el turno de: {{ current_user.nombre if current_user.is_authenticated else 'Invitado' }}</div>
+      <div class="card-subtitle">Registra los productos para el turno de: Empleado de Turno</div>
     </div>
 
     <div class="card-body">
       
       <div class="section-label">Añadir Producto</div>
-      <form action="{{ url_for('SolicitudProduccion.agregar_item') }}" method="POST" class="linea-row" style="background: #fef9f3; padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border);">
-        <div></div> <div>
+      <form action="" method="POST" class="linea-row" style="background: #fef9f3; padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border);">
+        <div></div> 
+        <div>
           <select name="idProducto" required>
             <option value="">— Producto —</option>
             {% for p in productos %}
@@ -56,7 +57,7 @@
             <input type="text" value="{{ item.nombre_prod }}" readonly>
             <input type="text" value="{{ item.sabor }}" readonly>
             <input type="number" value="{{ item.cantidad }}" readonly>
-            <a href="{{ url_for('SolicitudProduccion.quitar_item', index=loop.index0) }}" class="btn-remove-linea">×</a>
+            <a href="" class="btn-remove-linea">×</a>
           </div>
           {% endfor %}
         {% else %}
@@ -67,12 +68,12 @@
       </div>
 
       {% if carrito_produccion %}
-      <form action="{{ url_for('SolicitudProduccion.finalizar_solicitud') }}" method="POST" class="observaciones-section">
+      <form action="" method="POST" class="observaciones-section">
         <div class="section-label">Observaciones Generales</div>
         <textarea name="observaciones" placeholder="Indicaciones especiales para producción..."></textarea>
         
         <div class="card-footer">
-          <a href="{{ url_for('SolicitudProduccion.limpiar_carrito') }}" class="btn-cancelar">Vaciar lista</a>
+          <a href="" class="btn-cancelar">Vaciar lista</a>
           <button type="submit" class="btn-enviar">Enviar Solicitud Final</button>
         </div>
       </form>
