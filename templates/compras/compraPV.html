@@ -1,16 +1,21 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registrar Entrada — Compras</title>
-    <!-- Tailwind + Flowbite compilado por Flask -->
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='dist/output.css') }}"
-    />
-  </head>
-  <body class="bg-cream font-sans text-brand-text h-screen overflow-hidden">
+{% extends "base.html" %} {% block title %}Registrar Entrada — Compras{%
+endblock %} 
+
+
+{% block extra_css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='dist/output.css') }}"
+/>
+{% endblock %} 
+
+{% block body %}
+  <!-- NAV BAR -->
+  {% block navbar %}
+    {% include 'navbar.html' %}
+  {% endblock %}
+  
+  <div class="bg-cream font-sans text-brand-text h-screen overflow-hidden">
     <div id="page-compras" class="page active flex flex-1 h-full">
       <!-- Fondo / centrado -->
       <div
@@ -264,5 +269,6 @@
         alert("¡Compra guardada!");
       }
     </script>
-  </body>
-</html>
+
+
+{% endblock %}
