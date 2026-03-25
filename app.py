@@ -22,7 +22,6 @@ from usuarios import usuarios_bp
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 
-db.init_app(app)
 
 # Blueprint register
 app.register_blueprint(autenticacion_bp)
