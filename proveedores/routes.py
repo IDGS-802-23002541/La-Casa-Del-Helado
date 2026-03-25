@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-# Usamos el punto para indicar que models está un nivel arriba o en la raíz
 from models import db, Proveedor
 
 proveedores = Blueprint('proveedores', __name__)
