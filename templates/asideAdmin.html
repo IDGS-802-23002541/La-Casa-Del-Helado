@@ -1,0 +1,31 @@
+<aside class="sidebar w-64 shrink-0">
+    <div class="sb-section">Gestión</div>
+    <a href="{{ url_for('proveedores.index') }}" class="sb-item active">
+      🏭 Proveedor
+      <span class="sb-badge">{{ total }}</span>
+    </a>
+
+    <div class="sb-divider"></div>
+    <div class="sb-section">Filtrar por estatus</div>
+
+    <a
+      href="{{ url_for('proveedores.index', q=busqueda) }}"
+      class="sb-item {{ 'active-teal' if not estatus_activo }}"
+    >
+      📋 Todos
+    </a>
+
+    <a
+      href="{{ url_for('proveedores.index', estatus='Activo', q=busqueda) }}"
+      class="sb-item {{ 'active-teal' if estatus_activo == 'Activo' }}"
+    >
+      ✅ Activos
+    </a>
+
+    <a
+      href="{{ url_for('proveedores.index', estatus='Inactivo', q=busqueda) }}"
+      class="sb-item {{ 'active-teal' if estatus_activo == 'Inactivo' }}"
+    >
+      ⏸ Inactivos
+    </a>
+  </aside>
