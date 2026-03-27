@@ -1,6 +1,4 @@
-{% extends "base.html" %} {% block title %}Registrar Entrada — Compras{%
-endblock %} 
-
+{% extends "base.html" %} {% block title %}Registrar Entrada — Compras{% endblock %} 
 
 {% block extra_css %}
 <link
@@ -11,18 +9,16 @@ endblock %}
 
 {% block body %}
   <!-- NAV BAR -->
-  {% block navbar %}
-    {% include 'navbar.html' %}
-  {% endblock %}
+  {% include 'navAdmin.html' %}
+<div class="flex h-screen">
+  <!-- SIDEBAR -->
+  {% include 'asideAdmin.html' %}
   
-  <div class="bg-cream font-sans text-brand-text h-screen overflow-hidden">
-    <div id="page-compras" class="page active flex flex-1 h-full">
-      <!-- Fondo / centrado -->
-      <div
-        class="flex flex-1 items-center justify-center bg-cream overflow-y-auto p-6"
-      >
+  <div class="flex-1 bg-cream font-sans text-brand-text overflow-y-auto">
+    <div id="page-compras" class="p-6 flex justify-center">
+
         <!-- Modal -->
-        <div
+        <form method="POST" 
           class="bg-white rounded-[20px] shadow-2xl w-full max-w-[560px] overflow-hidden"
         >
           <!-- ── Header oscuro ── -->
@@ -218,11 +214,14 @@ endblock %}
               Guardar
             </button>
           </div>
-        </div>
+        </form>
         <!-- /.cp-modal -->
-      </div>
-    </div>
 
+    </div>
+  </div>
+
+</div>
+  
     <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
     <script>
       /* ─── Lógica del formulario ─── */
@@ -269,6 +268,5 @@ endblock %}
         alert("¡Compra guardada!");
       }
     </script>
-
 
 {% endblock %}
