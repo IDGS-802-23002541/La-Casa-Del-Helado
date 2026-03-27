@@ -1,0 +1,65 @@
+{% extends "layout.html" %} 
+{% block container %}
+{% import "_macros.html" as macros %}
+
+<form class="max-w-sm mx-auto space-y-4" method="POST" action="{{ url_for('usuarios.editar', id=request.args.get('id')) }}">
+
+    <div>
+        
+        {{ macros.campoNuevo(
+            field=form.nombre, 
+            class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-2.5 py-2 shadow-xs", 
+            placeholder="Escribe tu nombre"
+        ) }}
+    </div>
+
+     <div>
+        {{ macros.campoNuevo(
+            field=form.apellido, 
+            class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-2.5 py-2 shadow-xs", 
+            placeholder="Escribe tus apellidos"
+        ) }}
+    </div>
+
+    
+    <div>
+        {{ macros.campoNuevo(
+            field=form.nombreUsuario, 
+            class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-2.5 py-2 shadow-xs", 
+            placeholder="Nombre de Usuario"
+        ) }}
+    </div>
+
+    <div>
+       {{ macros.campoNuevo(
+           field=form.password, 
+           class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-2.5 py-2 shadow-xs", 
+           placeholder="Escribe tu telefono"
+       ) }}
+   </div>
+
+    <div>
+       {{ macros.campoNuevo(
+           field=form.idRol, 
+           class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-2.5 py-2 shadow-xs", 
+           placeholder="Escribe tu telefono"
+       ) }}
+   </div>
+
+    <div>
+       {{ macros.campoNuevo(
+           field=form.estatus, 
+           class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-2.5 py-2 shadow-xs", 
+           placeholder="Escribe tu telefono"
+       ) }}
+   </div>
+    
+    <button type="submit" class="w-full text-white bg-brand hover:bg-brand-dark font-medium rounded-base text-sm px-5 py-2.5">
+        Guardar Usuario
+    </button>
+    <a href="{{url_for('usuarios.index')}}" class="w-full text-white bg-brand hover:bg-brand-dark font-medium rounded-base text-sm px-5 py-2.5">
+        Cancelar
+    </a>
+</form>
+
+{% endblock %}

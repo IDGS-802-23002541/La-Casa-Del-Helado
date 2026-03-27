@@ -1,11 +1,12 @@
 .env
 node_modules/
 
-__pycache__/
+_pycache_/
 *.pyc
 venv/
 env/
 
 .DS_Store
 Thumbs.db
+
 config.py

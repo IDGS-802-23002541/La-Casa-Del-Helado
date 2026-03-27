@@ -1,5 +1,8 @@
 from flask import Flask, render_template
-from flask import flash
+from flask_security import Security, SQLAlchemyUserDatastore
+from config import DevelopmentConfig
+from models import db, Usuario, Rol 
+
 from flask_sqlalchemy import SQLAlchemy
 from config import DevelopmentConfig 
 from models import db
@@ -19,6 +22,7 @@ from compras import compra_bp
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
+
 
 # Blueprint register
 app.register_blueprint(autenticacion_bp)
@@ -41,4 +45,6 @@ def index():
     return render_template("inicio.html")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+	with app.app_context():
+		db.create_all()
+	app.run(debug=True)
