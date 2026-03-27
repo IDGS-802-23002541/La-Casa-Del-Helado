@@ -18,201 +18,132 @@
     <div id="page-compras" class="p-6 flex justify-center">
 
         <!-- Modal -->
-        <form method="POST" 
+        <form method="POST"
           class="bg-white rounded-[20px] shadow-2xl w-full max-w-[560px] overflow-hidden"
         >
-          <!-- ── Header oscuro ── -->
+          <!-- HEADER -->
           <div class="bg-dark px-6 pt-6 pb-5">
             <div class="font-display text-2xl text-white mb-1">
               Registrar Entrada
             </div>
             <div class="text-xs text-white/60">
-              Completa los campos para registrar la entrada de mercancía al
-              sistema
+              Completa los campos para registrar la entrada de mercancía
             </div>
           </div>
 
-          <!-- ── Body ── -->
+          <!-- BODY -->
           <div class="px-6 py-5 flex flex-col gap-3.5">
-            <!-- INFORMACIÓN GENERAL -->
-            <p
-              class="text-[10px] font-black tracking-[1.2px] text-muted uppercase"
-            >
-              Información General
-            </p>
 
-            <!-- Número de factura -->
+            <!-- FACTURA -->
             <div class="flex flex-col gap-1.5">
               <label class="text-[11px] font-extrabold text-brand-text">
-                Número de factura / referencia
-                <span class="text-orange">*</span>
+                Número de factura <span class="text-orange">*</span>
               </label>
               <input
                 type="text"
-                id="factura"
+                name="factura"
+                value="{{ compra_form.factura.data or '' }}"
                 placeholder="Ej. FAC-2026-0042"
-                class="font-sans text-sm text-brand-text bg-cream border border-border rounded-[11px] px-3 py-2.5 w-full outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 focus:bg-white transition-all"
+                class="input-style"
               />
             </div>
 
-            <!-- Proveedor -->
+            <!-- PROVEEDOR -->
             <div class="flex flex-col gap-1.5">
               <label class="text-[11px] font-extrabold text-brand-text">
                 Proveedor <span class="text-orange">*</span>
               </label>
-              <select
-                id="proveedor"
-                class="custom-select font-sans text-sm text-brand-text border border-border rounded-[11px] px-3 py-2.5 w-full outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 transition-all cursor-pointer"
-              >
+              <select name="idProveedor" class="custom-select">
                 <option value="">— Seleccionar proveedor —</option>
-                <option>Lácteos del Norte</option>
-                <option>Frutería El Vergel</option>
-                <option>Insumos Criollo</option>
-                <option>Distribuidora Azúcar SA</option>
-                <option>Empaques y Paletas MX</option>
-                <option>Otro</option>
+                {% for id, nombre in compra_form.idProveedor.choices %}
+                  <option value="{{ id }}"
+                    {% if compra_form.idProveedor.data == id %}selected{% endif %}
+                  >
+                    {{ nombre }}
+                  </option>
+                {% endfor %}
               </select>
             </div>
 
-            <!-- Divider -->
             <hr class="h-px bg-border border-0 my-0.5" />
 
-            <!-- PRODUCTOS RECIBIDOS -->
-            <p
-              class="text-[10px] font-black tracking-[1.2px] text-muted uppercase"
-            >
-              Productos Recibidos
-            </p>
+            <!-- PRODUCTO -->
+            <div class="flex flex-col gap-2.5">
 
-            <!-- Product lines container -->
-            <div id="productLines" class="flex flex-col gap-3">
-              <!-- Línea de producto #1 -->
-              <div
-                class="flex gap-2.5 items-start bg-cream rounded-xl p-3 border border-border relative"
+              <!-- Materia Prima -->
+              <select name="idMateriaPrima" class="custom-select">
+                <option value="">— Seleccionar producto —</option>
+                {% for id, nombre in detalle_form.idMateriaPrima.choices %}
+                  <option value="{{ id }}">{{ nombre }}</option>
+                {% endfor %}
+              </select>
+
+              <!-- Presentaicon -->
+              <select name="contenidoNeto" class="custom-select">
+                <option value="">— Seleccionar presentación —</option>
+              </select>
+
+              <!-- Cantidad -->
+               <input
+                type="number"
+                name="cantidad"
+                step="1"
+                placeholder="Cantidad"
+                class="input-style"
+              />
+
+              <!-- Precio -->
+              <input
+                type="number"
+                name="precio"
+                step="0.01"
+                placeholder="Precio"
+                class="input-style"
+              />
+
+              <!-- BOTÓN AGREGAR -->
+              <button
+                type="submit"
+                name="accion"
+                value="agregar_detalle"
+                class="btn-secondary"
               >
-                <!-- Número de línea -->
-                <span
-                  class="bg-orange text-white text-[10px] font-black px-2 py-0.5 rounded-[7px] mt-[22px] shrink-0"
-                >
-                  #1
-                </span>
+                + Agregar producto
+              </button>
 
-                <!-- Campos -->
-                <div class="flex-1 flex flex-col gap-2.5">
-                  <!-- Producto recibido -->
-                  <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-extrabold text-brand-text">
-                      Producto recibido <span class="text-orange">*</span>
-                    </label>
-                    <select
-                      class="custom-select font-sans text-sm text-brand-text border border-border rounded-[11px] px-3 py-2.5 w-full outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 transition-all cursor-pointer"
-                    >
-                      <option value="">— Seleccionar —</option>
-                      <optgroup label="Lácteos">
-                        <option>Leche entera</option>
-                        <option>Crema para batir</option>
-                        <option>Leche condensada</option>
-                        <option>Leche evaporada</option>
-                      </optgroup>
-                      <optgroup label="Frutas y saborizantes">
-                        <option>Pulpa de fresa</option>
-                        <option>Pulpa de mango</option>
-                        <option>Pulpa de tamarindo</option>
-                        <option>Pulpa de guanábana</option>
-                        <option>Esencia de vainilla</option>
-                        <option>Cacao en polvo</option>
-                      </optgroup>
-                      <optgroup label="Azúcares y bases">
-                        <option>Azúcar blanca</option>
-                        <option>Glucosa líquida</option>
-                        <option>Estabilizante para helado</option>
-                      </optgroup>
-                      <optgroup label="Empaque">
-                        <option>Palitos de madera</option>
-                        <option>Bolsas para paleta</option>
-                        <option>Conos de barquillo</option>
-                        <option>Vasos desechables</option>
-                        <option>Tapas para vaso</option>
-                      </optgroup>
-                      <option>Otro</option>
-                    </select>
-                  </div>
-
-                  <!-- Cantidad + Presentación -->
-                  <div class="grid grid-cols-2 gap-3">
-                    <div class="flex flex-col gap-1.5">
-                      <label class="text-[11px] font-extrabold text-brand-text">
-                        Cantidad <span class="text-orange">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        placeholder="0"
-                        min="0"
-                        step="0.1"
-                        class="font-sans text-sm text-brand-text bg-cream border border-border rounded-[11px] px-3 py-2.5 w-full outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 focus:bg-white transition-all"
-                      />
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                      <label class="text-[11px] font-extrabold text-brand-text">
-                        Presentación <span class="text-orange">*</span>
-                      </label>
-                      <select
-                        class="custom-select font-sans text-sm text-brand-text border border-border rounded-[11px] px-3 py-2.5 w-full outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 transition-all cursor-pointer"
-                      >
-                        <option value="">— Seleccionar —</option>
-                        <option>Galón (3.8 L)</option>
-                        <option>Cartón 1 L</option>
-                        <option>Bolsa 1 kg</option>
-                        <option>Bolsa 500 g</option>
-                        <option>Lata 800 g</option>
-                        <option>Caja 12 pzas</option>
-                        <option>Unidades</option>
-                        <option>Litros</option>
-                        <option>Kilogramos</option>
-                        <option>Paquete</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <!-- /Campos -->
-
-                <!-- Botón eliminar línea -->
-                <button
-                  onclick="removeLine(this)"
-                  title="Eliminar"
-                  class="w-7 h-7 rounded-lg border border-[#FFD0D0] bg-[#FFF0F0] text-[#E06060] text-sm cursor-pointer flex items-center justify-center mt-[22px] shrink-0 hover:bg-[#FFD8D8] hover:border-[#E06060] transition-all"
-                >
-                  ✕
-                </button>
-              </div>
-              <!-- /Línea #1 -->
             </div>
-            <!-- /productLines -->
 
-            <!-- Agregar producto -->
-            <button
-              onclick="addLine()"
-              class="w-full py-2.5 border-2 border-dashed border-border rounded-xl bg-transparent font-sans text-xs font-extrabold text-muted cursor-pointer hover:border-orange hover:text-orange hover:bg-orange-light transition-all"
-            >
-              + Agregar otro producto
-            </button>
+            <!-- LISTA DE PRODUCTOS AGREGADOS -->
+            {% if detalles %}
+              <div class="mt-3">
+                <p class="text-xs font-bold">Productos agregados:</p>
+
+                {% for d in detalles %}
+                  <div class="bg-cream p-2 rounded">
+                    {{ d.nombre }} - {{ d.cantidad }} {{ d.contenidoNeto }} x ${{ d.precio }}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
           </div>
-          <!-- /.cp-modal-body -->
 
-          <!-- ── Footer ── -->
+          <!-- FOOTER -->
           <div class="px-6 pb-5 pt-4 flex gap-3 border-t border-border">
-            <button
-              onclick="resetForm()"
-              class="flex-1 py-3 bg-white border border-border rounded-xl font-sans text-sm font-extrabold text-muted cursor-pointer hover:border-muted hover:text-brand-text transition-all"
-            >
+
+            <button type="reset" class="flex-1 btn-cancel">
               Cancelar
             </button>
+
             <button
-              onclick="saveCompra()"
-              class="flex-[2] py-3 bg-orange border-0 rounded-xl font-display text-base text-white cursor-pointer shadow-[0_4px_14px_rgba(255,107,53,0.35)] hover:bg-[#E85C28] hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(255,107,53,0.45)] transition-all"
+              type="submit"
+              name="accion"
+              value="guardar_compra"
+              class="flex-[2] btn-primary"
             >
-              Guardar
+              Guardar compra
             </button>
+
           </div>
         </form>
         <!-- /.cp-modal -->
@@ -224,49 +155,24 @@
   
     <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
     <script>
-      /* ─── Lógica del formulario ─── */
-      let lineCount = 1;
+      document.querySelector('[name="idMateriaPrima"]').addEventListener('change', function () {
+          const idMateria = this.value;
 
-      function removeLine(btn) {
-        const lines = document.querySelectorAll("#productLines > div");
-        if (lines.length > 1) btn.closest("div.flex").remove();
-        renumberLines();
-      }
+          fetch(`/get_presentaciones/${idMateria}`)
+              .then(res => res.json())
+              .then(data => {
+                  const select = document.querySelector('[name="contenidoNeto"]');
+                  select.innerHTML = '<option value="">— Seleccionar —</option>';
 
-      function renumberLines() {
-        document
-          .querySelectorAll("#productLines .bg-orange.text-white")
-          .forEach((el, i) => {
-            el.textContent = `#${i + 1}`;
-          });
-      }
-
-      function addLine() {
-        lineCount++;
-        const container = document.getElementById("productLines");
-        const first = container.querySelector("div.flex");
-        const clone = first.cloneNode(true);
-        clone.querySelector(".bg-orange.text-white").textContent =
-          `#${lineCount}`;
-        clone
-          .querySelectorAll("input, select")
-          .forEach((el) => (el.value = ""));
-        container.appendChild(clone);
-      }
-
-      function resetForm() {
-        document.getElementById("factura").value = "";
-        document.getElementById("proveedor").value = "";
-        const container = document.getElementById("productLines");
-        while (container.children.length > 1) container.lastChild.remove();
-        container.querySelector("input[type=number]").value = "";
-        container.querySelectorAll("select").forEach((s) => (s.value = ""));
-        setStatus("activo");
-      }
-
-      function saveCompra() {
-        alert("¡Compra guardada!");
-      }
+                  data.presentaciones.forEach(p => {
+                      const option = document.createElement("option");
+                      option.value = p[0];
+                      option.textContent = p[1];
+                      select.appendChild(option);
+                  });
+              });
+      });
+      
     </script>
 
 {% endblock %}

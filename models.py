@@ -57,19 +57,56 @@ class Proveedor(db.Model):
     direccion = db.Column(db.String(200), nullable=False)
     estatus = db.Column(db.String(20), default='Activo')
 
-    # compras = db.relationship('Compra', backref='proveedor', lazy=True)
+    compras = db.relationship('Compra', back_populates='proveedor', lazy=True)
 
-    def __repr__(self):
-        return f'<Proveedor {self.razonSocial}>'
 
 class Compra(db.Model):
     __tablename__='compra'
 
     id=db.Column(db.Integer, primary_key=True)
     factura=db.Column(db.String(50))
-    fechaCompra=db.Column(db.Date, default=datetime.datetime.now)
-    idProveedor=db.Column(db.Integer)
-    idUsuario=db.Column(db.Integer)
+    fechaCompra=db.Column(db.Date, default=datetime.date.today)
+    idProveedor=db.Column(db.Integer, db.ForeignKey('proveedor.id'), nullable=False)
+    idUsuario=db.Column(db.Integer,db.ForeignKey('usuario.id'), nullable=False)
 
-    proveedor=db.relationship('Proveedor', back_populates='compra')
+    proveedor = db.relationship('Proveedor', back_populates='compras')
+    usuario = db.relationship('Usuario', backref='compras')
+
+    detalles_compra = db.relationship('DetalleCompra', back_populates='compra')
     
+class DetalleCompra(db.Model):
+    __tablename__='detalle_compra'
+
+    id=db.Column(db.Integer, primary_key=True)
+    idCompra=db.Column(db.Integer, db.ForeignKey('compra.id'), nullable=False)
+    idMateriaPrima=db.Column(db.Integer, db.ForeignKey('materia_prima.id'), nullable=False)
+    cantidad=db.Column(db.Float, nullable=False)
+    contenidoNeto=db.Column(db.String(20))
+    precio=db.Column(db.Float, nullable=False)
+
+    compra = db.relationship('Compra', back_populates='detalles_compra')
+    materiaPrima=db.relationship('MateriaPrima', back_populates='detalles_compra')
+
+class MateriaPrima(db.Model):
+    __tablename__ = 'materia_prima'
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    unidadBase = db.Column(db.String(20), nullable=False)  # kg, litros, piezas
+    stockActual = db.Column(db.Float, default=0)
+    stockMinimo = db.Column(db.Float, default=0)
+    idCategoria=db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
+
+    categoria = db.relationship('Categoria', back_populates='materias_primas')
+    detalles_compra = db.relationship('DetalleCompra', back_populates='materiaPrima')
+
+    def __repr__(self):
+        return f'<MateriaPrima {self.nombre}>'
+    
+class Categoria(db.Model):
+    __tablename__='categoria'
+
+    id=db.Column(db.Integer, primary_key=True)
+    nombre=db.Column(db.String(100), nullable=False)
+
+    materias_primas=db.relationship('MateriaPrima', back_populates='categoria')
