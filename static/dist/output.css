@@ -1693,8 +1693,8 @@
     max-width: var(--container-4xl);
   }
 
-  .max-w-\[560px\] {
-    max-width: 560px;
+  .max-w-\[300px\] {
+    max-width: 300px;
   }
 
   .max-w-sm {

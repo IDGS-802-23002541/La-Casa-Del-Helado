@@ -10,3 +10,5 @@ env/
 Thumbs.db
 
 config.py
+
+static/dist/
