@@ -1,6 +1,6 @@
 from flask_security import UserMixin, RoleMixin
 from flask_sqlalchemy import SQLAlchemy
-import datetime 
+import datetime
 
 db= SQLAlchemy()    
 
@@ -98,3 +98,15 @@ class Producto(db.Model):
     idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
 
     categoria = db.relationship('Categoria', foreign_keys=[idCategoria])
+
+class Compra(db.Model):
+    __tablename__='compra'
+
+    id=db.Column(db.Integer, primary_key=True)
+    factura=db.Column(db.String(50))
+    fechaCompra=db.Column(db.Date, default=datetime.datetime.now)
+    idProveedor=db.Column(db.Integer)
+    idUsuario=db.Column(db.Integer)
+
+    proveedor=db.relationship('Proveedor', back_populates='compra')
+    

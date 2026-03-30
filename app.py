@@ -14,11 +14,11 @@ from produccion import produccion_bp
 from venta import venta_bp
 from recetas import receta_bp
 from usuarios import usuarios_bp
+from compras import compra_bp
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 
-db.init_app(app)
 
 # Blueprint register
 app.register_blueprint(autenticacion_bp)
@@ -31,6 +31,7 @@ app.register_blueprint(proveedores)
 app.register_blueprint(venta_bp)
 app.register_blueprint(receta_bp)
 app.register_blueprint(usuarios_bp)
+app.register_blueprint(compra_bp)
 
 @app.route("/", methods=['POST', 'GET'])
 def index():
