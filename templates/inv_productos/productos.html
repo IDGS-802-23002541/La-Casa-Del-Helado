@@ -1,5 +1,139 @@
-{% extends "layout.html" %} {% block container %}
+{% extends "base.html" %}
+{% block title %}Productos — La Casa del Helado{% endblock %}
 
-<p class="text-amber-600">INVENTARIO PRODUCTOS :D</p>
+{% block body %}
+  {% include 'navbar.html' %}
 
+  <div class="app-body has-panel">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sb-section">Inventario</div>
+      <a href="{{ url_for('producto.index') }}" class="sb-item active">
+        🍦 Productos
+        <span class="sb-badge">{{ total }}</span>
+      </a>
+
+      <div class="sb-divider"></div>
+      <div class="sb-section">Filtrar por categoría</div>
+
+      <a href="{{ url_for('producto.index', busqueda=busqueda) }}"
+         class="sb-item {{ 'active-teal' if not idCategoria }}">
+        📋 Todas
+      </a>
+      {% for c in categorias %}
+      <a href="{{ url_for('producto.index', idCategoria=c.id, busqueda=busqueda) }}"
+         class="sb-item {{ 'active-teal' if idCategoria == c.id|string }}">
+        {{ c.nombre }}
+      </a>
+      {% endfor %}
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="page-hdr">
+        <div>
+          <h1>Productos</h1>
+          <p>Inventario de productos terminados</p>
+        </div>
+        <a href="{{ url_for('producto.index') }}" class="btn-primary">
+          + Nuevo
+        </a>
+      </div>
+
+      <!-- BUSCADOR -->
+      <form method="GET" action="{{ url_for('producto.index') }}">
+        <input type="text" name="busqueda" value="{{ busqueda }}" placeholder="Buscar producto..."/>
+        <input type="hidden" name="idCategoria" value="{{ idCategoria }}"/>
+        <button type="submit">Buscar</button>
+      </form>
+
+      <!-- TABLA -->
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Unidad</th>
+            <th>Stock actual</th>
+            <th>Stock mínimo</th>
+            <th>Costo unitario</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in productos %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ p.nombre }}</td>
+            <td>{{ p.categoria.nombre if p.categoria else '-' }}</td>
+            <td>{{ p.unidadBase }}</td>
+            <td>
+              {% if p.stockActual <= p.stockMinimo %}
+                <span class="status-badge s-bajo">{{ p.stockActual }}</span>
+              {% else %}
+                {{ p.stockActual }}
+              {% endif %}
+            </td>
+            <td>{{ p.stockMinimo }}</td>
+            <td>${{ p.costoUnitario }}</td>
+            <td>
+              <a href="{{ url_for('producto.index', edit=p.id) }}" class="action-btn ab-editar">Editar</a>
+              <form method="POST"
+                    action="{{ url_for('producto.eliminar', id=p.id) }}"
+                    style="display:inline;">
+                <button type="submit" class="action-btn ab-eliminar">Eliminar</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </main>
+
+    <!-- PANEL DERECHO -->
+    <aside class="right-panel">
+      <h3>{{ 'Editar Producto' if prod_editar else 'Nuevo Producto' }}</h3>
+
+      <form method="POST"
+            action="{{ url_for('producto.editar', id=prod_editar.id) if prod_editar else url_for('producto.crear') }}">
+
+        <label>Nombre</label>
+        <input type="text" name="nombre"
+               value="{{ prod_editar.nombre if prod_editar else '' }}"/>
+
+        <label>Unidad base</label>
+        <input type="text" name="unidadBase"
+               value="{{ prod_editar.unidadBase if prod_editar else '' }}"/>
+
+        <label>Stock actual</label>
+        <input type="number" step="0.01" name="stockActual"
+               value="{{ prod_editar.stockActual if prod_editar else '' }}"/>
+
+        <label>Stock mínimo</label>
+        <input type="number" step="0.01" name="stockMinimo"
+               value="{{ prod_editar.stockMinimo if prod_editar else '' }}"/>
+
+        <label>Costo unitario</label>
+        <input type="number" step="0.01" name="costoUnitario"
+               value="{{ prod_editar.costoUnitario if prod_editar else '' }}"/>
+
+        <label>Categoría</label>
+        <select name="idCategoria">
+          <option value="">-Selecciona categoria-</option>
+          {% for c in categorias %}
+            <option value="{{ c.id }}"
+              {{ 'selected' if prod_editar and prod_editar.idCategoria == c.id }}>
+              {{ c.nombre }}
+            </option>
+          {% endfor %}
+        </select>
+
+        <br/><br/>
+        <button type="submit">Guardar</button>
+      </form>
+    </aside>
+
+  </div>
 {% endblock %}

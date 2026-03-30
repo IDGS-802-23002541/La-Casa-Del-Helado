@@ -1,67 +1,142 @@
-{% extends "layout.html" %} {% block container %}
+{% extends "base.html" %}
+{% block title %}Usuarios — La Casa del Helado{% endblock %}
 
-<a href="{{ url_for('auth.logout') }}" class="text-red-600 hover:underline">Cerrar sesión</a>
+{% block body %}
+  {% include 'navbar.html' %}
 
-<div class="">
-    <p> Total de usuarios activos</p>
-    <p> Activos </p>
-    {{ usuario | selectattr('estatus') | list | length }}
-</div>
+  <div class="app-body has-panel">
 
-<div class="">
-    <p> Inactivos </p>
-    {{ todos | rejectattr('estatus') | list | length }}
-</div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sb-section">Administración</div>
+      <a href="{{ url_for('usuarios.index') }}" class="sb-item active">
+        👤 Usuarios
+        <span class="sb-badge">{{ total }}</span>
+      </a>
 
-<td class="px-6 py-4 text-center">
-    <a href="{{url_for('usuarios.crear')}}" class="text-green-600 hover:underline">Crear Usuario</a>
-</td> 
+      <div class="sb-divider"></div>
+      <div class="sb-section">Filtrar por estatus</div>
 
-<form method="GET" action="{{ url_for('usuarios.index') }}">
-  <input type="text" name="busqueda" value="{{ busqueda }}" placeholder="Buscar usuario...">
-  
-  <select name="idRol">
-    <option value="">Todos los roles</option>
-    {% for r in roles %}
-      <option value="{{ r.id }}" {% if idRol == r.id|string %}selected{% endif %}>{{ r.nombre }}</option>
-    {% endfor %}
-  </select>
+      <a href="{{ url_for('usuarios.index', busqueda=busqueda, idRol=idRol) }}"
+         class="sb-item {{ 'active-teal' if not request.args.get('estatus') }}">
+        📋 Todos
+      </a>
+      <a href="{{ url_for('usuarios.index', estatus='activo', busqueda=busqueda, idRol=idRol) }}"
+         class="sb-item {{ 'active-teal' if request.args.get('estatus') == 'activo' }}">
+        ✅ Activos
+      </a>
+      <a href="{{ url_for('usuarios.index', estatus='inactivo', busqueda=busqueda, idRol=idRol) }}"
+         class="sb-item {{ 'active-teal' if request.args.get('estatus') == 'inactivo' }}">
+        ⏸ Inactivos
+      </a>
+    </aside>
 
-  <button type="submit">Buscar</button>
-</form>
+    <!-- MAIN -->
+    <main class="main">
+      <div class="page-hdr">
+        <div>
+          <h1>Usuarios</h1>
+          <p>Administración de usuarios del sistema</p>
+        </div>
+        <a href="{{ url_for('usuarios.index') }}" class="btn-primary">
+          + Nuevo
+        </a>
+      </div>
 
-<table>
-    <thead> 
-        <tr>
+      <!-- BUSCADOR -->
+      <form method="GET" action="{{ url_for('usuarios.index') }}">
+        <input type="text" name="busqueda" value="{{ busqueda }}" placeholder="Buscar usuario..."/>
+        <select name="idRol">
+          <option value="">Todos los roles</option>
+          {% for r in roles %}
+            <option value="{{ r.id }}" {{ 'selected' if idRol == r.id|string }}>
+              {{ r.nombre }}
+            </option>
+          {% endfor %}
+        </select>
+        <button type="submit">Buscar</button>
+      </form>
+
+      <!-- TABLA -->
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
             <th>Nombre</th>
-            <th>Fecha Ingreso</th>
+            <th>Usuario</th>
+            <th>Rol</th>
+            <th>Fecha ingreso</th>
             <th>Estatus</th>
             <th>Acciones</th>
-         </tr>
-    </thead>
-    <tbody>
-        {% for u in usuario %}
-        <tr>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in usuarios %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ u.persona.nombre }} {{ u.persona.apellido }}</td>
+            <td>{{ u.nombreUsuario }}</td>
+            <td>{{ u.rol.nombre if u.rol else '—' }}</td>
+            <td>{{ u.fechaIngreso }}</td>
+            <td>{{ 'Activo' if u.estatus else 'Inactivo' }}</td>
             <td>
-                {{u.nombreUsuario}}
-            </td>
-            <td>
-                {{u.fechaIngreso}}
-            </td>           
-            <td>
-                {{u.estatus}}
-            </td>     
-     
-            <td class="px-6 py-4 text-center">
-                <a href="{{url_for('usuarios.editar',id=u.id)}}" class="text-green-600 hover:underline">Editar</a>
-            </td>      
-            <td class="px-6 py-4 text-center">
-                <a href="{{ url_for('usuarios.eliminar', id=u.id) }}" class="text-red-600 hover:underline">Eliminar</a>
-            </td>     
-           
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+              <a href="{{ url_for('usuarios.index', edit=u.id) }}" class="action-btn ab-editar">Editar</a>
 
+              <form method="POST"
+                    action="{{ url_for('usuarios.eliminar', id=u.id) }}"
+                    style="display:inline;">
+                <button type="submit" class="action-btn ab-eliminar">Eliminar</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </main>
+
+    <!-- PANEL DERECHO -->
+    <aside class="right-panel">
+      <h3>{{ 'Editar Usuario' if usr_editar else 'Nuevo Usuario' }}</h3>
+
+      <form method="POST"
+            action="{{ url_for('usuarios.editar', id=usr_editar.id) if usr_editar else url_for('usuarios.crear') }}">
+
+        <label>Nombre</label>
+        <input type="text" name="nombre"
+               value="{{ usr_editar.persona.nombre if usr_editar else '' }}"/>
+
+        <label>Apellido</label>
+        <input type="text" name="apellido"
+               value="{{ usr_editar.persona.apellido if usr_editar else '' }}"/>
+
+        <label>Nombre de usuario</label>
+        <input type="text" name="nombreUsuario"
+               value="{{ usr_editar.nombreUsuario if usr_editar else '' }}"/>
+
+        <label>Contraseña</label>
+        <input type="password" name="password"/>
+
+        <label>Rol</label>
+        <select name="idRol">
+          {% for r in roles %}
+            <option value="{{ r.id }}"
+              {{ 'selected' if usr_editar and usr_editar.idRol == r.id }}>
+              {{ r.nombre }}
+            </option>
+          {% endfor %}
+        </select>
+
+        <label>Estatus</label>
+        <select name="estatus">
+          <option value="">-Selecciona categoria-</option>
+          <option value="true"  {{ 'selected' if not usr_editar or usr_editar.estatus }}>Activo</option>
+          <option value="false" {{ 'selected' if usr_editar and not usr_editar.estatus }}>Inactivo</option>
+        </select>
+
+        <br/><br/>
+        <button type="submit">Guardar</button>
+      </form>
+    </aside>
+
+  </div>
 {% endblock %}

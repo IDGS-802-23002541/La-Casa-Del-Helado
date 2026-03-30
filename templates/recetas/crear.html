@@ -1,0 +1,128 @@
+{% extends "layout.html" %} {% block container %}
+
+<!-- ── Page header ── -->
+<div class="page-hdr fade-up">
+  <div class="page-hdr-left">
+    <h1>Nueva Receta</h1>
+    <p>Completa los datos de la receta y agrega sus ingredientes</p>
+  </div>
+  <a href="{{ url_for('recetas.index') }}" class="btn-cancel" style="padding:10px 18px; border-radius:22px; text-decoration:none;">
+    ← Volver
+  </a>
+</div>
+
+<form method="POST" action="{{ url_for('recetas.crear') }}">
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start;">
+
+    <!-- ── Columna izquierda: datos generales ── -->
+    <div class="table-wrap fade-up-1" style="padding:20px 22px;">
+
+      <div class="fsec">Datos generales</div>
+
+      <!-- Nombre -->
+      <div class="fg">
+        {{ form.nombre.label }}
+        {{ form.nombre(placeholder="Ej. Helado de fresa 1L") }}
+        {% if form.nombre.errors %}
+          {% for e in form.nombre.errors %}
+            <span class="field-error show">{{ e }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <!-- Producto -->
+      <div class="fg">
+        {{ form.idProducto.label }}
+        {{ form.idProducto() }}
+        {% if form.idProducto.errors %}
+          {% for e in form.idProducto.errors %}
+            <span class="field-error show">{{ e }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <!-- Cantidad producida -->
+      <div class="fg">
+        {{ form.cantidadProducida.label }}
+        {{ form.cantidadProducida(placeholder="Ej. 10.00") }}
+        {% if form.cantidadProducida.errors %}
+          {% for e in form.cantidadProducida.errors %}
+            <span class="field-error show">{{ e }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- ── Columna derecha: ingredientes ── -->
+    <div class="table-wrap fade-up-2" style="padding:20px 22px;">
+
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+        <span class="fsec" style="margin:0; flex:1;">Ingredientes</span>
+        <button type="button" class="btn-primary-teal" onclick="agregarIngrediente()"
+          style="padding:6px 14px; border-radius:10px; font-size:11px;">
+          ＋ Agregar
+        </button>
+      </div>
+
+      <div id="ingredientes-lista" style="display:flex; flex-direction:column; gap:8px;">
+        <!-- filas dinámicas -->
+      </div>
+
+      <p id="ingredientes-vacio" style="color:var(--light-text); font-size:12px; text-align:center; padding:20px 0;">
+        Sin ingredientes aún. Agrega uno con el botón.
+      </p>
+
+    </div>
+
+  </div>
+
+  <!-- ── Botones ── -->
+  <div class="fade-up-3" style="display:flex; justify-content:flex-end; gap:10px; margin-top:4px;">
+    <a href="{{ url_for('recetas.index') }}" class="btn-cancel" style="padding:10px 22px; border-radius:22px; text-decoration:none;">
+      Cancelar
+    </a>
+    <button type="submit" class="btn-primary">
+      Guardar receta
+    </button>
+  </div>
+
+</form>
+
+{% block extra_js %}
+<script>
+  let contador = 0;
+
+  function agregarIngrediente() {
+    contador++;
+    const lista = document.getElementById('ingredientes-lista');
+    const vacio = document.getElementById('ingredientes-vacio');
+    vacio.style.display = 'none';
+
+    const fila = document.createElement('div');
+    fila.id = `ingrediente-${contador}`;
+    fila.style.cssText = 'display:grid; grid-template-columns:1fr 80px 80px 28px; gap:6px; align-items:center;';
+    fila.innerHTML = `
+      <input type="text"   name="mp_nombre"   placeholder="Nombre ingrediente" style="margin:0;" />
+      <input type="hidden" name="mp_id"        value="0" />
+      <input type="number" name="mp_cantidad"  placeholder="Cant." step="0.01" min="0" style="margin:0;" />
+      <input type="text"   name="mp_unidad"    placeholder="Und." style="margin:0;" />
+      <button type="button" onclick="quitarIngrediente(${contador})"
+        style="background:var(--blush); color:var(--coral-dark); border:none; border-radius:8px;
+               width:28px; height:28px; font-size:14px; cursor:pointer; flex-shrink:0;">✕</button>
+    `;
+    lista.appendChild(fila);
+  }
+
+  function quitarIngrediente(id) {
+    const fila = document.getElementById(`ingrediente-${id}`);
+    if (fila) fila.remove();
+    const lista = document.getElementById('ingredientes-lista');
+    const vacio = document.getElementById('ingredientes-vacio');
+    if (lista.children.length === 0) vacio.style.display = 'block';
+  }
+</script>
+{% endblock %}
+
+{% endblock %}

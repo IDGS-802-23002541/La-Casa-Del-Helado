@@ -3,10 +3,6 @@ from flask_security import Security, SQLAlchemyUserDatastore
 from config import DevelopmentConfig
 from models import db, Usuario, Rol 
 
-from flask_sqlalchemy import SQLAlchemy
-from config import DevelopmentConfig 
-from models import db
-
 # Rutas en Blueprint
 from proveedores.routes import proveedores
 from autenticacion import autenticacion_bp
@@ -35,9 +31,6 @@ app.register_blueprint(proveedores)
 app.register_blueprint(venta_bp)
 app.register_blueprint(receta_bp)
 app.register_blueprint(usuarios_bp)
-
-
-db.init_app(app)
 
 @app.route("/", methods=['POST', 'GET'])
 def index():

@@ -14,14 +14,12 @@ class Rol(db.Model, RoleMixin):
     def name(self):
         return self.nombre
     
-
 class Persona(db.Model):
     __tablename__='persona'
 
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
     apellido = db.Column(db.String(100), nullable=False)
-   
 class Usuario(db.Model, UserMixin):
     __tablename__='usuario'
 
@@ -45,7 +43,6 @@ class Usuario(db.Model, UserMixin):
     @property
     def active(self):
         return self.estatus
-    
 
 class Proveedor(db.Model):
     __tablename__ = 'proveedor'
@@ -61,3 +58,43 @@ class Proveedor(db.Model):
 
     def __repr__(self):
         return f'<Proveedor {self.razonSocial}>'
+
+class Receta(db.Model):
+    __tablename__ = 'receta'
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    idProducto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=True)
+    cantidadProducida = db.Column(db.Numeric(10,2), nullable=False)
+    estatus = db.Column(db.Boolean, default=True, nullable=False)
+
+    producto = db.relationship('Producto', backref='recetas', passive_deletes=True)
+    detalles = db.relationship('DetalleReceta', backref='receta', cascade='all, delete-orphan')
+
+class DetalleReceta(db.Model):
+    __tablename__ = 'detalle_receta'
+
+    id = db.Column(db.Integer, primary_key=True)
+    idReceta = db.Column(db.Integer, db.ForeignKey('receta.id'), nullable=False)
+    idMateriaPrima = db.Column(db.Integer, nullable=False)
+    cantidad = db.Column(db.Numeric(10,2), nullable=False)
+    unidad = db.Column(db.String(20), nullable=False)
+
+class Categoria(db.Model):
+    __tablename__ = 'categoria'
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False, unique=True)
+
+class Producto(db.Model): 
+    __tablename__ = 'producto'
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False, unique=True)
+    unidadBase = db.Column(db.String(20), nullable=False)
+    stockActual = db.Column(db.Numeric(10,2), nullable=False, default = 0)
+    stockMinimo = db.Column(db.Numeric(10,2), nullable=False, default = 0)
+    costoUnitario = db.Column(db.Numeric(10,2), nullable=False, default = 0)
+    idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
+
+    categoria = db.relationship('Categoria', foreign_keys=[idCategoria])
