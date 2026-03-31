@@ -3,7 +3,8 @@
 {% block title %}La Casa del Helado - Punto de Venta{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/punto_venta.css') }}">
+{# Usamos v=4.0 para forzar la carga de los estilos corregidos #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/punto_venta.css') }}?v=4.0">
 {% endblock %}
 
 {% block body %}
@@ -13,75 +14,120 @@
   <div class="left-panel">
     
     <div class="mode-switcher">
-      <button class="mode-btn active-vd" id="btnVD">🏪 Venta directa</button>
-      <button class="mode-btn" id="btnOL">🌐 Pedidos en línea</button>
+      <a href="{{ url_for('venta.punto_venta') }}" 
+         class="mode-btn {% if vista == 'vd' %}active-vd{% endif %}" style="text-decoration: none;">
+         🏪 Venta directa
+      </a>
+      <a href="{{ url_for('venta.pedidos_online') }}" 
+         class="mode-btn {% if vista == 'ol' %}active-ol{% endif %}" style="text-decoration: none;">
+         🌐 Pedidos en línea <span class="badge-dot"></span>
+      </a>
     </div>
 
-    <div id="panel-vd">
-      <form action="{{ url_for('venta.filtrar_productos') }}" method="GET" class="search-bar">
-        <span>🔍</span>
-        <input type="text" name="q" placeholder="Buscar sabor o producto..." value="{{ query_actual if query_actual }}">
-        {% if cat_actual %}
-            <input type="hidden" name="cat_id" value="{{ cat_actual }}">
-        {% endif %}
-        <button type="submit" style="display:none;">Buscar</button>
-      </form>
+    {# --- cambio de vistas --- #}
+    
+    {% if vista == 'vd' %}
+      <div id="panel-vd">
+        <form action="{{ url_for('venta.filtrar_productos') }}" method="GET" class="search-bar">
+          <span>🔍</span>
+          <input type="text" name="q" placeholder="Buscar sabor o producto..." value="{{ query_actual if query_actual }}">
+          {% if cat_actual %}<input type="hidden" name="cat_id" value="{{ cat_actual }}">{% endif %}
+          <button type="submit" style="display:none;">Buscar</button>
+        </form>
 
-      <div class="categories">
-        <a href="{{ url_for('venta.punto_venta') }}" 
-           class="pill {% if not cat_actual %}active{% endif %}">🍽 Todos</a>
+        <div class="categories">
+          <a href="{{ url_for('venta.punto_venta') }}" class="pill {% if not cat_actual %}active{% endif %}">🍽 Todos</a>
+          {% for cat in categorias %}
+            <a href="{{ url_for('venta.filtrar_productos', cat_id=cat.id, q=query_actual) }}" 
+               class="pill {% if cat_actual == cat.id %}active{% endif %}">
+               {{ cat.nombre }}
+            </a>
+          {% endfor %}
+        </div>
+
+        <div class="product-grid" id="productGrid">
+          {% for p in productos %}
+            {% set nombre_cat = p.relacion_categoria.nombre | lower if p.relacion_categoria else 'general' %}
+            {% if 'paleta' in nombre_cat %} {% set emoji, color_clase = '🍡', 'bg-mint' %}
+            {% elif 'cono' in nombre_cat %} {% set emoji, color_clase = '🍦', 'bg-peach' %}
+            {% elif 'vaso' in nombre_cat or 'nieve' in nombre_cat %} {% set emoji, color_clase = '🥤', 'bg-sky' %}
+            {% elif 'especial' in nombre_cat %} {% set emoji, color_clase = '⭐', 'bg-lavender' %}
+            {% elif 'leche' in nombre_cat %} {% set emoji, color_clase = '🍨', 'bg-yellow' %}
+            {% else %} {% set emoji, color_clase = '🍧', '' %} {% endif %}
+
+            <form action="{{ url_for('venta.vender_agregar') }}" method="POST" style="display: contents;">
+                <input type="hidden" name="idProducto" value="{{ p.id }}">
+                <button type="submit" class="card {{ color_clase }}" {% if p.stockActual <= 0 %}disabled style="opacity:0.7; cursor:not-allowed;"{% endif %}>
+                  <div class="card-badge {% if p.stockActual <= 0 %}badge-sinstock{% else %}badge-nuevo{% endif %}">
+                    {{ 'Agotado' if p.stockActual <= 0 else 'Disponible' }}
+                  </div>
+                  <div class="card-emoji">{{ emoji }}</div>
+                  <div class="card-name">{{ p.nombre }}</div>
+                  <div class="card-sub">Stock: {{ p.stockActual }}</div>
+                  <div class="card-footer">
+                    <span class="card-price">$35.00</span>
+                    <div class="btn-add">+</div>
+                  </div>
+                </button>
+            </form>
+          {% endfor %}
+        </div>
+      </div>
+{% else %}
+      {# --- PANEL DE PEDIDOS EN LÍNEA (DISEÑO FIGMA) --- #}
+      
+      <div id="panel-ol" style="padding: 25px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; background-color: #F9FAFB;">
         
-        {% for cat in categorias %}
-          <a href="{{ url_for('venta.filtrar_productos', cat_id=cat.id, q=query_actual) }}" 
-             class="pill {% if cat_actual == cat.id %}active{% endif %}">
-             {{ cat.nombre }}
-          </a>
-        {% endfor %}
+        <h1 style="font-weight: 800; color: #111827; font-size: 24px; margin-bottom: 25px; flex-shrink: 0;">Pedidos en línea</h1>
+
+        <div class="orders-list-figma" style="display: flex; flex-direction: column; gap: 20px;">
+          {% if pedidos_ol %}
+            {% for pedido in pedidos_ol %}
+              <div class="order-card-figma" style="background: white; border-radius: 12px; border-left: 6px solid {{ pedido.estado_color }}; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden;">
+                  
+                  <div style="padding: 20px 25px 15px;">
+                      <span style="font-size: 12px; font-weight: 700; color: #9CA3AF; letter-spacing: 0.5px;">{{ pedido.id_formateado }}</span>
+                      <div style="font-weight: 800; font-size: 20px; color: #111827; margin-top: 4px;">{{ pedido.cliente }}</div>
+                      
+                      <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 12px; color: #6B7280; font-size: 14px;">
+                          <div style="display: flex; align-items: center; gap: 8px;">
+                              <span>📞</span> {{ pedido.telefono }}
+                          </div>
+                      </div>
+                  </div>
+
+                  <div style="padding: 0 25px 20px; border-top: 1px solid #F3F4F6;">
+                      <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 5px; color: #374151; font-size: 15px; font-weight: 600;">
+                          {# CAMBIO CLAVE: Ahora usamos lista_productos para evitar el error de Python #}
+                          {% for producto in pedido.lista_productos %}
+                              <div>{{ producto }}</div>
+                          {% endfor %}
+                      </div>
+                  </div>
+
+                  {# Pie de tarjeta con color dinámico #}
+                  <div style="padding: 15px 25px; background-color: {{ pedido.estado_color }}10; border-top: 1px solid {{ pedido.estado_color }}20; text-align: center;">
+                      <button style="background: none; border: none; color: {{ pedido.estado_color }}; font-weight: 800; font-size: 14px; cursor: pointer; font-family: 'Nunito', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;">
+                          {% if pedido.estado_texto == 'Marcar listo' %}<span>✓</span>{% endif %}
+                          {{ pedido.estado_texto }}
+                      </button>
+                  </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div style="text-align: center; margin-top: 100px; opacity: 0.5;">
+                <div style="font-size: 60px;">📡</div>
+                <p style="font-weight: 800;">No hay pedidos en línea pendientes</p>
+            </div>
+          {% endif %}
+        </div>
       </div>
-
-      <div class="product-grid" id="productGrid">
-        {% for p in productos %}
-          {# Lógica de estilo por Categoría #}
-          {% set nombre_cat = p.relacion_categoria.nombre | lower if p.relacion_categoria else 'general' %}
-          
-          {% if 'paleta' in nombre_cat %} {% set emoji, color_clase = '🍡', 'bg-mint' %}
-          {% elif 'cono' in nombre_cat %} {% set emoji, color_clase = '🍦', 'bg-peach' %}
-          {% elif 'vaso' in nombre_cat or 'nieve' in nombre_cat %} {% set emoji, color_clase = '🥤', 'bg-sky' %}
-          {% elif 'especial' in nombre_cat %} {% set emoji, color_clase = '⭐', 'bg-lavender' %}
-          {% elif 'leche' in nombre_cat %} {% set emoji, color_clase = '🍨', 'bg-yellow' %}
-          {% else %} {% set emoji, color_clase = '🍧', '' %} {% endif %}
-
-          <form action="{{ url_for('venta.vender_agregar') }}" method="POST" style="display: contents;">
-              <input type="hidden" name="idProducto" value="{{ p.id }}">
-              
-              <button type="submit" class="card {{ color_clase }}" {% if p.stockActual <= 0 %}disabled style="opacity:0.7; cursor:not-allowed;"{% endif %}>
-                
-                {% if p.stockActual <= 0 %}
-                    <div class="card-badge badge-sinstock">Agotado</div>
-                {% elif p.stockActual <= 5 %}
-                    <div class="card-badge badge-popular">¡Últimos {{ p.stockActual }}!</div>
-                {% else %}
-                    <div class="card-badge badge-nuevo">Disponible</div>
-                {% endif %}
-
-                <div class="card-emoji">{{ emoji }}</div>
-                <div class="card-name">{{ p.nombre }}</div>
-                <div class="card-sub">Stock: {{ p.stockActual }}</div>
-                
-                <div class="card-footer">
-                  <span class="card-price">$35.00</span>
-                  <div class="btn-add">+</div>
-                </div>
-              </button>
-          </form>
-        {% endfor %}
-      </div>
-    </div>
+    {% endif %}
   </div>
 
   <div class="ticket-panel">
     <div class="ticket-header">
-      <div class="ticket-title">🧾 Ticket <span class="ticket-num">#{{ prox_venta_id if prox_venta_id else '001' }}</span></div>
+      <div class="ticket-title">🧾 Ticket <span class="ticket-num">#001</span></div>
       <form action="{{ url_for('venta.limpiar_ticket') }}" method="GET">
           <button type="submit" class="btn-limpiar">✕ Limpiar</button>
       </form>
@@ -109,19 +155,14 @@
     </div>
 
     <div class="ticket-footer">
-      <div class="subtotal-row">
-        <span>Subtotal</span>
-        <span>${{ total }}</span>
-      </div>
+      <div class="subtotal-row"><span>Subtotal</span><span>${{ total }}</span></div>
       <div class="total-row">
         <span class="total-label">TOTAL</span>
         <span class="total-amount">${{ total }}</span>
       </div>
-
       <div class="payment-methods">
         <button class="pay-btn selected" type="button">💵 Efectivo</button>
       </div>
-
       <form action="{{ url_for('venta.finalizar_venta') }}" method="POST">
           <button type="submit" class="btn-cobrar" {% if not carrito %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
             Cobrar ${{ total }}

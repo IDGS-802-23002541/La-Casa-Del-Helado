@@ -3,20 +3,21 @@ from models import db, Producto, Venta, DetalleVenta, Turno, Categoria
 from . import venta_bp 
 from datetime import datetime
 
-from flask import render_template, request, redirect, url_for, session
-from models import Producto, Categoria
-
 @venta_bp.route("/venta", methods=["GET"])
 def punto_venta():
-    productos = Producto.query.all()
+#  para que primero aparesca la vista principal osea 'vd'
+    vista = 'vd'
     categorias = Categoria.query.all()
+    productos = Producto.query.all() 
     carrito = session.get('carrito_pos', [])
     total_v = sum(float(item['subtotal']) for item in carrito)
     return render_template("punto_venta/venta.html", 
                            productos=productos, 
                            categorias=categorias, 
                            total=total_v, 
-                           carrito=carrito)
+                           carrito=carrito,
+                           vista=vista
+                           )
 
 @venta_bp.route("/venta/filtrar", methods=["GET"])
 def filtrar_productos():
@@ -88,7 +89,7 @@ def finalizar_venta():
             p = Producto.query.get(item['id'])
             if p:
                 if p.stockActual >= item['cantidad']:
-                    p.stockActual -= item['cantidad'] # Restamos del inventario        
+                    p.stockActual -= item['cantidad']         
                     detalle = DetalleVenta(
                         idProducto=item['id'],
                         idVenta=nueva_venta.id,
@@ -100,7 +101,6 @@ def finalizar_venta():
                     flash(f"Stock insuficiente para {p.nombre}")
                     db.session.rollback()
                     return redirect(url_for('venta.punto_venta'))
-
         db.session.commit()
         session.pop('carrito_pos', None)
     except Exception as e:
@@ -108,7 +108,43 @@ def finalizar_venta():
         print(f"Error: {e}")  
     return redirect(url_for('venta.punto_venta'))
 
+
 @venta_bp.route("/limpiar_ticket")
 def limpiar_ticket(): 
     session.pop('carrito_pos', None)
     return redirect(url_for('venta.punto_venta'))
+
+
+"""Ruta para los Pedidos que llegan en Línea SIMULADO"""
+
+@venta_bp.route("/pedidos_online", methods=["GET"])
+def pedidos_online():
+    # Datos simulachos de pedidos en línea
+    pedidos_ol = [
+        {
+            'id_formateado': '#PED-0041',
+            'cliente': 'Mariana García',
+            'telefono': '477 123 4567',
+            'lista_productos': ['Cono Doble', 'Paleta de Agua'],
+            'estado_texto': 'En preparación',
+            'estado_color': '#FB923C'
+        },
+        {
+            'id_formateado': '#PED-0040',
+            'cliente': 'Juan P.',
+            'telefono': '477 555 0000',
+            'lista_productos': ['1 Cono de Nuez'],
+            'estado_texto': 'Marcar listo',
+            'estado_color': '#10B981'
+        }
+    ]
+    
+    carrito = session.get('carrito_pos', [])
+    total_v = sum(float(item.get('subtotal', 0)) for item in carrito)
+
+    return render_template("punto_venta/venta.html", 
+                           pedidos_ol=pedidos_ol, 
+                           total=total_v, 
+                           carrito=carrito, 
+                           vista='ol'
+                        )
