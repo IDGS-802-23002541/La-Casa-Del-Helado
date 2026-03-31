@@ -78,5 +78,3 @@ class ProductoForm(Form):
         validators.DataRequired(message="El campo es requerido"), 
     ])
 
-
-

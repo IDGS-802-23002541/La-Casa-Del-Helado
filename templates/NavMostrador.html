@@ -1,0 +1,31 @@
+<nav class="navbar">
+  <a href="{{ url_for('venta.index') }}" class="nav-brand">
+    <div class="nav-brand-avatar">🍦</div>
+    <span class="nav-brand-name">La Casa del Helado</span>
+  </a>
+
+  <div class="nav-links">
+
+    {# <a href="{{ url_for('venta.index') }}"
+       class="nav-link {% if active_page == 'venta' %}active{% endif %}">
+      Venta Directa
+    </a> #}
+
+    {# <a href="{{ url_for('compra.index') }}"
+       class="nav-link {% if active_page == 'compras' %}active{% endif %}">
+      Compras Proveedores
+    </a> #}
+  </div>
+
+  <div class="nav-right">
+    <span class="nav-date">📅 {{ fecha_hoy }}</span>
+    <div class="nav-user-avatar"
+         title="{{ current_user.nombre }}">
+      {{ current_user.nombre[0] | upper if current_user.nombre else '?' }}
+    </div>
+    <a href="{{ url_for('auth.logout') }}" class="btn-logout"
+       style="width:auto; padding:6px 12px; border-radius:20px; font-size:11px; text-decoration:none;">
+      Salir
+    </a>
+  </div>
+</nav>

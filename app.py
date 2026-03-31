@@ -19,6 +19,10 @@ from compras import compra_bp
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 
+db.init_app(app)
+
+user_datastore = SQLAlchemyUserDatastore(db,Usuario,Rol)
+security = Security(app, user_datastore)
 
 # Blueprint register
 app.register_blueprint(autenticacion_bp)

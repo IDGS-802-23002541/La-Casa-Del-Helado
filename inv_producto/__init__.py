@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import db, Producto, Categoria
 import forms
+from flask_security.decorators import roles_accepted, login_required
 
 prod_bp = Blueprint(
     'producto',
@@ -9,6 +10,8 @@ prod_bp = Blueprint(
 )
 
 @prod_bp.route("/invproducto", methods=["GET"])
+@login_required
+@roles_accepted('Administrador')
 def index():
     
     edit_id = request.args.get('edit', type=int)
@@ -42,6 +45,8 @@ def index():
     return render_template("inv_productos/productos.html", productos=productos, categorias=categorias, total=total,prod_editar=prod_editar,form=create_from,busqueda=busqueda,idCategoria=idCategoria)
 
 @prod_bp.route("/invproducto/crear", methods=["POST"])
+@login_required
+@roles_accepted('Administrador')
 def crear():
     create_from = forms.ProductoForm(request.form)
     create_from.idCategoria.choices = [ (c.id, c.nombre) for c in Categoria.query.all()]
@@ -60,6 +65,8 @@ def crear():
     return redirect(url_for('producto.index'))
 
 @prod_bp.route("/invproducto/editar", methods=["GET", "POST"])
+@login_required
+@roles_accepted('Administrador')
 def editar():
     id = request.args.get('id')
     producto = Producto.query.filter_by(id=id).first()
@@ -79,6 +86,8 @@ def editar():
     return redirect(url_for('producto.index'))
     
 @prod_bp.route("/invproducto/eliminar", methods=["GET", "POST"])
+@login_required
+@roles_accepted('Administrador')
 def eliminar():
     id = request.args.get('id')
     producto = Producto.query.filter_by(id=id).first()

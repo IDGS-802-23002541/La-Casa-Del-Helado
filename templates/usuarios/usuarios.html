@@ -2,7 +2,6 @@
 {% block title %}Usuarios — La Casa del Helado{% endblock %}
 
 {% block body %}
-  {% include 'navbar.html' %}
 
   <div class="app-body has-panel">
 
@@ -33,28 +32,48 @@
 
     <!-- MAIN -->
     <main class="main">
-      <div class="page-hdr">
-        <div>
+      
+      <div class="page-hdr fade-up">
+        <div class="page-hdr-left">
           <h1>Usuarios</h1>
           <p>Administración de usuarios del sistema</p>
         </div>
-        <a href="{{ url_for('usuarios.index') }}" class="btn-primary">
-          + Nuevo
-        </a>
       </div>
 
       <!-- BUSCADOR -->
       <form method="GET" action="{{ url_for('usuarios.index') }}">
-        <input type="text" name="busqueda" value="{{ busqueda }}" placeholder="Buscar usuario..."/>
-        <select name="idRol">
-          <option value="">Todos los roles</option>
-          {% for r in roles %}
-            <option value="{{ r.id }}" {{ 'selected' if idRol == r.id|string }}>
-              {{ r.nombre }}
-            </option>
-          {% endfor %}
-        </select>
-        <button type="submit">Buscar</button>
+        <div class="toolbar fade-up-1">
+          <div class="search-inp">
+            <span style="color:var(--light-text); font-size:14px;">🔍</span>
+            <input type="text" name="busqueda" value="{{ busqueda }}" placeholder="Buscar usuario..."/>
+          </div>
+
+          <div class="sep"></div>
+
+          <select name="idRol" style="width:auto; min-width:130px;">
+            <option value="">Todos los roles</option>
+            {% for r in roles %}
+              <option value="{{ r.id }}"
+                {{ 'selected' if idRol == r.id|string }}>
+                {{ r.nombre }}
+              </option>
+            {% endfor %}
+          </select>
+
+          {% if request.args.get('estatus') %}
+            <input type="hidden" name="estatus" value="{{ request.args.get('estatus') }}" />
+          {% endif %}
+          <button type="submit" class="btn-primary-teal"
+                  style="padding:8px 16px; border-radius:10px; font-size:12px;">
+            Buscar
+          </button>
+          {% if busqueda or idRol %}
+            <a href="{{ url_for('usuarios.index') }}" class="btn-cancel"
+               style="padding:8px 14px; border-radius:10px; font-size:12px; text-decoration:none;">
+              Limpiar
+            </a>
+          {% endif %}
+        </div>
       </form>
 
       <!-- TABLA -->
@@ -74,7 +93,7 @@
           {% for u in usuarios %}
           <tr>
             <td>{{ loop.index }}</td>
-            <td>{{ u.persona.nombre }} {{ u.persona.apellido }}</td>
+            <td>{{ u.nombre }} {{ u.apellido }}</td>
             <td>{{ u.nombreUsuario }}</td>
             <td>{{ u.rol.nombre if u.rol else '—' }}</td>
             <td>{{ u.fechaIngreso }}</td>
@@ -103,11 +122,11 @@
 
         <label>Nombre</label>
         <input type="text" name="nombre"
-               value="{{ usr_editar.persona.nombre if usr_editar else '' }}"/>
+               value="{{ usr_editar.nombre if usr_editar else '' }}"/>
 
         <label>Apellido</label>
         <input type="text" name="apellido"
-               value="{{ usr_editar.persona.apellido if usr_editar else '' }}"/>
+               value="{{ usr_editar.apellido if usr_editar else '' }}"/>
 
         <label>Nombre de usuario</label>
         <input type="text" name="nombreUsuario"
@@ -118,6 +137,7 @@
 
         <label>Rol</label>
         <select name="idRol">
+          <option value="">-Selecciona el rol-</option>
           {% for r in roles %}
             <option value="{{ r.id }}"
               {{ 'selected' if usr_editar and usr_editar.idRol == r.id }}>
@@ -129,12 +149,16 @@
         <label>Estatus</label>
         <select name="estatus">
           <option value="">-Selecciona categoria-</option>
+  
           <option value="true"  {{ 'selected' if not usr_editar or usr_editar.estatus }}>Activo</option>
           <option value="false" {{ 'selected' if usr_editar and not usr_editar.estatus }}>Inactivo</option>
         </select>
 
         <br/><br/>
-        <button type="submit">Guardar</button>
+        <button type="submit" class="btn-save">Guardar</button>
+        <a href="{{ url_for('usuarios.index') }}" class="btn-cancel">
+          Cancelar
+        </a>
       </form>
     </aside>
 

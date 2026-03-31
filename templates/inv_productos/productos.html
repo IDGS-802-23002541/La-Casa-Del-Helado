@@ -2,7 +2,6 @@
 {% block title %}Productos — La Casa del Helado{% endblock %}
 
 {% block body %}
-  {% include 'navbar.html' %}
 
   <div class="app-body has-panel">
 
@@ -21,31 +20,44 @@
          class="sb-item {{ 'active-teal' if not idCategoria }}">
         📋 Todas
       </a>
-      {% for c in categorias %}
-      <a href="{{ url_for('producto.index', idCategoria=c.id, busqueda=busqueda) }}"
-         class="sb-item {{ 'active-teal' if idCategoria == c.id|string }}">
-        {{ c.nombre }}
-      </a>
-      {% endfor %}
     </aside>
 
     <!-- MAIN -->
     <main class="main">
-      <div class="page-hdr">
-        <div>
+
+      <div class="page-hdr fade-up">
+        <div class="page-hdr-left">
           <h1>Productos</h1>
           <p>Inventario de productos terminados</p>
         </div>
-        <a href="{{ url_for('producto.index') }}" class="btn-primary">
-          + Nuevo
-        </a>
       </div>
 
-      <!-- BUSCADOR -->
-      <form method="GET" action="{{ url_for('producto.index') }}">
-        <input type="text" name="busqueda" value="{{ busqueda }}" placeholder="Buscar producto..."/>
-        <input type="hidden" name="idCategoria" value="{{ idCategoria }}"/>
-        <button type="submit">Buscar</button>
+      <!-- Buscador -->
+      <form method="GET" action="{{ url_for('recetas.index') }}">
+        <div class="toolbar fade-up-1">
+          <div class="search-inp">
+            <span style="color:var(--light-text); font-size:14px;">🔍</span>
+            <input
+              type="text"
+              name="busqueda"
+              placeholder="Buscar receta…"
+              value="{{ busqueda }}"
+            />
+          </div>
+          {% if request.args.get('estatus') %}
+            <input type="hidden" name="estatus" value="{{ request.args.get('estatus') }}" />
+          {% endif %}
+          <button type="submit" class="btn-primary-teal"
+                  style="padding:8px 16px; border-radius:10px; font-size:12px;">
+            Buscar
+          </button>
+          {% if busqueda %}
+            <a href="{{ url_for('productos.index') }}" class="btn-cancel"
+               style="padding:8px 14px; border-radius:10px; font-size:12px; text-decoration:none;">
+              Limpiar
+            </a>
+          {% endif %}
+        </div>
       </form>
 
       <!-- TABLA -->
@@ -131,7 +143,10 @@
         </select>
 
         <br/><br/>
-        <button type="submit">Guardar</button>
+        <button type="submit" class="btn-save">Guardar</button>
+        <a href="{{ url_for('producto.index') }}" class="btn-cancel">
+        Cancelar
+        </a>
       </form>
     </aside>
 
