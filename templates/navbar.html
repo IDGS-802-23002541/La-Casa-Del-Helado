@@ -10,10 +10,10 @@
       Inicio
     </a>
 
-     <a href=""
+     <a href="{{ url_for('dash.auth') }}"
        class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">
-      Dashboard
-    </a>
+     Dashboard
+     </a>
 
     <a href="{{ url_for('proveedores.proveedoresTabla') }}"
        class="nav-link {% if active_page == 'proveedores' %}active{% endif %}">
