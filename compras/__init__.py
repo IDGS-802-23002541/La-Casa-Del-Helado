@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for
 from models import db, Proveedor, Compra, Usuario, MateriaPrima, DetalleCompra
 from flask_security import current_user
 from flask import session
+from datetime import datetime
 
 import forms
 
@@ -13,6 +14,7 @@ compra_bp = Blueprint(
 
 @compra_bp.route("/compra", methods=["GET", "POST"])
 def compra():
+    compras = Compra.query.filter_by(estatus=True).all()
     compra_form = forms.CompraForm(request.form)
     detalle_form = forms.DetalleCompraForm(request.form)
 
@@ -37,15 +39,36 @@ def compra():
 
         if accion == "agregar_detalle":
 
+            errores = []
+
+            if not detalle_form.idMateriaPrima.data:
+                errores.append("Selecciona una materia prima")
+
+            if not request.form.get("contenidoNeto"):
+                errores.append("Selecciona una presentación")
+
+            if not detalle_form.cantidad.data:
+                errores.append("Ingresa la cantidad")
+
+            if not detalle_form.precio.data:
+                errores.append("Ingresa el precio")
+
+            if errores:
+                return render_template(
+                    "compras/compraPV.html",
+                    compra_form=compra_form,
+                    detalle_form=detalle_form,
+                    detalles=session.get("detalles"),
+                    errores_detalle=errores,
+                    compras=compras
+            )
+
             session["compra_data"] = {
                 "factura": request.form.get("factura"),
                 "idProveedor": request.form.get("idProveedor")
             }
 
             session.modified = True
-
-            if not request.form.get("contenidoNeto"):
-                return "Selecciona una presentación", 400
 
             detalle_temp = {
                 "idMateriaPrima": detalle_form.idMateriaPrima.data,
@@ -66,11 +89,13 @@ def compra():
 
             if not session["detalles"]:
                 return "Agrega al menos un producto", 400
+            
 
             compra = Compra(
                 factura=compra_form.factura.data,
                 idProveedor=compra_form.idProveedor.data,
-                idUsuario=1 #current_user.id
+                idUsuario=1, #current_user.id,
+                estatus=True
             )
 
             db.session.add(compra)
@@ -109,7 +134,8 @@ def compra():
         "compras/compraPV.html",
         compra_form=compra_form,
         detalle_form=detalle_form,
-        detalles=session["detalles"]
+        detalles=session["detalles"],
+        compras=compras
     )
 
 def convertir_a_base(cantidad, presentacion, unidad_base):
@@ -130,6 +156,24 @@ def get_presentaciones(idMateria):
     opciones = PRESENTACIONES_UI.get(materia.unidadBase, [])
 
     return {"presentaciones": opciones}
+
+@compra_bp.route("/compra/cancelar", methods=["POST"])
+def cancelar_compra():
+    session.pop("detalles", None)
+    session.pop("compra_data", None)
+
+    return redirect(url_for("compra.compra"))
+
+@compra_bp.route("/compra/eliminar/<int:id>", methods=["POST"])
+def eliminar_compra(id):
+    compra = Compra.query.get_or_404(id)
+
+    compra.estatus = False
+    compra.fechaEliminacion = datetime.now()
+
+    db.session.commit()
+
+    return redirect(url_for("compra.compra"))
 
 CONVERSIONES = {
     "ml": {
