@@ -1,28 +1,73 @@
-
 <nav class="navbar">
-    <a href="{{ url_for('index') }}" class="nav-brand">
-      <div class="nav-brand-avatar">🍦</div>
-      <span class="nav-brand-name">La Casa del Helado</span>
-    </a>
+  <a href="{{ url_for('index') }}" class="nav-brand">
+    <div class="nav-brand-avatar">🍦</div>
+    <span class="nav-brand-name">La Casa del Helado</span>
+  </a>
 
   <div class="nav-links">
-  <a href="{{ url_for('index') }}"
-     class="nav-link {% if active_page == 'inicio' %}active{% endif %}">
-    Inicio
-  </a>
-  <a href="{{ url_for('proveedores.proveedoresTabla') }}"
-   class="nav-link {% if active_page == 'proveedores' %}active{% endif %}">
-  Proveedores
-</a>
-</div>
+    <a href="{{ url_for('index') }}"
+       class="nav-link {% if active_page == 'inicio' %}active{% endif %}">
+      Inicio
+    </a>
 
-    <div class="nav-right">
-      <span class="nav-date">
-        📅 {{ fecha_hoy }}
-      </span>
+     <a href=""
+       class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">
+      Dashboard
+    </a>
 
-      <div class="nav-user-avatar" title="{{ current_user.nombre if current_user else '' }}">
-        {{ current_user.nombre[0] | upper if current_user else '?' }}
-      </div>
+    <a href="{{ url_for('proveedores.proveedoresTabla') }}"
+       class="nav-link {% if active_page == 'proveedores' %}active{% endif %}">
+      Proveedores
+    </a>
+
+    <a href=""
+       class="nav-link {% if active_page == 'inventario' %}active{% endif %}">
+      Inventario
+    </a>
+
+     <a href=""
+       class="nav-link {% if active_page == 'recetas' %}active{% endif %}">
+      Recetas 
+    </a>
+
+    <a href=""
+     class="nav-link {% if active_page == 'usuarios' %}active{% endif %}">
+    Usuarios
+    </a>
+
+
+  </div>
+
+  <div class="nav-right" style="display: flex; align-items: center; gap: 15px;">
+    <span class="nav-date" id="clock-admin" style="font-weight: 700;">
+      00:00:00
+    </span>
+
+
+    {% if current_user and current_user.is_authenticated %}
+      <a href="{{ url_for('usuarios.logout') }}" 
+         style="text-decoration: none; font-size: 12px; color: #FF4757; font-weight: 800; padding: 5px 10px; background: rgba(255, 71, 87, 0.1); border-radius: 6px;">
+        Salir
+      </a>
+    {% endif %}
+
+    <div class="nav-user-avatar" 
+         title="{{ current_user.nombreUsuario if current_user and current_user.is_authenticated else 'Invitado' }}"
+         style="background-color: var(--purple); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+      {{ current_user.nombreUsuario[0] | upper if current_user and current_user.is_authenticated else '?' }}
     </div>
-  </nav>
+  </div>
+</nav>
+
+<script>
+  function updateAdminClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    const clockEl = document.getElementById('clock-admin');
+    if(clockEl) clockEl.textContent = `${h}:${m}:${s}`;
+  }
+  setInterval(updateAdminClock, 1000);
+  updateAdminClock();
+</script>

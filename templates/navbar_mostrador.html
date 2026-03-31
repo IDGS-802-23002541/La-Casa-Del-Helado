@@ -11,12 +11,12 @@
     <div class="nav-status">
       <div class="status-pill">
         <span class="status-dot"></span>
-        Turno activo — {{ current_user.nombreUsuario if current_user else 'Invitado' }}
+        Turno activo — {{ current_user.nombreUsuario if current_user and current_user.is_authenticated else 'Invitado' }}
       </div>
     </div>
 
-    <div class="nav-user-info">
-      <span class="nav-time" id="clock">03:47</span>
+    <div class="nav-user-info" style="display: flex; align-items: center; gap: 15px;">
+      <span class="nav-time" id="clock" style="font-weight: 800; color: var(--dark);">00:00</span>
       
       {% if turno_activo %}
         <form action="{{ url_for('usuarios.cerrar_turno') }}" method="POST" style="display:inline;">
@@ -24,8 +24,14 @@
         </form>
       {% endif %}
 
+      {% if current_user and current_user.is_authenticated %}
+        <a href="{{ url_for('usuarios.logout') }}" style="text-decoration: none; font-size: 12px; color: #FF4757; font-weight: 800; padding: 5px 10px; background: rgba(255, 71, 87, 0.1); border-radius: 6px;">
+          Cerrar Sesión
+        </a>
+      {% endif %}
+
       <div class="user-avatar-circle">
-        {{ current_user.nombreUsuario[:2].upper() if current_user else '??' }}
+        {{ current_user.nombreUsuario[:2].upper() if current_user and current_user.is_authenticated else 'PV' }}
       </div>
     </div>
   </div>
@@ -46,3 +52,15 @@
     </a>
   </div>
 </nav>
+
+<script>
+  function actualizarReloj() {
+    const ahora = new Date();
+    const horas = String(ahora.getHours()).padStart(2, '0');
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+    const el = document.getElementById('clock');
+    if(el) el.textContent = `${horas}:${minutos}`;
+  }
+  setInterval(actualizarReloj, 1000);
+  actualizarReloj();
+</script>
