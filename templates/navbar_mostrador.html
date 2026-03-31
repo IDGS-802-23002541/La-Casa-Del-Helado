@@ -11,26 +11,38 @@
     <div class="nav-status">
       <div class="status-pill">
         <span class="status-dot"></span>
-        Turno activo — {{ current_user.nombre if current_user else 'Yasmin M.' }}
+        Turno activo — {{ current_user.nombreUsuario if current_user else 'Invitado' }}
       </div>
     </div>
 
     <div class="nav-user-info">
-      <span class="nav-time">03:47</span>
-      <button class="btn-cerrar-turno">Cerrar turno</button>
-      <div class="user-avatar-circle">YM</div>
+      <span class="nav-time" id="clock">03:47</span>
+      
+      {% if turno_activo %}
+        <form action="{{ url_for('usuarios.cerrar_turno') }}" method="POST" style="display:inline;">
+          <button type="submit" class="btn-cerrar-turno">Cerrar turno</button>
+        </form>
+      {% endif %}
+
+      <div class="user-avatar-circle">
+        {{ current_user.nombreUsuario[:2].upper() if current_user else '??' }}
+      </div>
     </div>
   </div>
 
   <div class="nav-bottom">
-    <a href="#" class="nav-tab">
+    <a href="{{ url_for('venta.punto_venta') }}" 
+       class="nav-tab {% if request.endpoint == 'venta.punto_venta' %}active{% endif %}">
       <span class="tab-icon">🛒</span> Punto de Venta
     </a>
-    <a href="" class="nav-tab">
+
+    <a href="#" class="nav-tab">
       <span class="tab-icon">📦</span> Compras Proveedores
     </a>
-   <a href="{{ url_for('SolicitudProduccion.solicitud_produccion') }}" class="nav-tab active">
-    <span class="tab-icon">🏭</span> Solicitud Producción
-</a>
+
+    <a href="{{ url_for('SolicitudProduccion.solicitud_produccion') }}" 
+       class="nav-tab {% if request.endpoint == 'SolicitudProduccion.solicitud_produccion' %}active{% endif %}">
+      <span class="tab-icon">🏭</span> Solicitud Producción
+    </a>
   </div>
 </nav>
