@@ -1,5 +1,133 @@
-{% extends "layout.html" %} {% block container %}
+{% extends "base.html" %}
 
-<p class="text-amber-600">PUNTO DE VENTA :D</p>
+{% block title %}La Casa del Helado - Punto de Venta{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/punto_venta.css') }}">
+{% endblock %}
+
+{% block body %}
+{% include 'navbar_mostrador.html' %}
+
+<div class="main">
+  <div class="left-panel">
+    
+    <div class="mode-switcher">
+      <button class="mode-btn active-vd" id="btnVD">🏪 Venta directa</button>
+      <button class="mode-btn" id="btnOL">🌐 Pedidos en línea</button>
+    </div>
+
+    <div id="panel-vd">
+      <form action="{{ url_for('venta.filtrar_productos') }}" method="GET" class="search-bar">
+        <span>🔍</span>
+        <input type="text" name="q" placeholder="Buscar sabor o producto..." value="{{ query_actual if query_actual }}">
+        {% if cat_actual %}
+            <input type="hidden" name="cat_id" value="{{ cat_actual }}">
+        {% endif %}
+        <button type="submit" style="display:none;">Buscar</button>
+      </form>
+
+      <div class="categories">
+        <a href="{{ url_for('venta.punto_venta') }}" 
+           class="pill {% if not cat_actual %}active{% endif %}">🍽 Todos</a>
+        
+        {% for cat in categorias %}
+          <a href="{{ url_for('venta.filtrar_productos', cat_id=cat.id, q=query_actual) }}" 
+             class="pill {% if cat_actual == cat.id %}active{% endif %}">
+             {{ cat.nombre }}
+          </a>
+        {% endfor %}
+      </div>
+
+      <div class="product-grid" id="productGrid">
+        {% for p in productos %}
+          {# Lógica de estilo por Categoría #}
+          {% set nombre_cat = p.relacion_categoria.nombre | lower if p.relacion_categoria else 'general' %}
+          
+          {% if 'paleta' in nombre_cat %} {% set emoji, color_clase = '🍡', 'bg-mint' %}
+          {% elif 'cono' in nombre_cat %} {% set emoji, color_clase = '🍦', 'bg-peach' %}
+          {% elif 'vaso' in nombre_cat or 'nieve' in nombre_cat %} {% set emoji, color_clase = '🥤', 'bg-sky' %}
+          {% elif 'especial' in nombre_cat %} {% set emoji, color_clase = '⭐', 'bg-lavender' %}
+          {% elif 'leche' in nombre_cat %} {% set emoji, color_clase = '🍨', 'bg-yellow' %}
+          {% else %} {% set emoji, color_clase = '🍧', '' %} {% endif %}
+
+          <form action="{{ url_for('venta.vender_agregar') }}" method="POST" style="display: contents;">
+              <input type="hidden" name="idProducto" value="{{ p.id }}">
+              
+              <button type="submit" class="card {{ color_clase }}" {% if p.stockActual <= 0 %}disabled style="opacity:0.7; cursor:not-allowed;"{% endif %}>
+                
+                {% if p.stockActual <= 0 %}
+                    <div class="card-badge badge-sinstock">Agotado</div>
+                {% elif p.stockActual <= 5 %}
+                    <div class="card-badge badge-popular">¡Últimos {{ p.stockActual }}!</div>
+                {% else %}
+                    <div class="card-badge badge-nuevo">Disponible</div>
+                {% endif %}
+
+                <div class="card-emoji">{{ emoji }}</div>
+                <div class="card-name">{{ p.nombre }}</div>
+                <div class="card-sub">Stock: {{ p.stockActual }}</div>
+                
+                <div class="card-footer">
+                  <span class="card-price">$35.00</span>
+                  <div class="btn-add">+</div>
+                </div>
+              </button>
+          </form>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="ticket-panel">
+    <div class="ticket-header">
+      <div class="ticket-title">🧾 Ticket <span class="ticket-num">#{{ prox_venta_id if prox_venta_id else '001' }}</span></div>
+      <form action="{{ url_for('venta.limpiar_ticket') }}" method="GET">
+          <button type="submit" class="btn-limpiar">✕ Limpiar</button>
+      </form>
+    </div>
+
+    <div class="ticket-items">
+      {% if carrito %}
+        {% for item in carrito %}
+        <div class="ticket-item">
+          <div class="item-icon">🍦</div>
+          <div class="item-info">
+            <div class="item-name">{{ item.nombre }}</div>
+            <div class="item-flavor">P. Unitario: ${{ item.precio }}</div>
+          </div>
+          <div class="qty-val">{{ item.cantidad }}</div>
+          <div class="item-price">${{ item.subtotal }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-ticket">
+          <div class="cart-icon">🛒</div>
+          <p>Agrega productos<br>al ticket</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="ticket-footer">
+      <div class="subtotal-row">
+        <span>Subtotal</span>
+        <span>${{ total }}</span>
+      </div>
+      <div class="total-row">
+        <span class="total-label">TOTAL</span>
+        <span class="total-amount">${{ total }}</span>
+      </div>
+
+      <div class="payment-methods">
+        <button class="pay-btn selected" type="button">💵 Efectivo</button>
+      </div>
+
+      <form action="{{ url_for('venta.finalizar_venta') }}" method="POST">
+          <button type="submit" class="btn-cobrar" {% if not carrito %}disabled style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
+            Cobrar ${{ total }}
+          </button>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
