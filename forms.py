@@ -42,10 +42,6 @@ class CompraForm(Form):
         validators.DataRequired(message="El campo es requerido"), 
     ])
    
-    fechaCompra = DateField("Fecha de Compra", [
-        validators.DataRequired(message="El campo es requerido"), 
-    ])
-   
     idProveedor = SelectField("Proveedor", coerce=int, validators=[
         validators.DataRequired(message="Selecciona un proveedor")
     ])

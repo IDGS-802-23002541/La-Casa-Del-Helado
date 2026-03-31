@@ -64,15 +64,17 @@ class Compra(db.Model):
     __tablename__='compra'
 
     id=db.Column(db.Integer, primary_key=True)
-    factura=db.Column(db.String(50))
+    factura=db.Column(db.String(50), nullable=False)
     fechaCompra=db.Column(db.Date, default=datetime.date.today)
     idProveedor=db.Column(db.Integer, db.ForeignKey('proveedor.id'), nullable=False)
     idUsuario=db.Column(db.Integer,db.ForeignKey('usuario.id'), nullable=False)
+    estatus=db.Column(db.Boolean, default=True)
+    fechaEliminacion = db.Column(db.DateTime)
 
     proveedor = db.relationship('Proveedor', back_populates='compras')
     usuario = db.relationship('Usuario', backref='compras')
 
-    detalles_compra = db.relationship('DetalleCompra', back_populates='compra')
+    detalles_compra = db.relationship('DetalleCompra', back_populates='compra', cascade="all, delete-orphan")
     
 class DetalleCompra(db.Model):
     __tablename__='detalle_compra'
