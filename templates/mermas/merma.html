@@ -1,0 +1,128 @@
+{% extends "base.html" %} 
+{% import "_macros.html" as macros %}
+
+{% block title %}Registrar Entrada — Compras{% endblock %} 
+
+{% block extra_css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='dist/output.css') }}"
+/>
+{% endblock %} 
+
+{% block body %}
+  <!-- NAV BAR -->
+  {% include 'navAdmin.html' %}
+<div class="flex h-screen">
+  <!-- SIDEBAR -->
+  {% include 'asideAdmin.html' %}
+  
+  <div class="flex-1 bg-cream font-sans text-brand-text overflow-y-auto">
+    <div id="page-compras" class="p-6 flex justify-center gap-20">
+
+        <div class="mt-6 bg-white rounded-xl shadow p-4">
+          <h2 class="text-lg font-bold mb-3">Mermas Registradas</h2>
+
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left border-b">
+                <th>Merma</th>
+                <th>Cantidad</th>
+                <th>Unidad</th>
+                <th>Justificación</th>
+                <th>Fecha</th>
+                <th>Usuario</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for m in mermas %}
+              <tr class="border-b hover:bg-gray-50">
+                <!-- <td>{{ m.materia_prima.nombre }} || {{ m.producto.nombre }}</td> -->
+                <td>{{ m.cantidad }}</td>
+                <td>{{ m.unidad }} </td>
+                <td>{{ m.justificacion }} </td>
+                <td>{{ m.fecha.strftime('%Y-%m-%d') }}</td>
+                <!-- <td>{{ m.usuario.nombreUsuario }} </td> -->
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Modal -->
+        <form method="POST"
+          class="bg-white rounded-[20px] shadow-2xl w-full max-w-[300px] overflow-hidden"
+          id="formularioMerma"
+        >
+          <!-- HEADER -->
+          <div class="bg-dark px-6 pt-6 pb-5">
+            <div class="font-display text-2xl text-white mb-1">
+              Registrar Merma
+            </div>
+            <div class="text-xs text-white/60">
+              Completa los campos para registrar la merma
+            </div>
+          </div>
+
+          <!-- BODY -->
+          <div class="px-6 py-5 flex flex-col gap-3.5">
+
+            <!-- PRODUCTO/MATERIA PRIMA -->
+            Selecciona un producto o materia Prima
+            Despliega los productos/materias primas
+
+            <!-- UNIDAD -->
+            Ligada el producto o materiaPrima
+
+            <!-- CANTIDAD -->
+            <input
+            type="number"
+            name="cantidad"
+            value="{{ request.form.get('cantidad', '') }}"
+            step="1"
+            placeholder="Cantidad"
+            class="input-style"
+            />
+
+            <!-- JUSTIFICACION -->
+            <div class="flex flex-col gap-1.5">
+
+              {{ macros.campoCompra(  
+                  merma_form.justificacion,
+                  clase='w-full p-2 border rounded',
+                  placeholder='Justificación del producto/materia prima mermado'
+              ) }}
+            </div>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="px-6 pb-5 pt-4 flex gap-3 border-t border-border">
+
+            <button type="reset" class="flex-1 btn-cancel" onclick="cancelarMerma()">
+              Cancelar
+            </button>
+
+            <button
+              type="submit"
+              name="accion"
+              value="guardar_merma"
+              class="flex-[2] btn-primary"
+            >
+              Guardar
+            </button>
+
+          </div>
+        </form>
+        <!-- /.cp-modal -->
+
+    </div>
+  </div>
+
+</div>
+  
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
+    <script>
+      
+    </script>
+
+{% endblock %}
