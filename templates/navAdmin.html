@@ -1,53 +1,77 @@
-
 <nav class="navbar">
-    <a href="{{ url_for('index') }}" class="nav-brand">
-      <div class="nav-brand-avatar">🍦</div>
+  <a href="{{ url_for('index') }}" class="nav-brand">
+    <div class="nav-brand-avatar">🍦</div>
+    <div style="display: flex; flex-direction: column; line-height: 1;">
       <span class="nav-brand-name">La Casa del Helado</span>
-    </a>
+      <small style="font-size: 9px; color: #ff7043; font-weight: 800; letter-spacing: 0.5px;">ADMINISTRACIÓN</small>
+    </div>
+  </a>
 
   <div class="nav-links">
-    
-    <a href="{{ url_for('index') }}"
-    class="nav-link {% if active_page == 'inicio' %}active{% endif %}">
-    Inicio
-  </a>
 
-  <a href="{{ url_for('proveedores.index') }}"
-     class="nav-link {% if active_page == 'proveedores' %}active{% endif %}">
-    Proveedores
-  </a>
 
-   <a href="{{ url_for('producto.index') }}"
-       class="nav-link {% if active_page == 'productos' %}active{% endif %}">
-      Productos
+    <a href="{{ url_for('proveedores.proveedoresTabla') }}"
+       class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
+       🚚 Proveedores
+    </a>
+
+    <a href="{{ url_for('producto.index') }}"
+       class="nav-link {% if request.endpoint == 'producto.index' %}active{% endif %}">
+       📦 Productos
     </a>
   
-  <a href="{{url_for('usuarios.index')}}"
-       class="nav-link {% if active_page == 'usuarios' %} active {% endif %}">
-      Usuarios
-  </a>
-
-  <a href="{{url_for('recetas.index')}}"
-     class="nav-link 
-     {% if active_page == 'recetas' %} active
-     {% endif %}">
-     Recetas
-  </a>
-
-
-</div>
-
-<div class="nav-right">
-  <span class="nav-date">
-    📅 {{ fecha_hoy }}
-      </span>
-
-      <div class="nav-user-avatar" title="{{ current_user.nombre if current_user else '' }}">
-        {{ current_user.nombreUsuario[0] | upper if current_user else '?' }}
-      </div>
-      <a href="{{ url_for('auth.logout') }}" class="btn-logout"
-       style="width:auto; padding:6px 12px; border-radius:20px; font-size:11px; text-decoration:none;">
-      Salir
+    <a href="{{ url_for('usuarios.index') }}"
+       class="nav-link {% if request.endpoint == 'usuarios.index' %}active{% endif %}">
+       👥 Usuarios
     </a>
+
+    <a href="{{ url_for('recetas.index') }}"
+       class="nav-link {% if request.endpoint == 'recetas.index' %}active{% endif %}">
+       📖 Recetas
+    </a>
+
+    <a href="{{ url_for('dash.auth') }}"
+       class="nav-link {% if request.endpoint == 'dash_bp.auth' %}active{% endif %}">
+       📊 Dashboard
+    </a>
+  </div>
+
+  <div class="nav-right">
+    <div class="time-container" style="text-align: right; line-height: 1.2; margin-right: 15px;">
+      <div id="current-date" style="font-size: 10px; color: #888; font-weight: 700; text-transform: capitalize;">
+        Cargando fecha...
+      </div>
+      <div id="clock" style="font-weight: 800; color: #2d3436; font-size: 17px; letter-spacing: -0.5px;">
+        00:00
+      </div>
     </div>
-  </nav>
+
+    <div class="nav-user-avatar" title="{{ current_user.nombreUsuario if current_user else 'Invitado' }}">
+      {{ current_user.nombreUsuario[0] | upper if current_user and current_user.nombreUsuario else '?' }}
+    </div>
+    
+    <a href="{{ url_for('auth.logout') }}" class="btn-logout"
+       style="padding: 7px 15px; border-radius: 20px; font-size: 11px; text-decoration: none; background: rgba(255, 71, 87, 0.1); color: #FF4757; font-weight: 800; transition: 0.3s;">
+      CERRAR SESIÓN
+    </a>
+  </div>
+</nav>
+
+<script>
+  function actualizarTiempo() {
+    const ahora = new Date();
+    
+    const horas = String(ahora.getHours()).padStart(2, '0');
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+    const elReloj = document.getElementById('clock');
+    if(elReloj) elReloj.textContent = `${horas}:${minutos}`;
+
+    const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
+    const fechaTexto = ahora.toLocaleDateString('es-ES', opciones);
+    const elFecha = document.getElementById('current-date');
+    if(elFecha) elFecha.textContent = fechaTexto;
+  }
+  
+  setInterval(actualizarTiempo, 1000);
+  actualizarTiempo();
+</script>
