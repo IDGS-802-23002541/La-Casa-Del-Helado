@@ -1,9 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import db, Proveedor
+from flask_security import login_required, roles_accepted
+
 
 proveedores = Blueprint('proveedores', __name__)
 
 @proveedores.route('/proveedores')
+@login_required # Solo usuarios logueados apueden ver la tabla
 def proveedoresTabla():
     busqueda = request.args.get('q', '')
     estatus_filtro = request.args.get('estatus', '')
@@ -14,16 +17,25 @@ def proveedoresTabla():
         query = query.filter(Proveedor.estatus == estatus_filtro)   
     lista = enriquecer(query.order_by(Proveedor.razonSocial).all())
     total = len(lista)
-    return render_template("proveedores/proveedores.html",proveedores=lista, total=total,busqueda=busqueda, 
-                           estatus_activo=estatus_filtro)
+    
+    # IMPORTANTE: El template ahora usará current_user automáticamente gracias a Flask-Login
+    return render_template("proveedores/proveedores.html", 
+                           proveedores=lista, 
+                           total=total,
+                           busqueda=busqueda, 
+                           estatus_activo=estatus_filtro,
+                           active_page='proveedores') # Para que el Navbar sepa dónde estás
 
 @proveedores.route("/proveedorDetalles")
+@login_required
 def proveedorDetalles():
     id_proveedor = request.args.get('id', type=int)
     proveedor = Proveedor.query.get_or_404(id_proveedor)
     return render_template("proveedores/proveedores.html", proveedor=proveedor, modo="detalles")
 
 @proveedores.route("/proveedorNuevo", methods=["GET", "POST"])
+@login_required
+@roles_accepted('Administrador') # Solo el jefe puede crear
 def proveedorNuevo():
     if request.method == "POST":
         razon     = request.form.get('razonSocial')
@@ -31,14 +43,17 @@ def proveedorNuevo():
         telefono  = request.form.get('telefono')
         direccion = request.form.get('direccion')
         estatus   = request.form.get('estatus', 'Activo')
+        
         if not razon or not correo or not telefono or not direccion:
             flash("Todos los campos son obligatorios", "error")
             return redirect(url_for('proveedores.proveedoresTabla'))
+        
         if Proveedor.query.filter_by(correo=correo).first():
             flash("El correo ya existe", "error")
             return redirect(url_for('proveedores.proveedoresTabla'))
+        
         try:
-            nuevo = Proveedor( razonSocial=razon,correo=correo,telefono=telefono,direccion=direccion,estatus=estatus)
+            nuevo = Proveedor(razonSocial=razon, correo=correo, telefono=telefono, direccion=direccion, estatus=estatus)
             db.session.add(nuevo)
             db.session.commit()
             flash("Proveedor registrado correctamente", "success")
@@ -51,14 +66,18 @@ def proveedorNuevo():
     return redirect(url_for('proveedores.proveedoresTabla'))
 
 @proveedores.route("/proveedorModificar", methods=["GET", "POST"])
+@login_required
+@roles_accepted('Administrador') # Solo el jefe puede editar
 def proveedorModificar():
     id_proveedor = request.args.get('id', type=int)
     proveedor = Proveedor.query.get_or_404(id_proveedor)
+    
     if request.method == "POST":
         correo = request.form.get('correo')
         if Proveedor.query.filter(Proveedor.correo == correo, Proveedor.id != proveedor.id).first():
             flash("El correo ya existe", "error")
             return redirect(url_for('proveedores.proveedoresTabla'))
+            
         proveedor.razonSocial = request.form.get('razonSocial')
         proveedor.correo      = correo
         proveedor.telefono    = request.form.get('telefono')
@@ -68,11 +87,12 @@ def proveedorModificar():
         flash("Proveedor actualizado", "success")
         return redirect(url_for('proveedores.proveedoresTabla'))
     
-    # Para editar, volvemos a cargar la tabla pero pasando el objeto 'proveedor' para el panel
     lista = enriquecer(Proveedor.query.order_by(Proveedor.razonSocial).all())
     return render_template("proveedores/proveedores.html", proveedores=lista, proveedor=proveedor, modo="editar")
 
 @proveedores.route("/proveedorEliminar", methods=["GET", "POST"])
+@login_required
+@roles_accepted('Administrador') # Seguridad máxima para borrar
 def proveedorEliminar():
     id_proveedor = request.args.get('id', type=int)
     proveedor = Proveedor.query.get_or_404(id_proveedor)
@@ -86,6 +106,8 @@ def proveedorEliminar():
     return render_template("proveedores/proveedores.html", proveedor=proveedor, modo="eliminar")
 
 @proveedores.route("/proveedorToggle", methods=["POST"])
+@login_required
+@roles_accepted('Administrador')
 def proveedorToggle():
     id_proveedor = request.form.get('id', type=int)
     proveedor = Proveedor.query.get_or_404(id_proveedor)
@@ -94,13 +116,15 @@ def proveedorToggle():
     flash(f"Estado cambiado a {proveedor.estatus}", "success")
     return redirect(url_for('proveedores.proveedoresTabla'))
 
-# ── COLORES AVATAR ────────
+# ── COLORES AVATAR (Lógica de diseño) ────────
 AVATAR_COLORES = [
     'linear-gradient(135deg,#F4A4A4,#E8756A)',
     'linear-gradient(135deg,#B8EDE4,#5CC8BC)',
     'linear-gradient(135deg,#E8D5F5,#9B72CF)',
     'linear-gradient(135deg,#FFF3C4,#D4956A)',
-    'linear-gradient(135deg,#C8E8FF,#5BA8D8)',]
+    'linear-gradient(135deg,#C8E8FF,#5BA8D8)',
+]
+
 def enriquecer(lista):
     for i, p in enumerate(lista):
         p.avatar_color = AVATAR_COLORES[i % len(AVATAR_COLORES)]
