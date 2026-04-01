@@ -112,3 +112,43 @@ class Categoria(db.Model):
     nombre=db.Column(db.String(100), nullable=False)
 
     materias_primas=db.relationship('MateriaPrima', back_populates='categoria')
+
+class Merma(db.Model):
+    __tablename__ = 'merma'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    idMateriaPrima = db.Column(db.Integer, db.ForeignKey('materia_prima.id'), nullable=True)
+    idProducto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=True)
+    
+    cantidad = db.Column(db.Numeric(10, 2), nullable=False)
+    unidad = db.Column(db.String(20), nullable=False)
+    justificacion = db.Column(db.String(200), nullable=False)
+    fecha = db.Column(db.Date, nullable=False)
+    
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+
+    materia_prima = db.relationship('MateriaPrima', backref='mermas')
+    producto = db.relationship('Producto', backref='mermas')
+    usuario = db.relationship('Usuario', backref='mermas')
+
+    # Check constraint
+    __table_args__ = (
+        db.CheckConstraint(
+            '(idMateriaPrima IS NOT NULL AND idProducto IS NULL) OR '
+            '(idMateriaPrima IS NULL AND idProducto IS NOT NULL)',
+            name='check_merma_origen'
+        ),
+    )
+
+class Producto(db.Model): 
+    __tablename__ = 'producto'
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False, unique=True)
+    unidadBase = db.Column(db.String(20), nullable=False)
+    stockActual = db.Column(db.Numeric(10,2), nullable=False, default = 0)
+    stockMinimo = db.Column(db.Numeric(10,2), nullable=False, default = 0)
+    costoUnitario = db.Column(db.Numeric(10,2), nullable=False, default = 0)
+    idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
+
+    categoria = db.relationship('Categoria', foreign_keys=[idCategoria])

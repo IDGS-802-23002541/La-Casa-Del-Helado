@@ -60,3 +60,14 @@ class DetalleCompraForm(Form):
     precio = FloatField("Precio", [
         validators.DataRequired(message="El campo es requerido")
     ])
+
+class MermaForm(Form):
+    idMateriaPrima = SelectField("Materia Prima", coerce=int)
+    idProducto = SelectField("Producto", coerce=int)
+    cantidad = FloatField("Cantidad", [
+        validators.DataRequired(message="El campo es requerido")
+    ])
+    unidad = StringField("Unidad Base")
+    justificacion = StringField("Justificación", [
+        validators.DataRequired(message="El campo es requerido"), 
+    ])
