@@ -6,6 +6,4 @@ venta_bp = Blueprint(
     template_folder='templates'
 )
 
-@venta_bp.route("/venta", methods=["GET", "POST"])
-def auth():
-    return render_template("punto_venta/venta.html")
+from . import routes

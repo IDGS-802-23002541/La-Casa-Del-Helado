@@ -7,8 +7,7 @@
   <title>{% block title %}La Casa del Helado{% endblock %}</title>
   <link
       rel="stylesheet"
-      href="{{url_for('static',filename='dist/output.css')}}"
-    />
+      href="{{url_for('static',filename='dist/output.css')}}"/>
   <link rel="stylesheet" href="{{ url_for('static', filename='src/input.css') }}">
 
   {% block extra_css %}{% endblock %}
@@ -29,11 +28,7 @@
 
   <!-- CUERPO -->
   {% block body %}{% endblock %}
-
-  <!-- TOAST -->
   <div class="toast" id="toast"></div>
-
-  <!-- FLASH MESSAGES -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <script>
@@ -56,7 +51,6 @@
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
-
   {% block extra_js %}{% endblock %}
 
 </body>

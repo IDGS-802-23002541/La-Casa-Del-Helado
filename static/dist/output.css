@@ -4206,3 +4206,19 @@
     }
   }
 }
+
+.page { 
+    padding: 20px; 
+    background-color: #fdfaf5; 
+    min-height: calc(100vh - 120px); 
+    display: flex; 
+    justify-content: center; 
+}
+.card { 
+    background: white; 
+    border-radius: 15px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+    width: 100%; 
+    max-width: 900px; 
+    overflow: hidden; 
+}

@@ -52,7 +52,7 @@
   border-radius: 20px 20px 0 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-b etween;
 }
 .modal-hdr h3  { font-family: var(--font-display); font-size: 17px; color: white; }
 .modal-close   {
@@ -161,7 +161,6 @@
   cursor: pointer;
 }
 
-/* 🔥 FORZAR LAYOUT COMPLETO */
 .app-body.has-panel {
   display: grid;
   grid-template-columns: 220px 1fr 360px;
