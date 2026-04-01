@@ -6,7 +6,7 @@ class config(object):
 
 class DevelopmentConfig(config):   
     DEBUG= True
-    SQLALCHEMY_DATABASE_URI='mysql+pymysql://root:123456789@localhost:3306/lacasadelhelado'
+    SQLALCHEMY_DATABASE_URI='mysql+pymysql://root:root@localhost:3306/casadelhelado'
     SQLALCHEMY_TRACK_MODIFICATIONS= False
     SECURITY_PASSWORD_SALT = 'super-secret-salt-lcdh'
     WTF_CSRF_ENABLED = False # cambiar a true si esta en produccion

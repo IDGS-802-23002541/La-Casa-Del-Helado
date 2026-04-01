@@ -46,7 +46,7 @@ def login_post():
     elif nombre_rol == 'Produccion': 
         return redirect(url_for('recetas.index'))
     elif nombre_rol == 'Mostrador': 
-        return redirect(url_for('usuarios.index'))
+        return redirect(url_for('venta.punto_venta'))
     else: 
         flash('Tu usuario no tiene un rol asignado', 'error')
         return redirect(url_for('auth.login'))

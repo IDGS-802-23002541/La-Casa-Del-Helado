@@ -40,8 +40,6 @@ app.register_blueprint(compra_bp)
 app.register_blueprint(Soli_Produccion)
 
 
-db.init_app(app)
-
 @app.route("/", methods=['POST', 'GET'])
 def index():
     return render_template("inicio.html")
