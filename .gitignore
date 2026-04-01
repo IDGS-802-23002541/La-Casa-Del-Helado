@@ -11,4 +11,4 @@ Thumbs.db
 
 config.py
 
-static/dist/
+static/dist/output.css

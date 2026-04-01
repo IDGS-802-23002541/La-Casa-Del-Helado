@@ -6,8 +6,9 @@
     </a>
 
   <div class="nav-links">
-  <a href="{{ url_for('index') }}"
-     class="nav-link {% if active_page == 'inicio' %}active{% endif %}">
+    
+    <a href="{{ url_for('index') }}"
+    class="nav-link {% if active_page == 'inicio' %}active{% endif %}">
     Inicio
   </a>
 
@@ -15,15 +16,38 @@
      class="nav-link {% if active_page == 'proveedores' %}active{% endif %}">
     Proveedores
   </a>
+
+   <a href="{{ url_for('producto.index') }}"
+       class="nav-link {% if active_page == 'productos' %}active{% endif %}">
+      Productos
+    </a>
+  
+  <a href="{{url_for('usuarios.index')}}"
+       class="nav-link {% if active_page == 'usuarios' %} active {% endif %}">
+      Usuarios
+  </a>
+
+  <a href="{{url_for('recetas.index')}}"
+     class="nav-link 
+     {% if active_page == 'recetas' %} active
+     {% endif %}">
+     Recetas
+  </a>
+
+
 </div>
 
-    <div class="nav-right">
-      <span class="nav-date">
-        📅 {{ fecha_hoy }}
+<div class="nav-right">
+  <span class="nav-date">
+    📅 {{ fecha_hoy }}
       </span>
 
       <div class="nav-user-avatar" title="{{ current_user.nombre if current_user else '' }}">
-        {{ current_user.nombre[0] | upper if current_user else '?' }}
+        {{ current_user.nombreUsuario[0] | upper if current_user else '?' }}
       </div>
+      <a href="{{ url_for('auth.logout') }}" class="btn-logout"
+       style="width:auto; padding:6px 12px; border-radius:20px; font-size:11px; text-decoration:none;">
+      Salir
+    </a>
     </div>
   </nav>
