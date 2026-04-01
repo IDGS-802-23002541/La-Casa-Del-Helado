@@ -3,12 +3,10 @@
 {% block title %}La Casa del Helado - Punto de Venta{% endblock %}
 
 {% block extra_css %}
-{# Usamos v=4.0 para forzar la carga de los estilos corregidos #}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/punto_venta.css') }}?v=4.0">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/punto_venta.css') }}?v">
 {% endblock %}
 
 {% block body %}
-{% include 'navbar_mostrador.html' %}
 
 <div class="main">
   <div class="left-panel">
