@@ -33,6 +33,7 @@ class Usuario(db.Model, UserMixin):
     fechaIngreso = db.Column(db.Date, nullable=False)
     estatus = db.Column(db.Boolean, default=True, nullable=False)
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
+    ventas = db.relationship('Venta', backref='vendedor')
 
     idRol = db.Column(db.Integer, db.ForeignKey('rol.id'))
 
@@ -133,14 +134,13 @@ class Turno(db.Model):
     idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     apertura = db.Column(db.DateTime, nullable=False, default=datetime.now)
     cierre = db.Column(db.DateTime, nullable=True) 
-    ventas = db.relationship('Venta', backref='turno_rel')
 
 class Venta(db.Model):
     __tablename__ = 'venta'
     id = db.Column(db.Integer, primary_key=True)
     fecha = db.Column(db.DateTime, nullable=False, default=datetime.now)
     total = db.Column(db.Numeric(10, 2), nullable=False)
-    idTurno = db.Column(db.Integer, db.ForeignKey('turno.id'), nullable=False)
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     detalles = db.relationship('DetalleVenta', backref='venta_rel', cascade="all, delete-orphan")
 
 class DetalleVenta(db.Model):
