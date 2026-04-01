@@ -57,16 +57,16 @@ class Proveedor(db.Model):
     # compras = db.relationship('Compra', backref='proveedor', lazy=True)
     
 class SolicitudProduccion(db.Model):
-    __tablename__ = 'solicitudproduccion'
+    __tablename__ = 'solicitud_produccion'
     id = db.Column(db.Integer, primary_key=True)
-    fecha = db.Column(db.Date, nullable=False)
-    estatus = db.Column(db.String(20), nullable=False)
     idProducto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False)
-    cantidad = db.Column(db.Numeric(10, 2), nullable=False)
-    producto = db.relationship('Producto', backref='solicitudes_produccion')
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False) # El empleado de mostrador
+    cantidad_solicitada = db.Column(db.Integer, nullable=False)
+    fecha_solicitud = db.Column(db.DateTime, default=datetime.now)
+    estatus = db.Column(db.String(50), default='Pendiente') 
 
-    def __repr__(self):
-        return f'<Proveedor {self.razonSocial}>'
+    producto = db.relationship('Producto', backref='solicitudes')
+    usuario = db.relationship('Usuario', backref='solicitudes_creadas')
 
 class Receta(db.Model):
     __tablename__ = 'receta'
