@@ -207,7 +207,7 @@
 </div>
 
 <script>
-const materias = {{ materias_primas | tojson | safe }};
+const materias = JSON.parse('{{ materias_primas | tojson | safe }}');
 let estadoFiltro = "todos";
 
 // FILTRAR

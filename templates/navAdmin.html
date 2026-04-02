@@ -5,41 +5,50 @@
   </a>
 
   <div class="nav-links">
-
+    <!-- Inicio: asumo que está en el blueprint principal, ruta 'index' -->
     <a href="{{ url_for('index') }}" class="nav-link {% if active_page == 'inicio' %}active{% endif %}">
       Inicio
     </a>
 
-    <a href="{{ url_for('proveedores.index') }}"
+    <!-- Proveedores -->
+    <a href="{{ url_for('proveedores.proveedoresTabla') }}"
       class="nav-link {% if active_page == 'proveedores' %}active{% endif %}">
       Proveedores
     </a>
 
-    <a href="{{ url_for('producto.auth') }}" class="nav-link {% if active_page == 'productos' %}active{% endif %}">
+    <!-- Productos -->
+    <a href="{{ url_for('producto.index') }}" class="nav-link {% if active_page == 'productos' %}active{% endif %}">
       Productos
     </a>
 
-    <a href="{{url_for('usuarios.index')}}" class="nav-link {% if active_page == 'usuarios' %} active {% endif %}">
+    <!-- Usuarios -->
+    <a href="{{ url_for('usuarios.index') }}" class="nav-link {% if active_page == 'usuarios' %}active{% endif %}">
       Usuarios
     </a>
 
-    <a href="{{ url_for('recetas.auth') }}" class="nav-link {% if active_page == 'recetas' %}active{% endif %}">
+    <!-- Recetas -->
+    <a href="{{ url_for('recetas.index') }}" class="nav-link {% if active_page == 'recetas' %}active{% endif %}">
       Recetas
     </a>
 
+    <!-- Materia Prima -->
     <a href="{{ url_for('materia.materia') }}" class="nav-link {% if active_page == 'materia' %}active{% endif %}">
       Materia Prima
     </a>
-
   </div>
 
   <div class="nav-right">
-    <span class="nav-date" id="navDate">
-      📅 --:--:--
-    </span>
+    <div class="nav-date" id="navDate">
+      <div id="fecha"></div>
+      <div id="hora"></div>
+    </div>
 
-    <div class="nav-user-avatar" title="{{ current_user.nombre if current_user else '' }}">
-      {{ current_user.nombreUsuario[0] | upper if current_user else '?' }}
+    <div class="nav-user-avatar" title="{{ current_user.nombre if current_user.is_authenticated else '' }}">
+      {% if current_user.is_authenticated %}
+      {{ current_user.nombreUsuario[0] | upper }}
+      {% else %}
+      ?
+      {% endif %}
     </div>
     <a href="{{ url_for('auth.logout') }}" class="btn-logout"
       style="width:auto; padding:6px 12px; border-radius:20px; font-size:11px; text-decoration:none;">
@@ -47,6 +56,7 @@
     </a>
   </div>
 </nav>
+
 <script>
   function actualizarHora() {
     const now = new Date();
@@ -57,8 +67,11 @@
     const minutos = now.getMinutes().toString().padStart(2, '0');
     const segundos = now.getSeconds().toString().padStart(2, '0');
 
-    const fechaHora = `📅 ${dia}/${mes}/${anio} ${horas}:${minutos}:${segundos}`;
-    document.getElementById('navDate').textContent = fechaHora;
+    const fecha = `${dia}/${mes}/${anio}`;
+    const hora = `${horas}:${minutos}:${segundos}`;
+
+    document.getElementById('fecha').textContent = fecha;
+    document.getElementById('hora').textContent = hora;
   }
 
   // Actualiza cada segundo
@@ -67,3 +80,39 @@
   // Inicializa inmediatamente
   actualizarHora();
 </script>
+
+<style>
+  /* Asegúrate de que la fuente Baloo 2 se cargue correctamente */
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500&display=swap');
+
+  /* Aplica la fuente de manera forzada a todos los elementos relevantes */
+  body,
+  .nav-date,
+  .nav-date #fecha,
+  .nav-date #hora,
+  .nav-links,
+  .nav-link {
+    font-family: 'Baloo 2', sans-serif !important;
+    /* Forzar el uso de la fuente Baloo */
+    color: #000000 !important;
+    /* Forzar color negro para el texto */
+  }
+
+  .nav-date {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: right;
+    background: transparent !important;
+    /* Eliminar cualquier fondo blanco */
+  }
+
+  .nav-date #fecha {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .nav-date #hora {
+    font-size: 18px;
+  }
+</style>
