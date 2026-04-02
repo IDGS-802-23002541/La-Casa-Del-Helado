@@ -8,3 +8,8 @@ class DevelopmentConfig(config):
     DEBUG= True
     SQLALCHEMY_DATABASE_URI='mysql+pymysql://root:root@localhost:3306/LCDH'
     SQLALCHEMY_TRACK_MODIFICATIONS= False
+    SECURITY_PASSWORD_SALT = 'super-secret-salt-lcdh'
+    WTF_CSRF_ENABLED = False # cambiar a true si esta en produccion
+    SECURITY_LOGIN_URL = '/fs-login'
+    SECURITY_LOGOUT_URL = '/fs-logout'
+    SECURITY_REGISTERABLE = False

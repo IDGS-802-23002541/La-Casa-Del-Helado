@@ -1,6 +1,6 @@
 from flask_security import UserMixin, RoleMixin
 from flask_sqlalchemy import SQLAlchemy
-import datetime
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -28,13 +28,15 @@ class Usuario(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     nombreUsuario = db.Column(db.String(50), nullable=False)
+    nombre = db.Column(db.String(50), nullable=False)
+    apellido = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     fechaIngreso = db.Column(db.Date, nullable=False)
     estatus = db.Column(db.Boolean, default=True, nullable=False)
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
+    ventas = db.relationship('Venta', backref='vendedor')
 
     idRol = db.Column(db.Integer, db.ForeignKey('rol.id'))
-    idPersona = db.Column(db.Integer, db.ForeignKey('persona.id'))
 
     rol = db.relationship('Rol', backref='usuarios')
     persona = db.relationship('Persona', backref='usuario')

@@ -1,0 +1,68 @@
+<nav class="navbar">
+  <a href="{{ url_for('auth.login') }}" class="nav-brand">
+    <div class="nav-brand-avatar">🍦</div>
+    <div style="display: flex; flex-direction: column; line-height: 1;">
+      <span class="nav-brand-name" style="font-size: 16px;">La Casa del Helado</span>
+      <small style="font-size: 9px; color: #ff7043; font-weight: 800; letter-spacing: 1px;">SISTEMA INTEGRAL</small>
+    </div>
+  </a>
+
+  <div class="nav-links" style="display: flex; gap: 15px;">
+    <a href="{{ url_for('recetas.index') }}" 
+       class="nav-link {% if request.endpoint == 'recetas.index' %}active{% endif %}">
+       📖 Recetas
+    </a>
+    
+    <a href="" 
+       class="nav-link {% if request.endpoint == 'SolicitudProduccion.solicitud_produccion' %}active{% endif %}">
+       🏭 Producción
+    </a>
+
+    <a href="" 
+       class="nav-link {% if request.endpoint == 'materia.index' %}active{% endif %}">
+       🍎 Materia Prima
+    </a>
+  </div>
+
+  <div class="nav-right" style="display: flex; align-items: center; gap: 18px;">
+    
+    <div style="text-align: right; line-height: 1.1;">
+      <div id="current-date" style="font-size: 10px; color: #888; font-weight: 700; text-transform: capitalize;">
+        Cargando...
+      </div>
+      <div id="clock" style="font-weight: 800; color: #2d3436; font-size: 17px; letter-spacing: -0.5px;">
+        00:00
+      </div>
+    </div>
+
+    <div class="nav-user-avatar" 
+         style="background: #ff7043; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;"
+         title="{{ current_user.nombreUsuario }}">
+      {{ current_user.nombreUsuario[0] | upper if current_user.nombreUsuario else '?' }}
+    </div>
+
+    <a href="{{ url_for('auth.logout') }}" 
+       style="text-decoration: none; font-size: 11px; color: #ff7675; font-weight: 800; padding: 6px 12px; background: rgba(255, 118, 117, 0.1); border-radius: 20px; transition: 0.3s;">
+      SALIR
+    </a>
+  </div>
+</nav>
+// Fecha y hora en nav
+<script>
+  function actualizarPanel() {
+    const ahora = new Date();
+    
+    const h = String(ahora.getHours()).padStart(2, '0');
+    const m = String(ahora.getMinutes()).padStart(2, '0');
+    const elClock = document.getElementById('clock');
+    if(elClock) elClock.textContent = `${h}:${m}`;
+
+    const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
+    const fechaText = ahora.toLocaleDateString('es-ES', opciones);
+    const elDate = document.getElementById('current-date');
+    if(elDate) elDate.textContent = fechaText;
+  }
+
+  setInterval(actualizarPanel, 1000);
+  actualizarPanel();
+</script>
