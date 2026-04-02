@@ -4,18 +4,15 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='dist/output.css') }}">
 <style>
-/* Limitar altura de la tabla y permitir scroll */
 .table-wrap {
-    max-height: 540px; /* 9 filas aprox, ajusta según tu CSS */
+    max-height: 540px;
     overflow-y: auto;
 }
 
-/* Filas inactivas */
 .inactive-row {
     opacity: 0.5;
 }
 
-/* Chips de filtro */
 .filter-chip {
     display: inline-block;
     padding: 0.3em 0.7em;
@@ -28,7 +25,6 @@
     background: #ccc;
 }
 
-/* Status chip */
 .status-chip {
     display: inline-block;
     padding: 0.3em 0.7em;
@@ -38,7 +34,6 @@
 .status-chip.on { background: #4caf50; color: #fff; }
 .status-chip.off { background: #eee; color: #333; }
 
-/* Overlay para tarjeta */
 #overlay {
     position: fixed;
     top: 0;
@@ -71,7 +66,6 @@
 
 <div class="app-body has-panel">
 
-    <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sb-section">Administración</div>
         <a href="#" class="sb-item active">
@@ -80,10 +74,8 @@
         </a>
     </aside>
 
-    <!-- MAIN -->
     <main class="main">
 
-        <!-- HEADER -->
         <div class="page-hdr">
             <div class="page-hdr-left">
                 <h1>Inventario de materia prima</h1>
@@ -91,7 +83,6 @@
             </div>
         </div>
 
-        <!-- BUSCADOR -->
         <div class="toolbar">
             <div class="search-inp">
                 🔎
@@ -105,7 +96,6 @@
             <div class="filter-chip fc-inactivo inactive-filter">Inactivos</div>
         </div>
 
-        <!-- TABLA -->
         <div class="table-wrap">
             <table id="materiasTable">
                 <thead>
@@ -138,7 +128,6 @@
 
     </main>
 
-    <!-- PANEL DERECHO -->
     <aside class="right-panel">
         <div class="panel-hdr-dark">
             <h3>Nuevo insumo</h3>
@@ -195,7 +184,6 @@
 
 </div>
 
-<!-- TARJETA VER -->
 <div id="overlay"></div>
 <div id="card">
     <span id="closeCard">✖</span>
@@ -210,7 +198,6 @@
 const materias = JSON.parse('{{ materias_primas | tojson | safe }}');
 let estadoFiltro = "todos";
 
-// FILTRAR
 function filtrarTabla() {
     const texto = document.getElementById("search").value.toLowerCase();
     document.querySelectorAll("#materiasTable tbody tr").forEach(row => {
@@ -226,10 +213,8 @@ function filtrarTabla() {
     });
 }
 
-// BUSCADOR
 document.getElementById("search").addEventListener("keyup", filtrarTabla);
 
-// CHIPS
 const chips = document.querySelectorAll(".filter-chip");
 chips[0].onclick = () => { estadoFiltro="todos"; activarChip(0); filtrarTabla(); };
 chips[1].onclick = () => { estadoFiltro="activos"; activarChip(1); filtrarTabla(); };
@@ -237,7 +222,6 @@ chips[2].onclick = () => { estadoFiltro="inactivos"; activarChip(2); filtrarTabl
 function activarChip(index){ chips.forEach(c=>c.classList.add("inactive-filter")); chips[index].classList.remove("inactive-filter"); }
 activarChip(0);
 
-// TARJETA VER
 const overlay = document.getElementById("overlay");
 const card = document.getElementById("card");
 const closeCard = document.getElementById("closeCard");
@@ -260,7 +244,6 @@ document.querySelectorAll(".btnVer").forEach(btn=>{
 });
 closeCard.onclick = () => { overlay.style.display="none"; card.style.display="none"; };
 
-// EDITAR
 document.querySelectorAll(".btnEditar").forEach(btn=>{
     btn.addEventListener("click", ()=>{
         const mp = materias.find(m=>m.id==btn.dataset.id);
@@ -279,7 +262,6 @@ document.querySelectorAll(".btnEditar").forEach(btn=>{
     });
 });
 
-// STATUS CHIP
 document.querySelectorAll(".status-chip").forEach(chip=>{
     chip.onclick=()=>{
         document.querySelectorAll(".status-chip").forEach(c=>{c.classList.remove("on"); c.classList.add("off");});

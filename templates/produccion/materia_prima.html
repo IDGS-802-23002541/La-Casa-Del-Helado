@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+{% block title %}Inventario Materia Prima{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dist/output.css') }}">
+<style>
+    * {
+        box-sizing: border-box;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .app-body {
+        display: flex;
+        height: 100vh;
+    }
+
+    .sidebar {
+        width: 250px;
+        background: #f2e8dd;
+        padding: 25px 18px;
+        position: fixed;
+        left: 0;
+        height: 100vh;
+        border-right: 1px solid #e4d7cc;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .logo {
+        font-size: 12px;
+        font-weight: 600;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+    }
+
+    .sb-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #444;
+        font-size: 14px;
+    }
+
+    .sb-item:hover {
+        background: #eadfd5;
+    }
+
+    .sb-item.active {
+        background: #ffd8c7;
+        font-weight: 600;
+    }
+
+    .main {
+        margin-left: 250px;
+        padding: 20px;
+        background: #f7f3ee;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+        width: calc(100vw - 250px);
+    }
+
+    .page-hdr {
+        margin-bottom: 20px;
+    }
+
+    .page-hdr-left h1 {
+        font-size: 28px;
+        margin: 0;
+        color: #333;
+    }
+
+    .page-hdr-left p {
+        color: #777;
+    }
+
+    .toolbar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .search-inp {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #fff;
+        border-radius: 20px;
+        padding: 8px;
+        border: 1px solid #ddd;
+    }
+
+    .search-inp input {
+        border: none;
+        outline: none;
+        flex: 1;
+        padding: 5px;
+        font-size: 14px;
+    }
+
+    .filter-chip {
+        display: inline-block;
+        padding: 0.3em 0.7em;
+        margin-right: 0.5em;
+        background: #eee;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .filter-chip.inactive-filter {
+        background: #ccc;
+    }
+
+    .table-wrap {
+        max-height: 540px;
+        overflow-y: auto;
+    }
+
+    .inactive-row {
+        opacity: 0.5;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f7f3ee;
+        color: #333;
+    }
+
+    .action-btn {
+        background: #ffd8c7;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .action-btn:hover {
+        background: #f7e1c1;
+    }
+
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 999;
+    }
+
+    #card {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 2em;
+        border-radius: 10px;
+        width: 300px;
+        display: none;
+        z-index: 1000;
+    }
+
+    #card h3 {
+        margin-top: 0;
+    }
+
+    #closeCard {
+        cursor: pointer;
+        float: right;
+        font-size: 18px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+{% include 'NavProduccion.html' %}
+
+<div class="app-body">
+
+    <aside class="sidebar">
+        <h2 class="logo">Gestión de producción</h2>
+        <a href="#" class="sb-item active">
+            🧪 Materia Prima
+            <span class="sb-badge">{{ materias_primas|length }}</span>
+        </a>
+    </aside>
+
+    <main class="main">
+
+        <div class="page-hdr">
+            <div class="page-hdr-left">
+                <h1>Inventario de materia prima</h1>
+                <p>Visualiza todos los insumos registrados</p>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-inp">
+                🔎
+                <input type="text" id="search" placeholder="Buscar insumo, categoría o proveedor...">
+            </div>
+            <div class="sep"></div>
+            <div class="filter-chip fc-all">Todos</div>
+            <div class="filter-chip fc-activo inactive-filter">Activos</div>
+            <div class="filter-chip fc-inactivo inactive-filter">Inactivos</div>
+        </div>
+
+        <div class="table-wrap">
+            <table id="materiasTable">
+                <thead>
+                    <tr>
+                        <th>Insumo</th>
+                        <th>Categoría</th>
+                        <th>Proveedor</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mp in materias_primas %}
+                    <tr data-id="{{ mp.id }}" class="{% if not mp.estatus %}inactive-row{% endif %}">
+                        <td><strong>{{ mp.nombre }}</strong><br><span class="text-xs text-muted">{{ mp.unidadBase
+                                }}</span></td>
+                        <td>{{ mp.categoria.nombre }}</td>
+                        <td>{{ mp.proveedor.razonSocial if mp.proveedor else 'Sin proveedor' }}</td>
+                        <td>{{ mp.stockActual }} {{ mp.unidadBase }}</td>
+                        <td>{% if mp.estatus %}Activo{% else %}Inactivo{% endif %}</td>
+                        <td><button class="action-btn btnVer" data-id="{{ mp.id }}">Ver</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+
+</div>
+
+<div id="overlay"></div>
+<div id="card">
+    <span id="closeCard">✖</span>
+    <h3 id="cardNombre"></h3>
+    <p><strong>Categoría:</strong> <span id="cardCategoria"></span></p>
+    <p><strong>Proveedor:</strong> <span id="cardProveedor"></span></p>
+    <p><strong>Stock:</strong> <span id="cardStock"></span></p>
+    <p><strong>Estatus:</strong> <span id="cardEstatus"></span></p>
+</div>
+
+<script>
+    const materias = JSON.parse('{{ materias_primas | tojson | safe }}');
+    let estadoFiltro = "todos";
+
+    function filtrarTabla() {
+        const texto = document.getElementById("search").value.toLowerCase();
+        document.querySelectorAll("#materiasTable tbody tr").forEach(row => {
+            const contenido = row.innerText.toLowerCase();
+            const esActivo = !row.classList.contains("inactive-row");
+            let cumpleTexto = contenido.includes(texto);
+            let cumpleEstado = (
+                estadoFiltro === "todos" ||
+                (estadoFiltro === "activos" && esActivo) ||
+                (estadoFiltro === "inactivos" && !esActivo)
+            );
+            row.style.display = (cumpleTexto && cumpleEstado) ? "" : "none";
+        });
+    }
+
+    document.getElementById("search").addEventListener("keyup", filtrarTabla);
+
+    const chips = document.querySelectorAll(".filter-chip");
+    chips[0].onclick = () => { estadoFiltro = "todos"; activarChip(0); filtrarTabla(); };
+    chips[1].onclick = () => { estadoFiltro = "activos"; activarChip(1); filtrarTabla(); };
+    chips[2].onclick = () => { estadoFiltro = "inactivos"; activarChip(2); filtrarTabla(); };
+    function activarChip(index) { chips.forEach(c => c.classList.add("inactive-filter")); chips[index].classList.remove("inactive-filter"); }
+    activarChip(0);
+
+    const overlay = document.getElementById("overlay");
+    const card = document.getElementById("card");
+    const closeCard = document.getElementById("closeCard");
+    const cardNombre = document.getElementById("cardNombre");
+    const cardCategoria = document.getElementById("cardCategoria");
+    const cardProveedor = document.getElementById("cardProveedor");
+    const cardStock = document.getElementById("cardStock");
+    const cardEstatus = document.getElementById("cardEstatus");
+
+    document.querySelectorAll(".btnVer").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const mp = materias.find(m => m.id == btn.dataset.id);
+            cardNombre.textContent = mp.nombre;
+            cardCategoria.textContent = mp.categoria.nombre;
+            cardProveedor.textContent = mp.proveedor ? mp.proveedor.razonSocial : "Sin proveedor";
+            cardStock.textContent = mp.stockActual + " " + mp.unidadBase;
+            cardEstatus.textContent = mp.estatus ? "Activo" : "Inactivo";
+            overlay.style.display = "block"; card.style.display = "block";
+        });
+    });
+    closeCard.onclick = () => { overlay.style.display = "none"; card.style.display = "none"; };
+</script>
+
+{% endblock %}

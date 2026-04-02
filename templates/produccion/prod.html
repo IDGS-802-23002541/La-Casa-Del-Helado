@@ -1,5 +1,342 @@
-{% extends "layout.html" %} {% block container %}
+{% extends "base.html" %}
 
-<p class="text-amber-600">MODULO PRODUCCION :D</p>
+{% block body %}
+
+{% include "NavProduccion.html" %}
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <div>
+            <h2 class="logo">Gestión de producción</h2>
+            <nav class="menu">
+                <a href="#" class="item active">
+                    🏭 <span>Producción</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <main class="content">
+
+        <div class="header">
+            <div>
+                <h1>🏭 Producción</h1>
+                <p>Gestión de solicitudes de producción del día</p>
+            </div>
+        </div>
+
+        <div class="resumen">
+            <div class="pill amarillo">● {{ pendientes|length }} Pendiente</div>
+            <div class="pill azul">● {{ en_proceso|length }} En proceso</div>
+            <div class="pill verde">● {{ terminadas|length }} Terminado</div>
+        </div>
+
+        <div class="board">
+
+            <div class="col pendiente">
+                <div class="col-header">
+                    🕒 Pendiente <span>{{ pendientes|length }}</span>
+                </div>
+                {% for s in pendientes %}
+                <div class="card">
+                    <div class="top">
+                        <div>
+                            <strong>🍭 {{ s.producto.nombre }}</strong>
+                            <small>ID Solicitud: {{ s.id }}</small>
+                        </div>
+                        <span class="qty">{{ s.cantidad_solicitada }}</span>
+                    </div>
+                    <small>📋 Receta:
+                        {% if s.producto.recetas %}
+                        {{ s.producto.recetas[0].nombre }}
+                        {% else %}
+                        Sin receta
+                        {% endif %}
+                    </small>
+                    <small>🗓️ {{ s.fecha_solicitud.strftime('%d %b %Y') }}</small>
+                    <form method="POST" action="{{ url_for('produccion.iniciar_produccion', sol_id=s.id) }}">
+                        <button class="btn iniciar">▶ Iniciar</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="col proceso">
+                <div class="col-header">
+                    ⚙️ En proceso <span>{{ en_proceso|length }}</span>
+                </div>
+                {% for s in en_proceso %}
+                <div class="card proceso-card">
+                    <div class="top">
+                        <div>
+                            <strong>⚙️ {{ s.producto.nombre }}</strong>
+                            <small>ID Solicitud: {{ s.id }}</small>
+                        </div>
+                        <span class="qty">{{ s.cantidad_solicitada }}</span>
+                    </div>
+                    <small>📋 Receta:
+                        {% if s.producto.recetas %}
+                        {{ s.producto.recetas[0].nombre }}
+                        {% else %}
+                        Sin receta
+                        {% endif %}
+                    </small>
+                    <small>🗓️ {{ s.fecha_solicitud.strftime('%d %b %Y') }}</small>
+                    <form method="POST" action="{{ url_for('produccion.terminar_produccion', sol_id=s.id) }}">
+                        <button class="btn terminar">⏹ Terminar</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="col terminado">
+                <div class="col-header">
+                    ✅ Terminado <span>{{ terminadas|length }}</span>
+                </div>
+                {% for s in terminadas %}
+                <div class="card terminado-card">
+                    <div class="top">
+                        <div>
+                            <strong>✅ {{ s.producto.nombre }}</strong>
+                            <small>ID Solicitud: {{ s.id }}</small>
+                        </div>
+                        <span class="qty">{{ s.cantidad_solicitada }}</span>
+                    </div>
+                    <small>📋 Receta:
+                        {% if s.producto.recetas %}
+                        {{ s.producto.recetas[0].nombre }}
+                        {% else %}
+                        Sin receta
+                        {% endif %}
+                    </small>
+                    <small>🗓️ {{ s.fecha_solicitud.strftime('%d %b %Y') }}</small>
+                    <button class="btn completo">🎉 Completado</button>
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+    </main>
+</div>
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.layout {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background: #f2e8dd;
+    padding: 25px 18px;
+    position: fixed;
+    left: 0;
+    height: 100vh;
+    border-right: 1px solid #e4d7cc;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 12px;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #444;
+    font-size: 14px;
+}
+
+.item:hover {
+    background: #eadfd5;
+}
+
+.item.active {
+    background: #ffd8c7;
+    font-weight: 600;
+}
+
+.content {
+    margin-left: 250px;
+    padding: 20px;
+    background: #f7f3ee;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    width: calc(100vw - 250px);
+}
+
+.header p {
+    color: #777;
+}
+
+.resumen {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.amarillo {
+    background: #ffe5a3;
+}
+
+.azul {
+    background: #cde7e3;
+}
+
+.verde {
+    background: #cdebdc;
+}
+
+.board {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+.col {
+    flex: 1;
+    border-radius: 15px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 90%;
+    overflow-y: auto;
+}
+
+.iniciar {
+    background: #e1e1df;
+}
+
+.pendiente {
+    background: #fff3cd;
+}
+
+.proceso {
+    background: #dbecee;
+}
+
+.terminado {
+    background: #dff3e8;
+}
+
+.col-header {
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px;
+    height: 145px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.top, .card small, .btn {
+    flex-shrink: 0;
+}
+
+.proceso-card {
+    background: #fff1e6;
+}
+
+.terminado-card {
+    background: #eafaf1;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top small {
+    display: block;
+    color: #777;
+}
+
+.qty {
+    background: #ff6b2c;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.card small {
+    display: block;
+    color: #666;
+    font-size: 12px;
+}
+
+.btn {
+    width: 100%;
+    margin-top: 12px; /* espacio extra sobre el botón */
+    padding: 7px;
+    border-radius: 10px;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.terminar {
+    background: #ffd9c2;
+}
+
+.completo {
+    background: #b7e4c7;
+}
+
+.col::-webkit-scrollbar {
+    width: 8px;
+}
+
+.col::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 10px;
+}
+</style>
 
 {% endblock %}

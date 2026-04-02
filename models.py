@@ -180,13 +180,36 @@ class SolicitudProduccion(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     idProducto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False)
-    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)  # El empleado de mostrador
-    cantidad_solicitada = db.Column(db.Integer, nullable=False)
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    cantidad_solicitada = db.Column(db.Numeric(10,2), nullable=False)
     fecha_solicitud = db.Column(db.DateTime, default=datetime.datetime.now)
-    estatus = db.Column(db.String(50), default='Pendiente') 
+    estatus = db.Column(db.String(50), default='Pendiente')  # Pendiente, En Proceso, Terminado
 
+    # Relaciones
     producto = db.relationship('Producto', backref='solicitudes')
     usuario = db.relationship('Usuario', backref='solicitudes_creadas')
+
+    def procesar_terminado(self):
+
+        if self.estatus == 'Terminado':
+            return 
+
+        receta = Receta.query.filter_by(idProducto=self.idProducto).first()
+        if not receta:
+            raise Exception(f"No hay receta definida para el producto {self.producto.nombre}")
+
+        for detalle in receta.detalles:
+            mp = detalle.materiaPrima
+            cantidad_total = detalle.cantidad * float(self.cantidad_solicitada)
+            if mp.stockActual < cantidad_total:
+                raise Exception(f"Materia prima insuficiente: {mp.nombre}")
+            mp.stockActual -= cantidad_total
+
+        self.producto.stockActual += float(self.cantidad_solicitada)
+
+
+        self.estatus = 'Terminado'
+        db.session.commit()
 
 
 class Receta(db.Model):

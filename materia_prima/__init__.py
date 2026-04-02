@@ -20,14 +20,12 @@ def materia():
         idProveedor = request.form.get("idProveedor")
         estatus = request.form.get("estatus")
 
-        # 🔥 CONVERSIÓN IMPORTANTE
         idCategoria = int(idCategoria) if idCategoria else None
         idProveedor = int(idProveedor) if idProveedor else None
         stockActual = float(stockActual)
         stockMinimo = float(stockMinimo)
 
         if materia_id:
-            # 🔹 EDITAR
             materia_existente = MateriaPrima.query.get(materia_id)
 
             if materia_existente:
@@ -40,7 +38,6 @@ def materia():
                 materia_existente.estatus = True if estatus == "1" else False
 
         else:
-            # 🔹 CREAR
             nueva = MateriaPrima(
                 nombre=nombre,
                 unidadBase=unidadBase,
@@ -55,12 +52,10 @@ def materia():
         db.session.commit()
         return redirect(url_for("materia.materia"))
 
-    # 🔹 CONSULTAS
     materias_db = MateriaPrima.query.all()
     categorias = Categoria.query.all()
     proveedores = Proveedor.query.all()
 
-    # 🔥 FORMATO CORRECTO (OBJETOS)
     materias_primas = []
     for mp in materias_db:
         materias_primas.append({
