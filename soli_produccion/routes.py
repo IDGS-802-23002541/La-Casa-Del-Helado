@@ -6,8 +6,8 @@ from flask_security import login_required, roles_accepted, current_user
 
 
 @Soli_Produccion.route('/solicitud_produccion', methods=['GET', 'POST'])
-@login_required
-@roles_accepted('Mostrador')
+# @login_required
+# @roles_accepted('Mostrador')
 def solicitud_produccion():
     if request.method == 'POST':
         id_prod = request.form.get('idProducto')
@@ -41,8 +41,8 @@ def solicitud_produccion():
 
 # Esta es la ruta que "le llega" a producciom. Solo ven lo que falta por hacer.
 @Soli_Produccion.route('/panel_produccion')
-@login_required
-@roles_accepted('Produccion')
+# @login_required
+# @roles_accepted('Produccion')
 def panel_produccion():
     # Solo traemos lo que NO está completado
     tareas = SolicitudProduccion.query.filter(SolicitudProduccion.estatus != 'Completada').order_by(SolicitudProduccion.fecha.asc()).all()
@@ -51,8 +51,8 @@ def panel_produccion():
 
 # Esta ruta hace la actualizar el inventario automáticamente cuando se marca una tarea como "Completada"
 @Soli_Produccion.route('/estatus/actualizar', methods=['POST'])
-@login_required
-@roles_accepted('Produccion')
+# @login_required
+# @roles_accepted('Produccion')
 def actualizar_estatus():
     id_solicitud = request.form.get('id_solicitud')
     nuevo_estatus = request.form.get('nuevo_estatus')
@@ -75,8 +75,8 @@ def actualizar_estatus():
     return redirect(request.referrer or url_for('SolicitudProduccion.solicitud_produccion'))
 
 @Soli_Produccion.route('/eliminar_historial')
-@login_required
-@roles_accepted('Mostrador')
+# @login_required
+# @roles_accepted('Mostrador')
 def eliminar_registro():
     id_reg = request.args.get('id')
     if id_reg:
