@@ -90,6 +90,7 @@ def compra():
             if not session["detalles"]:
                 return "Agrega al menos un producto", 400
             
+            detalles_json = json.dumps(session["detalles"])
 
             compra = Compra(
                 factura=compra_form.factura.data,

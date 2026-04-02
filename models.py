@@ -182,37 +182,19 @@ class Merma(db.Model):
         ),
     )
 
-class Producto(db.Model): 
-    __tablename__ = 'producto'
-
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), nullable=False, unique=True)
-    unidadBase = db.Column(db.String(20), nullable=False)
-    stockActual = db.Column(db.Numeric(10,2), nullable=False, default = 0)
-    stockMinimo = db.Column(db.Numeric(10,2), nullable=False, default = 0)
-    costoUnitario = db.Column(db.Numeric(10,2), nullable=False, default = 0)
-    idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
-
-    categoria = db.relationship('Categoria', foreign_keys=[idCategoria])
-    unidadBase = db.Column(db.String(20), nullable=False)
-    stockActual = db.Column(db.Numeric(10,2), nullable=False, default=0)
-    stockMinimo = db.Column(db.Numeric(10,2), nullable=False, default=0)
-    idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'),nullable=False)
-
-    categoria = db.relationship('Categoria', foreign_keys=[idCategoria])
 
 class Turno(db.Model):
     __tablename__ = 'turno'
     id = db.Column(db.Integer, primary_key=True)
     idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
-    apertura = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    apertura = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     cierre = db.Column(db.DateTime, nullable=True) 
     ventas = db.relationship('Venta', backref='turno_rel')
 
 class Venta(db.Model):
     __tablename__ = 'venta'
     id = db.Column(db.Integer, primary_key=True)
-    fecha = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    fecha = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     total = db.Column(db.Numeric(10, 2), nullable=False)
     idTurno = db.Column(db.Integer, db.ForeignKey('turno.id'), nullable=False)
     detalles = db.relationship('DetalleVenta', backref='venta_rel', cascade="all, delete-orphan")
@@ -227,9 +209,4 @@ class DetalleVenta(db.Model):
 
     producto = db.relationship('Producto')
 
-class Categoria(db.Model):
-    __tablename__ = 'categoria'
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(50), nullable=False)
-    productos = db.relationship('Producto', backref='categoria_rel')
     
