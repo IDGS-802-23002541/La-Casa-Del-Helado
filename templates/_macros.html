@@ -12,3 +12,22 @@
 
 {% endmacro %}
 
+{% macro campoCompra(field, clase='', placeholder='') %}
+<div class="mb-3">
+
+    <label class="text-xs font-extrabold text-brand-text">
+        {{ field.label }} <span class="text-orange">*</span>
+    </label>
+
+    <div>
+        {{ field(class_=clase, placeholder=placeholder) }}
+    </div>
+
+    {% if field.errors %}
+        {% for error in field.errors %}
+            <p class="text-red-500 text-xs">{{ error }}</p>
+        {% endfor %}
+    {% endif %}
+
+</div>
+{% endmacro %}

@@ -1,0 +1,170 @@
+/* Layout & Grid */
+.grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.h-7 {
+    height: calc(0.25rem * 7);
+}
+
+.w-7 {
+    width: calc(0.25rem * 7);
+}
+
+.mt-\[22px\] {
+    margin-top: 22px;
+}
+
+.max-w-\[560px\] {
+    max-width: 560px;
+}
+
+.p-3 {
+    padding: calc(0.25rem * 3);
+}
+
+.px-3 {
+    padding-inline: calc(0.25rem * 3);
+}
+
+.py-0\.5 {
+    padding-block: calc(0.25rem * 0.5);
+}
+
+/* Borders */
+.border-2 {
+    border-width: 2px;
+    border-style: solid;
+}
+
+.border-dashed {
+    border-style: dashed;
+}
+
+.border-\[\#FFD0D0\] {
+    border-color: #FFD0D0;
+}
+
+/* Backgrounds */
+.bg-\[\#FFF0F0\] {
+    background-color: #FFF0F0;
+}
+
+.bg-orange {
+    background-color: var(--color-orange);
+}
+
+/* Border-radius */
+.rounded-\[7px\] {
+    border-radius: 7px;
+}
+
+.rounded-\[11px\] {
+    border-radius: 11px;
+}
+
+/* Typography */
+.font-black {
+    font-weight: 900;
+}
+
+.text-\[10px\] {
+    font-size: 10px;
+}
+
+.text-\[11px\] {
+    font-size: 11px;
+}
+
+.text-\[\#E06060\] {
+    color: #E06060;
+}
+
+.text-muted {
+    color: var(--color-muted);
+}
+
+.tracking-\[1\.2px\] {
+    letter-spacing: 1.2px;
+}
+
+/* Shadows */
+.shadow-\[0_4px_14px_rgba\(255\,107\,53\,0\.35\)\] {
+    box-shadow: 0 4px 14px rgba(255, 107, 53, 0.35);
+}
+
+/* Transitions */
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.outline-none {
+    outline: none;
+}
+
+/* Hover variants */
+.hover\:-translate-y-px:hover {
+    transform: translateY(-1px);
+}
+
+.hover\:border-\[\#E06060\]:hover {
+    border-color: #E06060;
+}
+
+.hover\:border-muted:hover {
+    border-color: var(--color-muted);
+}
+
+.hover\:border-orange:hover {
+    border-color: var(--color-orange);
+}
+
+.hover\:bg-\[\#E85C28\]:hover {
+    background-color: #E85C28;
+}
+
+.hover\:bg-\[\#FFD8D8\]:hover {
+    background-color: #FFD8D8;
+}
+
+.hover\:text-orange:hover {
+    color: var(--color-orange);
+}
+
+.hover\:shadow-\[0_6px_20px_rgba\(255\,107\,53\,0\.45\)\]:hover {
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.45);
+}
+
+/* Focus variants */
+.focus\:border-orange:focus {
+    border-color: var(--color-orange);
+}
+
+.focus\:bg-white:focus {
+    background-color: #ffffff;
+}
+
+.focus\:ring-orange\/10:focus {
+    --tw-ring-color: color-mix(in oklab, var(--color-orange) 10%, transparent);
+    box-shadow: 0 0 0 calc(2px + var(--tw-ring-offset-width, 0px)) var(--tw-ring-color);
+}
+
+/* Page-level components (solo en CSS2) */
+.page {
+    padding: 20px;
+    background-color: #fdfaf5;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    justify-content: center;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 900px;
+    overflow: hidden;
+}

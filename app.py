@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from flask_security import Security, SQLAlchemyUserDatastore
 from config import DevelopmentConfig
 from models import db, Usuario, Rol 
+from flask_migrate import Migrate
 
 # Rutas en Blueprint
 from proveedores.routes import proveedores
@@ -15,12 +16,14 @@ from venta import venta_bp
 from recetas import receta_bp
 from usuarios import usuarios_bp
 from compras import compra_bp
+from mermas import merma_bp
 from soli_produccion import Soli_Produccion
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 
 db.init_app(app)
+migrate = Migrate(app, db)
 
 user_datastore = SQLAlchemyUserDatastore(db,Usuario,Rol)
 security = Security(app, user_datastore)
@@ -37,6 +40,7 @@ app.register_blueprint(venta_bp)
 app.register_blueprint(receta_bp)
 app.register_blueprint(usuarios_bp)
 app.register_blueprint(compra_bp)
+app.register_blueprint(merma_bp)
 app.register_blueprint(Soli_Produccion)
 
 
