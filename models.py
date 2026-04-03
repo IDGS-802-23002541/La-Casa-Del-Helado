@@ -40,6 +40,8 @@ class Usuario(db.Model, UserMixin):
 
     rol = db.relationship('Rol', foreign_keys=[idRol])
 
+    compras = db.relationship('Compra', back_populates='usuario')
+
     @property
     def active(self):
         return self.estatus
@@ -53,7 +55,7 @@ class Proveedor(db.Model):
     telefono = db.Column(db.String(15), nullable=False)
     direccion = db.Column(db.String(200), nullable=False)
     estatus = db.Column(db.String(20), default='Activo')
-    # compras = db.relationship('Compra', backref='proveedor', lazy=True)
+    compras = db.relationship('Compra', back_populates='proveedor')
     
 class SolicitudProduccion(db.Model):
     __tablename__ = 'solicitudproduccion'
@@ -107,14 +109,14 @@ class Compra(db.Model):
 
     id=db.Column(db.Integer, primary_key=True)
     factura=db.Column(db.String(50), nullable=False)
-    fechaCompra=db.Column(db.Date, default=datetime.date.today)
+    fechaCompra=db.Column(db.Date, default=datetime.datetime.utcnow)
     idProveedor=db.Column(db.Integer, db.ForeignKey('proveedor.id'), nullable=False)
     idUsuario=db.Column(db.Integer,db.ForeignKey('usuario.id'), nullable=False)
     estatus=db.Column(db.Boolean, default=True)
     fechaEliminacion = db.Column(db.DateTime)
 
     proveedor = db.relationship('Proveedor', back_populates='compras')
-    usuario = db.relationship('Usuario', backref='compras')
+    usuario = db.relationship('Usuario', back_populates='compras')
 
     detalles_compra = db.relationship('DetalleCompra', back_populates='compra', cascade="all, delete-orphan")
     
@@ -162,10 +164,14 @@ class Merma(db.Model):
     idMateriaPrima = db.Column(db.Integer, db.ForeignKey('materia_prima.id'), nullable=True)
     idProducto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=True)
     
-    cantidad = db.Column(db.Numeric(10, 2), nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False)
     unidad = db.Column(db.String(20), nullable=False)
     justificacion = db.Column(db.String(200), nullable=False)
     fecha = db.Column(db.Date, nullable=False)
+
+    estatus=db.Column(db.Boolean, default=True)
+    fechaEliminacion = db.Column(db.DateTime)
+
     
     idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
 
