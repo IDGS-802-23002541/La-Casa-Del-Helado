@@ -1,6 +1,6 @@
 from flask_security import UserMixin, RoleMixin
 from flask_sqlalchemy import SQLAlchemy
-import datetime
+from datetime import datetime
 
 db= SQLAlchemy()    
 
@@ -18,6 +18,7 @@ class Rol(db.Model, RoleMixin):
     @property
     def name(self):
         return self.nombre
+    
     @property
     def description(self):
         return ''
@@ -33,6 +34,7 @@ class Usuario(db.Model, UserMixin):
     fechaIngreso = db.Column(db.Date, nullable=False)
     estatus = db.Column(db.Boolean, default=True, nullable=False)
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
+    ventas = db.relationship('Venta', backref='vendedor')
 
     idRol = db.Column(db.Integer, db.ForeignKey('rol.id'))
 
@@ -56,16 +58,19 @@ class Proveedor(db.Model):
     direccion = db.Column(db.String(200), nullable=False)
     estatus = db.Column(db.String(20), default='Activo')
     compras = db.relationship('Compra', back_populates='proveedor')
+    materiasPrimas = db.relationship('MateriaPrima', back_populates='proveedor')
     
 class SolicitudProduccion(db.Model):
-    __tablename__ = 'solicitudproduccion'
+    __tablename__ = 'solicitud_produccion'
     id = db.Column(db.Integer, primary_key=True)
-    fecha = db.Column(db.Date, nullable=False)
-    estatus = db.Column(db.String(20), nullable=False)
     idProducto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False)
-    cantidad = db.Column(db.Numeric(10, 2), nullable=False)
-    producto = db.relationship('Producto', backref='solicitudes_produccion')
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False) # El empleado de mostrador
+    cantidad_solicitada = db.Column(db.Integer, nullable=False)
+    fecha_solicitud = db.Column(db.DateTime, default=datetime.now)
+    estatus = db.Column(db.String(50), default='Pendiente') 
 
+    producto = db.relationship('Producto', backref='solicitudes')
+    usuario = db.relationship('Usuario', backref='solicitudes_creadas')
 
 class Receta(db.Model):
     __tablename__ = 'receta'
@@ -195,14 +200,13 @@ class Turno(db.Model):
     idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     apertura = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     cierre = db.Column(db.DateTime, nullable=True) 
-    ventas = db.relationship('Venta', backref='turno_rel')
 
 class Venta(db.Model):
     __tablename__ = 'venta'
     id = db.Column(db.Integer, primary_key=True)
     fecha = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     total = db.Column(db.Numeric(10, 2), nullable=False)
-    idTurno = db.Column(db.Integer, db.ForeignKey('turno.id'), nullable=False)
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     detalles = db.relationship('DetalleVenta', backref='venta_rel', cascade="all, delete-orphan")
 
 class DetalleVenta(db.Model):

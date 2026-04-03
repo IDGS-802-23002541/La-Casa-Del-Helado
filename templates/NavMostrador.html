@@ -1,31 +1,77 @@
-<nav class="navbar">
-  <a href="{{ url_for('venta.index') }}" class="nav-brand">
-    <div class="nav-brand-avatar">🍦</div>
-    <span class="nav-brand-name">La Casa del Helado</span>
-  </a>
+<nav class="nav-mostrador">
+  <div class="nav-top">
+    <div class="nav-brand">
+      <div class="brand-logo">🍦</div>
+      <div class="brand-text">
+        <span class="brand-title">La Casa del Helado</span>
+        <span class="brand-subtitle">PUNTO DE VENTA</span>
+      </div>
+    </div>
 
-  <div class="nav-links">
+    <div class="nav-status">
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        Turno activo — {{ current_user.nombreUsuario if current_user and current_user.is_authenticated else 'Invitado' }}
+      </div>
+    </div>
 
-    {# <a href="{{ url_for('venta.index') }}"
-       class="nav-link {% if active_page == 'venta' %}active{% endif %}">
-      Venta Directa
-    </a> #}
+    <div class="nav-user-info" style="display: flex; align-items: center; gap: 15px;">
+      <div style="text-align: right; line-height: 1.2;">
+        <div id="current-date" style="font-size: 11px; color: #666; font-weight: 600; text-transform: capitalize;">Cargando fecha...</div>
+        <div class="nav-time" id="clock" style="font-weight: 800; color: #333; font-size: 18px;">00:00</div>
+      </div>
+    
+      {% if turno_activo %}
+        <form action="{{ url_for('usuarios.index') }}" method="POST" style="display:inline;">
+          <button type="submit" class="btn-cerrar-turno">Cerrar turno</button>
+        </form>
+      {% endif %}
 
-    {# <a href="{{ url_for('compra.index') }}"
-       class="nav-link {% if active_page == 'compras' %}active{% endif %}">
-      Compras Proveedores
-    </a> #}
+      {% if current_user and current_user.is_authenticated %}
+        {# ✅ CORRECCIÓN CLAVE: De 'usuarios.logout' a 'auth.logout' #}
+        <a href="{{ url_for('auth.logout') }}" style="text-decoration: none; font-size: 12px; color: #FF4757; font-weight: 800; padding: 5px 10px; background: rgba(255, 71, 87, 0.1); border-radius: 6px;">
+          Cerrar Sesión
+        </a>
+      {% endif %}
+
+      <div class="user-avatar-circle">
+        {{ current_user.nombreUsuario[:2].upper() if current_user and current_user.is_authenticated else 'PV' }}
+      </div>
+    </div>
   </div>
 
-  <div class="nav-right">
-    <span class="nav-date">📅 {{ fecha_hoy }}</span>
-    <div class="nav-user-avatar"
-         title="{{ current_user.nombre }}">
-      {{ current_user.nombre[0] | upper if current_user.nombre else '?' }}
-    </div>
-    <a href="{{ url_for('auth.logout') }}" class="btn-logout"
-       style="width:auto; padding:6px 12px; border-radius:20px; font-size:11px; text-decoration:none;">
-      Salir
+  <div class="nav-bottom">
+    <a href="{{ url_for('venta.punto_venta') }}" 
+       class="nav-tab {% if request.endpoint == 'venta.punto_venta' %}active{% endif %}">
+      <span class="tab-icon">🛒</span> Punto de Venta
+    </a>
+
+    <a href="#" class="nav-tab">
+      <span class="tab-icon">📦</span> Compras Proveedores
+    </a>
+
+    {# Asegúrate de que el blueprint se llame SolicitudProduccion con mayúsculas, si no cámbialo a minúsculas #}
+    <a href="{{ url_for('SolicitudProduccion.solicitud_produccion') }}" 
+       class="nav-tab {% if request.endpoint == 'SolicitudProduccion.solicitud_produccion' %}active{% endif %}">
+      <span class="tab-icon">🏭</span> Solicitud Producción
     </a>
   </div>
 </nav>
+
+<script>
+  function actualizarReloj() {
+    const ahora = new Date();
+    const horas = String(ahora.getHours()).padStart(2, '0');
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+    const el = document.getElementById('clock');
+    if(el) el.textContent = `${horas}:${minutos}`;
+
+    const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
+    const fechaTexto = ahora.toLocaleDateString('es-ES', opciones);
+    const elFecha = document.getElementById('current-date');
+    if(elFecha) elFecha.textContent = fechaTexto;
+  }
+
+  setInterval(actualizarReloj, 1000);
+  actualizarReloj();
+</script>

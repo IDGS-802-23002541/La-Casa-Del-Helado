@@ -114,53 +114,75 @@
     </main>
 
     <!-- PANEL DERECHO -->
-    <aside class="right-panel">
+  <aside class="right-panel">
+    <div class="panel-hdr-dark">
       <h3>{{ 'Editar Usuario' if usr_editar else 'Nuevo Usuario' }}</h3>
+      <p>Completa los campos para {{ 'actualizar el' if usr_editar else 'registrar un nuevo' }} usuario</p>
+    </div>
 
-      <form method="POST"
+    <div class="panel-body">
+      <form id="form-usuario" method="POST"
             action="{{ url_for('usuarios.editar', id=usr_editar.id) if usr_editar else url_for('usuarios.crear') }}">
 
-        <label>Nombre</label>
-        <input type="text" name="nombre"
-               value="{{ usr_editar.nombre if usr_editar else '' }}"/>
+        <div class="fr2">
+          <div class="fg">
+            <label>Nombre</label>
+            <input type="text" name="nombre"
+                  value="{{ usr_editar.nombre if usr_editar else '' }}" />
+          </div>
+          <div class="fg">
+            <label>Apellido</label>
+            <input type="text" name="apellido"
+                  value="{{ usr_editar.apellido if usr_editar else '' }}" />
+          </div>
+        </div>
 
-        <label>Apellido</label>
-        <input type="text" name="apellido"
-               value="{{ usr_editar.apellido if usr_editar else '' }}"/>
+        <div class="fg">
+          <label>Nombre de usuario</label>
+          <input type="text" name="nombreUsuario"
+                value="{{ usr_editar.nombreUsuario if usr_editar else '' }}" />
+        </div>
 
-        <label>Nombre de usuario</label>
-        <input type="text" name="nombreUsuario"
-               value="{{ usr_editar.nombreUsuario if usr_editar else '' }}"/>
+        <div class="fg">
+          <label>Contraseña</label>
+          <input type="password" name="password" />
+        </div>
 
-        <label>Contraseña</label>
-        <input type="password" name="password"/>
+        <div class="fg">
+          <label>Rol</label>
+          <select name="idRol">
+            <option value="">— Selecciona el rol —</option>
+            {% for r in roles %}
+              <option value="{{ r.id }}"
+                {{ 'selected' if usr_editar and usr_editar.idRol == r.id }}>
+                {{ r.nombre }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
 
-        <label>Rol</label>
-        <select name="idRol">
-          <option value="">-Selecciona el rol-</option>
-          {% for r in roles %}
-            <option value="{{ r.id }}"
-              {{ 'selected' if usr_editar and usr_editar.idRol == r.id }}>
-              {{ r.nombre }}
-            </option>
-          {% endfor %}
-        </select>
+        <div class="fg">
+          <label>Estatus</label>
+          <select name="estatus">
+            <option value="">— Selecciona estatus —</option>
+            <option value="true"  {{ 'selected' if not usr_editar or usr_editar.estatus }}>Activo</option>
+            <option value="false" {{ 'selected' if usr_editar and not usr_editar.estatus }}>Inactivo</option>
+          </select>
+        </div>
 
-        <label>Estatus</label>
-        <select name="estatus">
-          <option value="">-Selecciona categoria-</option>
-  
-          <option value="true"  {{ 'selected' if not usr_editar or usr_editar.estatus }}>Activo</option>
-          <option value="false" {{ 'selected' if usr_editar and not usr_editar.estatus }}>Inactivo</option>
-        </select>
-
-        <br/><br/>
-        <button type="submit" class="btn-save">Guardar</button>
-        <a href="{{ url_for('usuarios.index') }}" class="btn-cancel">
-          Cancelar
-        </a>
       </form>
-    </aside>
+    </div>
+
+    <div class="panel-footer">
+      <a href="{{ url_for('usuarios.index') }}" class="btn-cancel">
+        Cancelar
+      </a>
+      <button type="submit" form="form-usuario" class="btn-save">
+        {{ 'Actualizar' if usr_editar else 'Guardar' }}
+      </button>
+    </div>
+
+  </aside>
 
   </div>
 {% endblock %}
