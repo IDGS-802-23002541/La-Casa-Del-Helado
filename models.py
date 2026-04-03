@@ -58,7 +58,6 @@ class Proveedor(db.Model):
     direccion = db.Column(db.String(200), nullable=False)
     estatus = db.Column(db.String(20), default='Activo')
     compras = db.relationship('Compra', back_populates='proveedor')
-    materiasPrimas = db.relationship('MateriaPrima', back_populates='proveedor')
     
 class SolicitudProduccion(db.Model):
     __tablename__ = 'solicitud_produccion'
@@ -114,7 +113,7 @@ class Compra(db.Model):
 
     id=db.Column(db.Integer, primary_key=True)
     factura=db.Column(db.String(50), nullable=False)
-    fechaCompra=db.Column(db.Date, default=datetime.datetime.utcnow)
+    fechaCompra=db.Column(db.Date, default=datetime.utcnow)
     idProveedor=db.Column(db.Integer, db.ForeignKey('proveedor.id'), nullable=False)
     idUsuario=db.Column(db.Integer,db.ForeignKey('usuario.id'), nullable=False)
     estatus=db.Column(db.Boolean, default=True)
@@ -199,13 +198,13 @@ class Turno(db.Model):
     __tablename__ = 'turno'
     id = db.Column(db.Integer, primary_key=True)
     idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
-    apertura = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    apertura = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     cierre = db.Column(db.DateTime, nullable=True) 
 
 class Venta(db.Model):
     __tablename__ = 'venta'
     id = db.Column(db.Integer, primary_key=True)
-    fecha = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    fecha = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     total = db.Column(db.Numeric(10, 2), nullable=False)
     idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     detalles = db.relationship('DetalleVenta', backref='venta_rel', cascade="all, delete-orphan")
