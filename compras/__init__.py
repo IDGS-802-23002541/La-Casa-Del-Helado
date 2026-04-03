@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from models import db, Proveedor, Compra, Usuario, MateriaPrima, DetalleCompra
 from flask_security import current_user
-from flask import session
+from flask import session, flash
+from sqlalchemy import text
 from datetime import datetime
 
+import json
 import forms
 
 compra_bp = Blueprint(
@@ -92,39 +94,18 @@ def compra():
             
             detalles_json = json.dumps(session["detalles"])
 
-            compra = Compra(
-                factura=compra_form.factura.data,
-                idProveedor=compra_form.idProveedor.data,
-                idUsuario=1, #current_user.id,
-                estatus=True
+            db.session.execute(
+                text("CALL registrar_compra(:factura, :proveedor, :usuario, :detalles)"),
+                {
+                    "factura": compra_form.factura.data,
+                    "proveedor": compra_form.idProveedor.data,
+                    "usuario": 1,
+                    "detalles": detalles_json
+                }
             )
-
-            db.session.add(compra)
-            db.session.flush()
-
-            for d in session["detalles"]:
-                detalle = DetalleCompra(
-                    idCompra=compra.id,
-                    idMateriaPrima=d["idMateriaPrima"],
-                    cantidad=d["cantidad"],
-                    contenidoNeto=d["contenidoNeto"],
-                    precio=d["precio"]
-                )
-
-                db.session.add(detalle)
-
-                # Actualizar stock
-                materia = MateriaPrima.query.get(d["idMateriaPrima"])
-                
-                cantidad_convertida = convertir_a_base(
-                    d["cantidad"],
-                    d["contenidoNeto"],
-                    materia.unidadBase
-                )
-
-                materia.stockActual += cantidad_convertida
-
             db.session.commit()
+
+            flash("Compra registrada", "success")
 
             session.pop("detalles", None)
             session.pop("compra_data", None)
@@ -139,13 +120,13 @@ def compra():
         compras=compras
     )
 
-def convertir_a_base(cantidad, presentacion, unidad_base):
-    factor = CONVERSIONES[unidad_base].get(presentacion)
+# def convertir_a_base(cantidad, presentacion, unidad_base):
+#     factor = CONVERSIONES[unidad_base].get(presentacion)
 
-    if not factor:
-        raise Exception("Conversión no definida")
+#     if not factor:
+#         raise Exception("Conversión no definida")
 
-    return cantidad * factor
+#     return cantidad * factor
 
 @compra_bp.route("/get_presentaciones/<int:idMateria>")
 def get_presentaciones(idMateria):
@@ -174,6 +155,7 @@ def eliminar_compra(id):
 
     db.session.commit()
 
+    flash("Eliminación completada", "success")
     return redirect(url_for("compra.compra"))
 
 CONVERSIONES = {
