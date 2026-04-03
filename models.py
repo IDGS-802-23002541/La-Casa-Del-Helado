@@ -18,6 +18,7 @@ class Rol(db.Model, RoleMixin):
     @property
     def name(self):
         return self.nombre
+    
     @property
     def description(self):
         return ''
@@ -55,6 +56,7 @@ class Proveedor(db.Model):
     direccion = db.Column(db.String(200), nullable=False)
     estatus = db.Column(db.String(20), default='Activo')
     # compras = db.relationship('Compra', backref='proveedor', lazy=True)
+    materiasPrimas = db.relationship('MateriaPrima', back_populates='proveedor')
     
 class SolicitudProduccion(db.Model):
     __tablename__ = 'solicitud_produccion'
@@ -120,13 +122,23 @@ class MateriaPrima(db.Model):
     __tablename__ = 'materia_prima'
 
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), nullable=False)
+    nombre = db.Column(db.String(100), nullable=False, unique=True)
     unidadBase = db.Column(db.String(20), nullable=False)
-    stockActual = db.Column(db.Numeric(10,2), nullable=False, default=0)
-    stockMinimo = db.Column(db.Numeric(10,2), nullable=False, default=0)
-    idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'),nullable=False)
 
-    categoria = db.relationship('Categoria', foreign_keys=[idCategoria])
+    stockActual = db.Column(db.Numeric(10, 2), default=0)
+    stockMinimo = db.Column(db.Numeric(10, 2), nullable=False)
+
+    estatus = db.Column(db.Boolean, default=True)
+
+    idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
+    idProveedor = db.Column(db.Integer, db.ForeignKey('proveedor.id'))
+
+    # Relaciones
+    categoria = db.relationship('Categoria', back_populates='materiasPrimas')
+    proveedor = db.relationship('Proveedor', back_populates='materiasPrimas')
+
+    def __repr__(self):
+        return f'<MateriaPrima {self.nombre}>'
 
 class Turno(db.Model):
     __tablename__ = 'turno'
@@ -158,4 +170,11 @@ class Categoria(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(50), nullable=False)
     productos = db.relationship('Producto', backref='categoria_rel')
+
+    # Relaciones
+    materiasPrimas = db.relationship('MateriaPrima', back_populates='categoria')
+    productos = db.relationship('Producto', backref='categoria_rel')
+
+    def __repr__(self):
+        return f'<Categoria {self.nombre}>'
     

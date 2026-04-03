@@ -13,6 +13,11 @@
        🚚 Proveedores
     </a>
 
+    <a href="{{ url_for('materia.materia') }}"
+       class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
+        Materia Prima
+    </a>
+
     <a href="{{ url_for('producto.index') }}"
        class="nav-link {% if request.endpoint == 'producto.index' %}active{% endif %}">
        📦 Productos
