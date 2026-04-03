@@ -12,10 +12,8 @@
 
 {% block body %}
   <!-- NAV BAR -->
-  {% include 'navAdmin.html' %}
 <div class="flex h-screen">
   <!-- SIDEBAR -->
-  {% include 'asideAdmin.html' %}
   
   <div class="flex-1 bg-cream font-sans text-brand-text overflow-y-auto">
     <div id="page-compras" class="p-6 flex justify-center gap-20">
@@ -32,17 +30,33 @@
                 <th>Justificación</th>
                 <th>Fecha</th>
                 <th>Usuario</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
               {% for m in mermas %}
               <tr class="border-b hover:bg-gray-50">
-                <!-- <td>{{ m.materia_prima.nombre }} || {{ m.producto.nombre }}</td> -->
+                <td>
+                {% if m.materia_prima %}
+                  {{ m.materia_prima.nombre }}
+                {% elif m.producto %}
+                  {{ m.producto.nombre }}
+                {% endif %}
+              </td>
                 <td>{{ m.cantidad }}</td>
                 <td>{{ m.unidad }} </td>
                 <td>{{ m.justificacion }} </td>
                 <td>{{ m.fecha.strftime('%Y-%m-%d') }}</td>
-                <!-- <td>{{ m.usuario.nombreUsuario }} </td> -->
+                <td>{{ m.usuario.nombreUsuario }} </td>
+                <td>
+                  <button
+                    onclick="abrirModalEliminar('{{ url_for('merma.eliminar_merma', id=m.id) }}')"
+                    type="button"
+                    class="text-red-600 font-bold hover:underline"
+                  >
+                    Eliminar
+                  </button>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -51,54 +65,104 @@
 
         <!-- Modal -->
         <form method="POST"
-          class="bg-white rounded-[20px] shadow-2xl w-full max-w-[300px] overflow-hidden"
+          class="bg-white rounded-[20px] shadow-2xl w-full max-w-[300px] overflow-hidden flex flex-col"
           id="formularioMerma"
         >
+
           <!-- HEADER -->
-          <div class="bg-dark px-6 pt-6 pb-5">
-            <div class="font-display text-2xl text-white mb-1">
+          <div class="bg-dark px-6 py-5">
+            <div class="text-2xl text-white font-bold">
               Registrar Merma
             </div>
-            <div class="text-xs text-white/60">
-              Completa los campos para registrar la merma
+            <div class="text-sm text-white/70">
+              Selecciona el tipo y completa los datos
             </div>
           </div>
 
           <!-- BODY -->
-          <div class="px-6 py-5 flex flex-col gap-3.5">
+          <div class="px-6 py-5 flex flex-col gap-4">
 
-            <!-- PRODUCTO/MATERIA PRIMA -->
-            Selecciona un producto o materia Prima
-            Despliega los productos/materias primas
+            <!-- SELECTOR -->
+            <div class="flex gap-3">
+              <button type="button" onclick="seleccionarTipo('producto')" id="btnProducto"
+                class="flex-1 h-20 rounded-xl shadow bg-blue-100 hover:bg-blue-200 flex flex-col items-center justify-center text-lg font-semibold transition">
+                🍦 Producto
+              </button>
+
+              <button type="button" onclick="seleccionarTipo('materia')" id="btnMateria"
+                class="flex-1 h-20 rounded-xl shadow bg-orange-300 hover:bg-green-200 flex flex-col items-center justify-center text-lg font-semibold transition">
+                🐮 Materia Prima
+              </button>
+            </div>
+
+            <!-- SELECT PRODUCTO -->
+            <div id="selectProducto" class="hidden">
+              <label class="text-sm font-semibold">Producto</label>
+              <select name="idProducto" id="productoSelect" class="input-style w-full" onchange="setUnidad(this)">
+                <option value="">Selecciona producto</option>
+                {% for p in productos %}
+                  <option value="{{ p.id }}" data-unidad="{{ p.unidadBase }}">
+                    {{ p.nombre }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- SELECT MATERIA -->
+            <div id="selectMateria" class="hidden">
+              <label class="text-sm font-semibold">Materia Prima</label>
+              <select name="idMateriaPrima" id="materiaSelect" class="input-style w-full" onchange="setUnidad(this)">
+                <option value="">Selecciona materia prima</option>
+                {% for m in materias %}
+                  <option value="{{ m.id }}" data-unidad="{{ m.unidadBase }}">
+                    {{ m.nombre }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
 
             <!-- UNIDAD -->
-            Ligada el producto o materiaPrima
+            <div>
+              <label class="text-sm font-semibold">Unidad</label>
+              <input disabled
+                type="text"
+                id="unidadInput"
+                readonly
+                class="input-style w-full bg-gray-100"
+                placeholder="Se asigna automáticamente"
+              />
+            </div>
 
             <!-- CANTIDAD -->
-            <input
-            type="number"
-            name="cantidad"
-            value="{{ request.form.get('cantidad', '') }}"
-            step="1"
-            placeholder="Cantidad"
-            class="input-style"
-            />
+            <div>
+              <label class="text-sm font-semibold">Cantidad</label>
+              <input
+                type="number"
+                name="cantidad"
+                step="0.01"
+                required
+                class="input-style w-full"
+              />
+            </div>
 
             <!-- JUSTIFICACION -->
-            <div class="flex flex-col gap-1.5">
-
-              {{ macros.campoCompra(  
-                  merma_form.justificacion,
-                  clase='w-full p-2 border rounded',
-                  placeholder='Justificación del producto/materia prima mermado'
-              ) }}
+            <div>
+              <label class="text-sm font-semibold">Justificación</label>
+              <textarea
+                name="justificacion"
+                rows="5"
+                required
+                class="w-full p-3 border rounded resize-none"
+                placeholder="Describe el motivo de la merma..."
+              ></textarea>
             </div>
+
           </div>
 
           <!-- FOOTER -->
-          <div class="px-6 pb-5 pt-4 flex gap-3 border-t border-border">
+          <div class="px-6 pb-5 pt-4 flex gap-3 border-t">
 
-            <button type="reset" class="flex-1 btn-cancel" onclick="cancelarMerma()">
+            <button type="reset" class="flex-1 btn-cancel">
               Cancelar
             </button>
 
@@ -115,14 +179,89 @@
         </form>
         <!-- /.cp-modal -->
 
+        <div id="modalEliminar" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 w-[320px] shadow-xl text-center">
+          
+          <h2 class="text-lg font-bold mb-2 text-red-600">Eliminar merma</h2>
+          
+          <p class="text-sm text-gray-600 mb-4">
+            ¿Estás seguro? Esta acción no se puede deshacer.
+          </p>
+
+          <div class="flex gap-3">
+            <button 
+            type="button"
+            onclick="cerrarModal()" 
+            class="flex-1 py-2 border rounded-lg">
+              Cancelar
+            </button>
+
+            <button
+              type="submit"
+              form="formEliminar"
+              class="flex-1 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 active:scale-95 transition"
+            >
+              Eliminar
+            </button>
+
+            <form id="formEliminar" method="POST"></form>
+          </div>
+
+        </div>
+      </div>
     </div>
   </div>
 
 </div>
   
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
-    <script>
-      
-    </script>
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
+  <script>
+  function seleccionarTipo(tipo) {
+      let btnProducto = document.getElementById("btnProducto");
+      let btnMateria = document.getElementById("btnMateria");
+
+      document.getElementById("selectProducto").classList.add("hidden");
+      document.getElementById("selectMateria").classList.add("hidden");
+
+      btnProducto.classList.remove("ring-2", "ring-blue-500");
+      btnMateria.classList.remove("ring-2", "ring-green-500");
+
+      if (tipo === "producto") {
+          document.getElementById("selectProducto").classList.remove("hidden");
+          document.getElementById("materiaSelect").value = "";
+          btnProducto.classList.add("ring-2", "ring-blue-500");
+      } else {
+          document.getElementById("selectMateria").classList.remove("hidden");
+          document.getElementById("productoSelect").value = "";
+          btnMateria.classList.add("ring-2", "ring-green-500");
+      }
+
+      document.getElementById("unidadInput").value = "";
+  }
+
+  function setUnidad(select) {
+    let unidad = select.options[select.selectedIndex].dataset.unidad;
+    document.getElementById("unidadInput").value = unidad || "";
+  }
+
+  function abrirModalEliminar(url) {
+    const modal = document.getElementById("modalEliminar");
+    const form = document.getElementById("formEliminar");
+
+    form.action = url;
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+
+  function cerrarModal() {
+    const modal = document.getElementById("modalEliminar");
+    modal.classList.add("hidden");
+  }
+
+  function cancelarMerma() {
+    fetch("/merma/cancelar", { method: "POST" })
+      .then(() => window.location.reload());
+  }
+  </script>
 
 {% endblock %}
