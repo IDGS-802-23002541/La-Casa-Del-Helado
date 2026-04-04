@@ -2,46 +2,25 @@
 
 {% block body %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
-<div style="display: flex; flex-direction: column; height: 100vh; width: 100vw; overflow: hidden; font-family: 'Nunito', sans-serif;">
-        <div style="width: 100%;">
-        </div>
-
-
+<div id="dashboard-content" style="display: flex; flex-direction: column; height: 100vh; width: 100vw; overflow: hidden; font-family: 'Nunito', sans-serif;">
+    <div style="width: 100%;"></div>
     <div style="display: flex; flex: 1; width: 100%; overflow: hidden; background-color: #F9FAFB;">
-        
-        <aside style="width: 260px; background: white; border-right: 1px solid #E5E7EB; padding: 25px; display: flex; flex-direction: column; gap: 25px; flex-shrink: 0;">
-            <div>
-                <p style="font-size: 11px; font-weight: 800; color: #9CA3AF; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Inventario</p>
-                <nav style="display: flex; flex-direction: column; gap: 8px;">
-                    <a href="#" style="text-decoration: none; color: #374151; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; font-weight: 700; background: #F3F4F6;">📦 Prod. Terminado</a>
-                    <a href="#" style="text-decoration: none; color: #6B7280; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; font-weight: 700;">🍎 Materias Primas</a>
-                </nav>
-            </div>
-
-            <div>
-                <p style="font-size: 11px; font-weight: 800; color: #9CA3AF; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Producción</p>
-                <nav style="display: flex; flex-direction: column; gap: 8px;">
-                    <a href="#" style="text-decoration: none; color: #6B7280; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; font-weight: 700;">📝 Recetas</a>
-                    <a href="#" style="text-decoration: none; color: #FF8A8A; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; font-weight: 800; background: #FFF5F5;">📊 Reportes Ventas</a>
-                </nav>
-            </div>
-
-            <div style="margin-top: auto; border-top: 1px solid #F3F4F6; padding-top: 20px;">
-                <a href="#" style="text-decoration: none; color: #9B2C2C; padding: 10px; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 14px;">🚪 Cerrar sesión</a>
-            </div>
+        <aside class="sidebar">
+            <div class="sb-section">Administración</div>
+            <a href="#" class="sb-item active">📊 Reportes de ventas</a>
         </aside>
-
         <main style="flex: 1; padding: 40px; overflow-y: auto;">
-            
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 35px;">
                 <div>
                     <h1 style="font-weight: 800; color: #111827; font-size: 28px; margin: 0;">Análisis de Ventas</h1>
-                    <p style="color: #6B7280; font-size: 16px; margin-top: 5px;">Bienvenida, Aide Vannesa!</p>
+                    <p style="color: #6B7280; font-size: 16px; margin-top: 5px;">Bienvenida, {{ usuario_nombre }}!</p>
                 </div>
                 <div style="display: flex; gap: 12px;">
-                    <button style="background: white; border: 1px solid #E5E7EB; padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; color: #374151;">Excel</button>
-                    <button style="background: #FF8A8A; color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer;">PDF</button>
+                    <button id="exportPDF" style="background: #FF8A8A; color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer;">PDF</button>
                 </div>
             </div>
 
@@ -60,74 +39,122 @@
                 <h2 style="font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 25px;">Utilidad por Producto</h2>
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
-                        <tr style="text-align: left; border-bottom: 2px solid #F3F4F6;">
-                            <th style="padding: 15px; color: #9CA3AF; font-size: 13px;">PRODUCTO</th>
-                            <th style="padding: 15px; color: #9CA3AF; font-size: 13px;">VENTA</th>
-                            <th style="padding: 15px; color: #9CA3AF; font-size: 13px;">UTILIDAD</th>
-                            <th style="padding: 15px; color: #9CA3AF; font-size: 13px;">RENDIMIENTO</th>
+                        <tr style="text-align:left; border-bottom:2px solid #F3F4F6;">
+                            <th style="padding:15px; color:#9CA3AF; font-size:13px;">PRODUCTO</th>
+                            <th style="padding:15px; color:#9CA3AF; font-size:13px;">VENTA</th>
+                            <th style="padding:15px; color:#9CA3AF; font-size:13px;">UTILIDAD</th>
+                            <th style="padding:15px; color:#9CA3AF; font-size:13px;">RENDIMIENTO</th>
                         </tr>
                     </thead>
-                    <tbody style="font-weight: 700; color: #374151;">
-                        <tr style="border-bottom: 1px solid #F3F4F6;">
-                            <td style="padding: 20px 15px;">🍦 Cono Doble</td>
-                            <td style="padding: 15px;">$45.00</td>
-                            <td style="padding: 15px; color: #10B981;">+$26.50</td>
-                            <td style="padding: 15px;">
-                                <div style="width: 120px; height: 8px; background: #F3F4F6; border-radius: 10px; overflow: hidden;">
-                                    <div style="width: 58%; height: 100%; background: #FF8A8A;"></div>
-                                </div>
-                            </td>
+                    <tbody style="font-weight:700; color:#374151;">
+                        {% for p in utilidad_productos %}
+                        <tr style="border-bottom:1px solid #F3F4F6;">
+                            <td>{{ p.producto }}</td>
+                            <td>${{ "%.2f"|format(p.venta) }}</td>
+                            <td style="color:#10B981;">${{ "%.2f"|format(p.utilidad) }}</td>
+                            <td>{{ "%.2f"|format((p.utilidad/p.venta*100) if p.venta else 0) }}%</td>
                         </tr>
-                        <tr style="border-bottom: 1px solid #F3F4F6;">
-                            <td style="padding: 20px 15px;">🍭 Paleta Agua</td>
-                            <td style="padding: 15px;">$18.00</td>
-                            <td style="padding: 15px; color: #10B981;">+$12.90</td>
-                            <td style="padding: 15px;">
-                                <div style="width: 120px; height: 8px; background: #F3F4F6; border-radius: 10px; overflow: hidden;">
-                                    <div style="width: 72%; height: 100%; background: #FF8A8A;"></div>
-                                </div>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
+
         </main>
     </div>
 </div>
 
 <script>
-    // Gráfica de Barras
-    const ctxBar = document.getElementById('ventasSemana').getContext('2d');
-    new Chart(ctxBar, {
-        type: 'bar',
-        data: {
-            labels: ['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM'],
-            datasets: [{
-                label: 'Ventas $',
-                data: [4200, 3800, 5500, 4100, 6800, 9500, 8200],
-                backgroundColor: '#FF8A8A',
-                borderRadius: 10,
-            }]
-        },
-        options: {
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, grid: { color: '#F3F4F6' } }, x: { grid: { display: false } } }
+const diasES = {'Mon':'LUN','Tue':'MAR','Wed':'MIE','Thu':'JUE','Fri':'VIE','Sat':'SAB','Sun':'DOM'};
+window.DASHBOARD_DATA = {
+    ventasSemanaLabels: {{ ventas_semanales.labels | tojson }},
+    ventasSemanaData: {{ ventas_semanales.data | tojson }},
+    distribucionLabels: {{ distribucion.labels | tojson }},
+    distribucionData: {{ distribucion.data | tojson }},
+    utilidadProductos: {{ utilidad_productos | tojson }}
+};
+
+const labelsES = window.DASHBOARD_DATA.ventasSemanaLabels.map(d => diasES[d] || d);
+
+const ctxBar = document.getElementById('ventasSemana').getContext('2d');
+new Chart(ctxBar, {
+    type: 'bar',
+    data: { labels: labelsES, datasets: [{label:'Ventas $',data:window.DASHBOARD_DATA.ventasSemanaData,backgroundColor:'#FF8A8A',borderRadius:10}] },
+    options:{
+        plugins:{
+            legend:{display:false},
+            datalabels:{
+                anchor: 'end',
+                align: 'end',
+                formatter: value => `$${value}`
+            }
         }
+    },
+    plugins: [ChartDataLabels]
+});
+
+const ctxPie = document.getElementById('ventasTipo').getContext('2d');
+new Chart(ctxPie, {
+    type:'doughnut',
+    data: {
+        labels: window.DASHBOARD_DATA.distribucionLabels,
+        datasets:[{data: window.DASHBOARD_DATA.distribucionData, backgroundColor: ['#FF8A8A','#6366F1','#FBBF24'] }]
+    },
+    options:{cutout:'75%', plugins:{legend:{position:'bottom'}}}
+});
+
+document.getElementById('exportPDF').addEventListener('click', function() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p','mm','a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 25;
+    let yPos = 20;
+
+    doc.addImage("{{ url_for('static', filename='img/logo.png') }}",'PNG',margin,yPos,30,30);
+    doc.setFontSize(20); doc.setTextColor('#FF8A8A');
+    doc.text("La Casa del Helado", pageWidth/2, yPos+12, {align:'center'});
+    doc.setFontSize(12); doc.setTextColor(0,0,0);
+    doc.text("{{ current_date }}", pageWidth-margin, yPos+20, {align:'right'});
+    yPos += 40;
+
+    doc.setFontSize(14); doc.setTextColor(0,0,0);
+    doc.text("Ventas Semanales ($)", margin, yPos);
+    yPos += 7;
+    const barCanvas = document.getElementById('ventasSemana');
+    doc.addImage(barCanvas.toDataURL('image/png'),'PNG',margin,yPos,pageWidth-2*margin,50);
+    yPos += 60;
+
+    doc.setFontSize(14); doc.setTextColor(0,0,0);
+    doc.text("Distribución por Categoría", margin, yPos);
+    yPos += 7;
+    doc.autoTable({
+        startY: yPos,
+        head: [['Categoría','Cantidad']],
+        body: window.DASHBOARD_DATA.distribucionLabels.map((label,i)=>[label, window.DASHBOARD_DATA.distribucionData[i]]),
+        theme: 'grid',
+        headStyles:{fillColor:[255,138,138]},
+        styles:{cellPadding:2,fontSize:10}
+    });
+    yPos = doc.lastAutoTable.finalY + 15;
+
+    doc.setFontSize(14); doc.setTextColor(0,0,0);
+    doc.text("Utilidad por Producto", margin, yPos);
+    yPos += 7;
+    doc.autoTable({
+        startY: yPos,
+        head:[['Producto','Venta','Utilidad','Rendimiento (%)']],
+        body: window.DASHBOARD_DATA.utilidadProductos.map(p=>[
+            p.producto,
+            `$${p.venta.toFixed(2)}`,
+            `$${p.utilidad.toFixed(2)}`,
+            `${((p.utilidad/p.venta)*100).toFixed(2)}%`
+        ]),
+        theme:'grid',
+        headStyles:{fillColor:[255,138,138]},
+        styles:{cellPadding:2,fontSize:10}
     });
 
-    // Gráfica de Dona
-    const ctxPie = document.getElementById('ventasTipo').getContext('2d');
-    new Chart(ctxPie, {
-        type: 'doughnut',
-        data: {
-            labels: ['Helados', 'Paletas', 'Otros'],
-            datasets: [{
-                data: [60, 25, 15],
-                backgroundColor: ['#FF8A8A', '#6366F1', '#FBBF24'],
-                borderWidth: 0
-            }]
-        },
-        options: { cutout: '75%', plugins: { legend: { position: 'bottom' } } }
-    });
+    const fechaArchivo = "{{ current_date|replace('/', '-') }}";
+    doc.save(`${fechaArchivo}_reporte_de_ventas.pdf`);
+});
 </script>
 {% endblock %}

@@ -94,7 +94,7 @@
         <div class="toolbar">
             <div class="search-inp">
                 🔎
-                <input type="text" id="search" placeholder="Buscar insumo, categoría o proveedor...">
+                <input type="text" id="search" placeholder="Buscar insumo, categoría ...">
             </div>
 
             <div class="sep"></div>
@@ -111,7 +111,6 @@
                     <tr>
                         <th>Insumo</th>
                         <th>Categoría</th>
-                        <th>Proveedor</th>
                         <th>Stock</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -122,7 +121,6 @@
                     <tr data-id="{{ mp.id }}" class="{% if not mp.estatus %}inactive-row{% endif %}">
                         <td><strong>{{ mp.nombre }}</strong><br><span class="text-xs text-muted">{{ mp.unidadBase }}</span></td>
                         <td><span class="cat-badge cat-insumo">{{ mp.categoria.nombre }}</span></td>
-                        <td>{{ mp.proveedor.razonSocial if mp.proveedor else 'Sin proveedor' }}</td>
                         <td><strong>{{ mp.stockActual }} {{ mp.unidadBase }}</strong></td>
                         <td>{% if mp.estatus %}<span class="status-badge s-activo">Activo</span>{% else %}<span class="status-badge s-inactivo">Inactivo</span>{% endif %}</td>
                         <td>
@@ -158,14 +156,6 @@
                         </select>
                     </div>
                     <div class="fg"><label>Unidad</label><input name="unidadBase" type="text" required></div>
-                </div>
-                <div class="fg"><label>Proveedor</label>
-                    <select name="idProveedor">
-                        <option value="">Sin proveedor</option>
-                        {% for p in proveedores %}
-                        <option value="{{ p.id }}">{{ p.razonSocial }}</option>
-                        {% endfor %}
-                    </select>
                 </div>
 
                 <div class="fsec">Stock</div>
@@ -270,7 +260,6 @@ document.querySelectorAll(".btnEditar").forEach(btn=>{
         form.stockActual.value = mp.stockActual;
         form.stockMinimo.value = mp.stockMinimo;
         form.idCategoria.value = mp.categoria.id;
-        form.idProveedor.value = mp.proveedor ? mp.proveedor.id : "";
         const chipsStatus = document.querySelectorAll(".status-chip");
         chipsStatus.forEach(c=>{c.classList.remove("on");c.classList.add("off");});
         if(mp.estatus){ chipsStatus[0].classList.add("on"); document.querySelector("input[value='1']").checked=true;}

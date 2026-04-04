@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from models import db, MateriaPrima, Categoria, Proveedor
+from models import db, MateriaPrima, Categoria
 
 materia_bp = Blueprint(
     'materia',
@@ -17,12 +17,10 @@ def materia():
         stockActual = request.form.get("stockActual") or 0
         stockMinimo = request.form.get("stockMinimo")
         idCategoria = request.form.get("idCategoria")
-        idProveedor = request.form.get("idProveedor")
         estatus = request.form.get("estatus")
 
         # 🔥 CONVERSIÓN IMPORTANTE
         idCategoria = int(idCategoria) if idCategoria else None
-        idProveedor = int(idProveedor) if idProveedor else None
         stockActual = float(stockActual)
         stockMinimo = float(stockMinimo)
 
@@ -36,7 +34,6 @@ def materia():
                 materia_existente.stockActual = stockActual
                 materia_existente.stockMinimo = stockMinimo
                 materia_existente.idCategoria = idCategoria
-                materia_existente.idProveedor = idProveedor
                 materia_existente.estatus = True if estatus == "1" else False
 
         else:
@@ -47,7 +44,6 @@ def materia():
                 stockActual=stockActual,
                 stockMinimo=stockMinimo,
                 idCategoria=idCategoria,
-                idProveedor=idProveedor,
                 estatus=True if estatus == "1" else False
             )
             db.session.add(nueva)
@@ -58,7 +54,6 @@ def materia():
     # 🔹 CONSULTAS
     materias_db = MateriaPrima.query.all()
     categorias = Categoria.query.all()
-    proveedores = Proveedor.query.all()
 
     # 🔥 FORMATO CORRECTO (OBJETOS)
     materias_primas = []
@@ -74,17 +69,11 @@ def materia():
             "categoria": {
                 "id": mp.categoria.id if mp.categoria else None,
                 "nombre": mp.categoria.nombre if mp.categoria else "Sin categoría"
-            },
-
-            "proveedor": {
-                "id": mp.proveedor.id if mp.proveedor else None,
-                "razonSocial": mp.proveedor.razonSocial if mp.proveedor else "Sin proveedor"
             }
         })
 
     return render_template(
         "materia_prima/materia.html",
         materias_primas=materias_primas,
-        categorias=categorias,
-        proveedores=proveedores
+        categorias=categorias
     )

@@ -82,8 +82,8 @@ def crear():
     return render_template("recetas/crear.html", form=form, materias=materias)
 
 @receta_bp.route("/recetas/editar", methods=["GET", "POST"])
-@login_required
-@roles_accepted('Administrador')
+# @login_required
+# @roles_accepted('Administrador')
 def editar():
     id_rec = request.args.get('id', type=int)
     receta = Receta.query.get_or_404(id_rec)
@@ -105,25 +105,26 @@ def editar():
         receta.cantidadProducida = create_from.cantidadProducida.data
         receta.estatus = create_from.estatus.data
 
-    DetalleReceta.query.filter_by(idReceta=receta.id).delete()
+        DetalleReceta.query.filter_by(idReceta=receta.id).delete()
 
-    cantidades = request.form.getlist('mp_cantidad')
-    unidades = request.form.getlist('mp_unidad')
-    ids_mp = request.form.getlist('mp_id')
+        cantidades = request.form.getlist('mp_cantidad')
+        unidades = request.form.getlist('mp_unidad')
+        ids_mp = request.form.getlist('mp_id')
 
-    for i in range(len(cantidades)):
-        if cantidades[i] and ids_mp[i]:
-            detalle = DetalleReceta(
-                idReceta = receta.id,
-                idMateriaPrima = int(ids_mp[i]),
-                cantidad = cantidades[i],
-                unidad = unidades[i],
-            )
-            db.session.add(detalle)
+        for i in range(len(cantidades)):
+            if cantidades[i] and ids_mp[i]:
+                detalle = DetalleReceta(
+                    idReceta = receta.id,
+                    idMateriaPrima = int(ids_mp[i]),
+                    cantidad = cantidades[i],
+                    unidad = unidades[i],
+                )
+                db.session.add(detalle)
 
         db.session.commit()
         flash('Receta actualizada correctamente', 'success')
         return redirect(url_for('recetas.index'))
+    
     return render_template("recetas/editar.html", form=create_from, receta=receta, materias=materias)
 
 @receta_bp.route("/recetas/eliminar", methods=["POST"])

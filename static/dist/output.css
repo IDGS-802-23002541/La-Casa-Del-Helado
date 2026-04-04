@@ -852,14 +852,8 @@
       max-width: 96rem;
     }
   }
-  .my-0\.5 {
-    margin-block: calc(var(--spacing) * 0.5);
-  }
   .mt-2 {
     margin-top: calc(var(--spacing) * 2);
-  }
-  .mt-3 {
-    margin-top: calc(var(--spacing) * 3);
   }
   .mt-6 {
     margin-top: calc(var(--spacing) * 6);
@@ -1273,9 +1267,6 @@
   .h-\[calc\(100\%-1rem\)\] {
     height: calc(100% - 1rem);
   }
-  .h-px {
-    height: 1px;
-  }
   .h-screen {
     height: 100vh;
   }
@@ -1505,17 +1496,8 @@
   .justify-start {
     justify-content: flex-start;
   }
-  .gap-1\.5 {
-    gap: calc(var(--spacing) * 1.5);
-  }
-  .gap-2\.5 {
-    gap: calc(var(--spacing) * 2.5);
-  }
   .gap-3 {
     gap: calc(var(--spacing) * 3);
-  }
-  .gap-3\.5 {
-    gap: calc(var(--spacing) * 3.5);
   }
   .gap-4 {
     gap: calc(var(--spacing) * 4);
@@ -1736,9 +1718,6 @@
       background-color: color-mix(in oklab, var(--color-gray-900) 50%, transparent);
     }
   }
-  .bg-green-100 {
-    background-color: var(--color-green-100);
-  }
   .bg-neutral-primary {
     background-color: var(--color-neutral-primary);
   }
@@ -1753,6 +1732,9 @@
   }
   .bg-neutral-tertiary-medium {
     background-color: var(--color-neutral-tertiary-medium);
+  }
+  .bg-orange-300 {
+    background-color: var(--color-orange-300);
   }
   .bg-red-100 {
     background-color: var(--color-red-100);
@@ -1889,9 +1871,6 @@
   }
   .pt-4 {
     padding-top: calc(var(--spacing) * 4);
-  }
-  .pt-6 {
-    padding-top: calc(var(--spacing) * 6);
   }
   .search-filtering-row {
     .datatable-wrapper .datatable-container thead tr& th {
@@ -2092,6 +2071,9 @@
   .text-heading {
     color: var(--color-heading);
   }
+  .text-muted {
+    color: var(--color-muted);
+  }
   .text-orange {
     color: var(--color-orange);
   }
@@ -2106,12 +2088,6 @@
   }
   .text-white {
     color: var(--color-white);
-  }
-  .text-white\/60 {
-    color: color-mix(in srgb, #fff 60%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      color: color-mix(in oklab, var(--color-white) 60%, transparent);
-    }
   }
   .text-white\/70 {
     color: color-mix(in srgb, #fff 70%, transparent);
