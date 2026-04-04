@@ -6,9 +6,7 @@
 
   <div class="nav-links">
     <!-- Inicio: asumo que está en el blueprint principal, ruta 'index' -->
-    <a href="{{ url_for('index') }}" class="nav-link {% if active_page == 'inicio' %}active{% endif %}">
-      Inicio
-    </a>
+    <a href="{{ url_for('dash.auth') }}" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">Inicio</a>
 
     <!-- Proveedores -->
     <a href="{{ url_for('proveedores.proveedoresTabla') }}"
