@@ -15,7 +15,7 @@
 
     <a href="{{ url_for('materia.materia') }}"
        class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
-        Materia Prima
+        🍎 Materia Prima
     </a>
 
     <a href="{{ url_for('producto.index') }}"
@@ -32,6 +32,11 @@
        class="nav-link {% if request.endpoint == 'recetas.index' %}active{% endif %}">
        📖 Recetas
     </a>
+
+   <a href="{{ url_for('merma.merma') }}"
+   class="nav-link {% if request.endpoint == 'mermas.index' %}active{% endif %}">
+    📋 Mermas
+</a>
 
     <a href="{{ url_for('dash.auth') }}"
        class="nav-link {% if request.endpoint == 'dash_bp.auth' %}active{% endif %}">

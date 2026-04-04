@@ -11,25 +11,23 @@ materia_bp = Blueprint(
 def materia():
     if request.method == "POST":
         materia_id = request.form.get("id")
-
         nombre = request.form.get("nombre")
         unidadBase = request.form.get("unidadBase")
         stockActual = request.form.get("stockActual") or 0
-        stockMinimo = request.form.get("stockMinimo")
+        stockMinimo = request.form.get("stockMinimo") or 0
         idCategoria = request.form.get("idCategoria")
         idProveedor = request.form.get("idProveedor")
         estatus = request.form.get("estatus")
 
-        # 🔥 CONVERSIÓN IMPORTANTE
+        # Conversión de tipos de datos
         idCategoria = int(idCategoria) if idCategoria else None
         idProveedor = int(idProveedor) if idProveedor else None
         stockActual = float(stockActual)
         stockMinimo = float(stockMinimo)
 
         if materia_id:
-            # 🔹 EDITAR
+            # EDITAR
             materia_existente = MateriaPrima.query.get(materia_id)
-
             if materia_existente:
                 materia_existente.nombre = nombre
                 materia_existente.unidadBase = unidadBase
@@ -38,9 +36,8 @@ def materia():
                 materia_existente.idCategoria = idCategoria
                 materia_existente.idProveedor = idProveedor
                 materia_existente.estatus = True if estatus == "1" else False
-
         else:
-            # 🔹 CREAR
+            # CREAR
             nueva = MateriaPrima(
                 nombre=nombre,
                 unidadBase=unidadBase,
@@ -55,12 +52,12 @@ def materia():
         db.session.commit()
         return redirect(url_for("materia.materia"))
 
-    # 🔹 CONSULTAS
+    # CONSULTAS
     materias_db = MateriaPrima.query.all()
     categorias = Categoria.query.all()
     proveedores = Proveedor.query.all()
 
-    # 🔥 FORMATO CORRECTO (OBJETOS)
+    # Formateo de datos para el template
     materias_primas = []
     for mp in materias_db:
         materias_primas.append({
@@ -70,12 +67,10 @@ def materia():
             "stockActual": float(mp.stockActual or 0),
             "stockMinimo": float(mp.stockMinimo or 0),
             "estatus": mp.estatus,
-
             "categoria": {
                 "id": mp.categoria.id if mp.categoria else None,
                 "nombre": mp.categoria.nombre if mp.categoria else "Sin categoría"
             },
-
             "proveedor": {
                 "id": mp.proveedor.id if mp.proveedor else None,
                 "razonSocial": mp.proveedor.razonSocial if mp.proveedor else "Sin proveedor"

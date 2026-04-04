@@ -150,6 +150,13 @@ class MateriaPrima(db.Model):
 
     categoria = db.relationship('Categoria', back_populates='materias_primas')
     detalles_compra = db.relationship('DetalleCompra', back_populates='materiaPrima')
+    
+# se la agregue porque faltaba la relacion con proveedor, pero no se si es necesario o si se puede manejar solo con el idProveedor
+    idProveedor = db.Column(db.Integer, db.ForeignKey('proveedor.id'), nullable=True)
+    categoria = db.relationship('Categoria', back_populates='materias_primas')
+    detalles_compra = db.relationship('DetalleCompra', back_populates='materiaPrima')
+    proveedor = db.relationship('Proveedor', backref='materias_primas')
+
 
     def __repr__(self):
         return f'<MateriaPrima {self.nombre}>'
@@ -172,7 +179,7 @@ class Merma(db.Model):
     cantidad = db.Column(db.Integer, nullable=False)
     unidad = db.Column(db.String(20), nullable=False)
     justificacion = db.Column(db.String(200), nullable=False)
-    fecha = db.Column(db.Date, nullable=False)
+    fecha = db.Column(db.DateTime, default=datetime.now)
 
     estatus=db.Column(db.Boolean, default=True)
     fechaEliminacion = db.Column(db.DateTime)
