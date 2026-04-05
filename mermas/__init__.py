@@ -15,7 +15,16 @@ merma_bp = Blueprint(
 
 @merma_bp.route('/merma', methods=["GET", "POST"])
 def merma():
-    mermas = Merma.query.filter_by(estatus=True).all()
+    # Filtro por fecha
+    fecha = request.args.get("fecha")
+    query = Merma.query.filter_by(estatus=True)
+    if fecha:
+        dia = datetime.strptime(fecha, "%Y-%m-%d")
+        query = query.filter(
+            Merma.fecha >= dia.replace(hour=0, minute=0, second=0),
+            Merma.fecha <= dia.replace(hour=23, minute=59, second=59)
+        )
+    mermas = query.order_by(Merma.fecha.desc()).all()
     merma_form = forms.MermaForm(request.form)
 
     materias = MateriaPrima.query.all()
