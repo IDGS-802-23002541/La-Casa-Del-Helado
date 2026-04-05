@@ -230,3 +230,13 @@ class presentacionVenta(db.Model):
     estatus = db.Column(db.Boolean, default=True)
 
     productoBase = db.relationship('Producto', backref='presentaciones')
+    
+class Conversion(db.Model):
+    __tablename__ = 'conversiones'
+
+    unidadBase = db.Column(db.String(20), primary_key=True)
+    presentacion = db.Column(db.String(20), primary_key=True)
+    factor = db.Column(db.Float, nullable=False)
+
+    def __repr__(self):
+        return f'<Conversion {self.presentacion} -> {self.unidadBase} = {self.factor}>'

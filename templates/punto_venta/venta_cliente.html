@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Casa del Helado – Pedido en línea</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/venta_cliente.css') }}?v">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-brand">
+      <div class="nav-logo">🍦</div>
+      <div>
+        <div class="nav-name">La Casa del Helado</div>
+        <div class="nav-sub">Helados desde 1995</div>
+      </div>
+    </div>
+    <button class="nav-btn-pedido">
+      🛒 Mi pedido <span class="nav-badge">0</span>
+    </button>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>¿Qué se te antoja hoy? 🍧</h1>
+    <p>Elige tus productos, deja tus datos y recógelos en<br>tienda a la hora que más te convenga.</p>
+    <div class="hero-pills">
+      <div class="hero-pill">🕑 Pedido con 2h de anticipación</div>
+      <div class="hero-pill">💳 Pago al recoger</div>
+      <div class="hero-pill">📅 Hasta 7 días adelante</div>
+    </div>
+  </div>
+
+  <!-- LAYOUT -->
+  <div class="layout">
+
+    <!-- LEFT: products -->
+    <div class="product-panel">
+
+      <!-- Search -->
+      <div class="search-bar">
+        <span style="color:#9CA3AF">🔍</span>
+        <input type="text" placeholder="Buscar producto o sabor...">
+      </div>
+
+      <!-- Categories -->
+      <div class="categories">
+        <a href="#" class="pill active">🍽 Todos</a>
+        <a href="#" class="pill active-paleta">🍡 Paletas</a>
+        <a href="#" class="pill active-cono">🍦 Conos</a>
+        <a href="#" class="pill active-rollo">🍧 Rollitos</a>
+        <a href="#" class="pill active-vaso">🥤 Vasos</a>
+        <a href="#" class="pill active-especial">⭐ Especiales</a>
+      </div>
+
+      <!-- Product Grid -->
+      <div class="product-grid">
+
+        <!-- 1 -->
+        <button class="card bg-mint">
+          <span class="badge badge-local">LOCAL</span>
+          <div class="card-emoji">🍡</div>
+          <div class="card-name">Paleta de Agua</div>
+          <div class="card-sub">8 sabores disponibles</div>
+          <div class="card-footer">
+            <span class="card-price">$15</span>
+            <div class="btn-add">+</div>
+          </div>
+        </button>
+
+        <!-- 2 -->
+        <button class="card bg-yellow">
+          <span class="badge badge-disponible">Disponible</span>
+          <div class="card-emoji">🍨</div>
+          <div class="card-name">Paleta de Leche</div>
+          <div class="card-sub">10 sabores disponibles</div>
+          <div class="card-footer">
+            <span class="card-price">$18</span>
+            <div class="btn-add">+</div>
+          </div>
+        </button>
+
+        <!-- 3 -->
+        <button class="card">
+          <span class="badge badge-disponible">Disponible</span>
+          <div class="card-emoji">🍦</div>
+          <div class="card-name">Esquimol</div>
+          <div class="card-sub">7 sabores disponibles</div>
+          <div class="card-footer">
+            <span class="card-price">$20</span>
+            <div class="btn-add">+</div>
+          </div>
+        </button>
+
+        <!-- 4 -->
+        <button class="card bg-peach">
+          <span class="badge badge-disponible">Disponible</span>
+          <div class="card-emoji">🍦</div>
+          <div class="card-name">Cono Sencillo</div>
+          <div class="card-sub">7 sabores disponibles</div>
+          <div class="card-footer">
+            <span class="card-price">$25</span>
+            <div class="btn-add">+</div>
+          </div>
+        </button>
+
+        <!-- 5 -->
+        <button class="card bg-peach">
+          <span class="badge badge-popular">POPULAR</span>
+          <div class="card-emoji">🍦</div>
+          <div class="card-name">Cono Doble</div>
+          <div class="card-sub">7 sabores disponibles</div>
+          <div class="card-footer">
+            <span class="card-price">$32</span>
+            <div class="btn-add">+</div>
+          </div>
+        </button>
+
+        <!-- 6 -->
+        <button class="card bg-sky">
+          <span class="badge badge-disponible">Disponible</span>
+          <div class="card-emoji">🥤</div>
+          <div class="card-name">Vaso Mediano</div>
+          <div class="card-sub">7 sabores disponibles</div>
+          <div class="card-footer">
+            <span class="card-price">$38</span>
+            <div class="btn-add">+</div>
+          </div>
+        </button>
+
+        <!-- 7 -->
+        <button class="card bg-sky">
+          <span class="badge badge-viral">VIRAL</span>
+          <div class="card-emoji">🥤</div>
+          <div class="card-name">Vaso Grande</div>
+          <div class="card-sub">7 sabores disponibles</div>
+          <div class="card-footer">
+            <span class="card-price">$38</span>
+            <div class="btn-add">+</div>
+          </div>
+        </button>
+
+        <!-- 8 -->
+        <button class="card bg-lavender">
+          <span class="badge badge-disponible">Disponible</span>
+          <div class="card-emoji">🌀</div>
+          <div class="card-name">Rollitos</div>
+          <div class="card-sub">7 sabores disponibles</div>
+          <div class="card-footer">
+            <span class="card-price">$40</span>
+            <div class="btn-add">+</div>
+          </div>
+        </button>
+
+        <!-- 9 -->
+        <button class="card bg-mint">
+          <span class="badge badge-artesanal">ARTESANAL</span>
+          <div class="card-emoji">🍡</div>
+          <div class="card-name">Troles</div>
+          <div class="card-sub">5 sabores disponibles</div>
+          <div class="card-footer">
+            <span class="card-price">$30</span>
+            <div class="btn-add">+</div>
+          </div>
+        </button>
+
+        <!-- 10 -->
+        <button class="card">
+          <span class="badge badge-nuevo">NUEVO</span>
+          <div class="card-emoji">🍢</div>
+          <div class="card-name">Mini Pops x3</div>
+          <div class="card-sub">4 sabores disponibles</div>
+          <div class="card-footer">
+            <span class="card-price">$35</span>
+            <div class="btn-add">+</div>
+          </div>
+        </button>
+
+        <!-- 11 -->
+        <button class="card bg-peach">
+          <span class="badge badge-disponible">Disponible</span>
+          <div class="card-emoji">🍦</div>
+          <div class="card-name">Cono Bañado</div>
+          <div class="card-sub">4 sabores disponibles</div>
+          <div class="card-footer">
+            <span class="card-price">$35</span>
+            <div class="btn-add">+</div>
+          </div>
+        </button>
+
+        <!-- 12 agotado -->
+        <button class="card" disabled>
+          <span class="badge badge-sinstock">SIN STOCK</span>
+          <div class="card-emoji" style="opacity:.4">⭐</div>
+          <div class="card-name" style="color:#9CA3AF">Cajeta Especial</div>
+          <div class="card-sub">No disponible hoy</div>
+          <div class="card-footer">
+            <span class="card-price" style="color:#9CA3AF">$45</span>
+            <div class="btn-add disabled" style="background:#D1D5DB">✕</div>
+          </div>
+        </button>
+
+      </div><!-- /product-grid -->
+    </div><!-- /product-panel -->
+
+    <!-- RIGHT: order ticket -->
+    <div class="ticket-panel">
+
+      <div class="ticket-header">
+        <div class="ticket-title">🧾 Mi pedido <span class="ticket-num">#001</span></div>
+        <button class="btn-limpiar">✕ Limpiar</button>
+      </div>
+
+      <div class="ticket-items">
+        <!-- Example items -->
+        <div class="ticket-item">
+          <div class="item-icon">🍡</div>
+          <div class="item-info">
+            <div class="item-name">Paleta de Agua</div>
+            <div class="item-flavor">P. Unitario: $15.00</div>
+          </div>
+          <div class="qty-ctrl">
+            <button class="qty-btn">−</button>
+            <span class="qty-val">2</span>
+            <button class="qty-btn">+</button>
+          </div>
+          <div class="item-price">$30</div>
+        </div>
+
+        <div class="ticket-item">
+          <div class="item-icon">🍨</div>
+          <div class="item-info">
+            <div class="item-name">Paleta de Leche</div>
+            <div class="item-flavor">P. Unitario: $18.00</div>
+          </div>
+          <div class="qty-ctrl">
+            <button class="qty-btn">−</button>
+            <span class="qty-val">1</span>
+            <button class="qty-btn">+</button>
+          </div>
+          <div class="item-price">$18</div>
+        </div>
+
+        <div class="ticket-item">
+          <div class="item-icon">🥤</div>
+          <div class="item-info">
+            <div class="item-name">Vaso Mediano</div>
+            <div class="item-flavor">P. Unitario: $30.00</div>
+          </div>
+          <div class="qty-ctrl">
+            <button class="qty-btn">−</button>
+            <span class="qty-val">2</span>
+            <button class="qty-btn">+</button>
+          </div>
+          <div class="item-price">$60</div>
+        </div>
+      </div>
+
+      <div class="ticket-footer">
+        <div class="subtotal-row">
+          <span>Total estimado</span>
+          <span style="color:#F97316;font-weight:900">$108</span>
+        </div>
+
+        <!-- Customer form -->
+        <div class="form-section">
+          <div class="form-label">Tus datos</div>
+          <input type="text" class="form-input" placeholder="Nombre completo *">
+          <input type="tel"  class="form-input" placeholder="Teléfono *">
+        </div>
+
+        <!-- Pickup time -->
+        <div class="form-section">
+          <div class="form-label">¿Cuándo pasas?</div>
+          <div class="hint-box">
+            🕑 Con al menos 2 horas de anticipación · Máximo 7 días adelante · Pago al recoger en tienda
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input type="date" class="form-input" value="2026-04-03">
+            </div>
+            <div class="form-group">
+              <input type="time" class="form-input" value="14:00">
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-cobrar">Enviar pedido</button>
+      </div>
+
+    </div><!-- /ticket-panel -->
+
+  </div><!-- /layout -->
+
+</body>
+</html>

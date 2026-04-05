@@ -18,6 +18,7 @@ from usuarios import usuarios_bp
 from compras import compra_bp
 from mermas import merma_bp
 from soli_produccion import Soli_Produccion
+from venta_cliente import clientes
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
@@ -42,6 +43,7 @@ app.register_blueprint(usuarios_bp)
 app.register_blueprint(compra_bp)
 app.register_blueprint(merma_bp)
 app.register_blueprint(Soli_Produccion)
+app.register_blueprint(clientes)
 
 
 @app.route("/", methods=['POST', 'GET'])
