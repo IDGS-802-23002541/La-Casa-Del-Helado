@@ -11,12 +11,12 @@
     <!-- Proveedores -->
     <a href="{{ url_for('proveedores.proveedoresTabla') }}"
        class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
-       🚚 Proveedores
+        Proveedores
     </a>
 
     <a href="{{ url_for('compra.compra') }}"
        class="nav-link {% if request.endpoint == 'proveedores.compra' %}active{% endif %}">
-       🛍️ Compra
+       Compra
     </a>
 
     <a href="{{ url_for('materia.materia') }}"
@@ -26,10 +26,8 @@
 
     <a href="{{ url_for('producto.index') }}"
        class="nav-link {% if request.endpoint == 'producto.index' %}active{% endif %}">
-       📦 Productos
-    <!-- Productos -->
-    <a href="{{ url_for('producto.index') }}" class="nav-link {% if active_page == 'productos' %}active{% endif %}">
-      Productos
+       Productos
+    
     </a>
 
     <!-- Usuarios -->
@@ -44,12 +42,12 @@
 
     <a href="{{ url_for('merma.merma') }}"
        class="nav-link {% if request.endpoint == 'merma.merma' %}active{% endif %}">
-       🗑️ Mermas
+        Mermas
     </a>
 
     <a href="{{ url_for('dash.auth') }}"
        class="nav-link {% if request.endpoint == 'dash_bp.auth' %}active{% endif %}">
-       📊 Dashboard
+        Dashboard
     </a>
   </div>
 

@@ -38,7 +38,7 @@ def merma():
         try:
             idMateriaPrima = request.form.get("idMateriaPrima") or None
             idProducto = request.form.get("idProducto") or None
-            cantidad = int(request.form.get("cantidad"))
+            cantidad = float(request.form.get("cantidad"))
             justificacion = request.form.get("justificacion")
 
             # convertir a int o None
@@ -62,8 +62,8 @@ def merma():
 
         except Exception as e:
             db.session.rollback()
-            # print({str(e)})
-            # flash(f"Error: {str(e)}", "error")
+            print({str(e)})
+            flash(f"Error: {str(e)}", "error")
             flash(f"Vuelve a intentarlo más tarde", "error")
 
         return redirect(url_for('merma.merma'))

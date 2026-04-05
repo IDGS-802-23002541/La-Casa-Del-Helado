@@ -169,7 +169,7 @@ class Merma(db.Model):
     idMateriaPrima = db.Column(db.Integer, db.ForeignKey('materia_prima.id'), nullable=True)
     idProducto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=True)
     
-    cantidad = db.Column(db.Integer, nullable=False)
+    cantidad = db.Column(db.Numeric(10,2), nullable=False)
     unidad = db.Column(db.String(20), nullable=False)
     justificacion = db.Column(db.String(200), nullable=False)
     fecha = db.Column(db.Date, nullable=False)
