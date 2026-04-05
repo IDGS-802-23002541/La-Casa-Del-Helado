@@ -7,154 +7,331 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <div id="dashboard-content" style="display: flex; flex-direction: column; height: 100vh; width: 100vw; overflow: hidden; font-family: 'Nunito', sans-serif;">
-    <div style="width: 100%;"></div>
-    <div style="display: flex; flex: 1; width: 100%; overflow: hidden; background-color: #F9FAFB;">
-        <aside class="sidebar">
-            <div class="sb-section">Administración</div>
-            <a href="#" class="sb-item active">📊 Reportes de ventas</a>
-        </aside>
-        <main style="flex: 1; padding: 40px; overflow-y: auto;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 35px;">
-                <div>
-                    <h1 style="font-weight: 800; color: #111827; font-size: 28px; margin: 0;">Análisis de Ventas</h1>
-                    <p style="color: #6B7280; font-size: 16px; margin-top: 5px;">Bienvenida, {{ usuario_nombre }}!</p>
-                </div>
-                <div style="display: flex; gap: 12px;">
-                    <button id="exportPDF" style="background: #FF8A8A; color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer;">PDF</button>
-                </div>
-            </div>
+<div style="width: 100%;"></div>
+<div style="display: flex; flex: 1; width: 100%; overflow: hidden; background-color: #F9FAFB;">
+<aside class="sidebar">
+<div class="sb-section">Administración</div>
+<a href="#" class="sb-item active">📊 Reportes de ventas</a>
+</aside>
 
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-bottom: 40px;">
-                <div style="background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.02);">
-                    <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 20px;">Ventas Semanales ($)</h3>
-                    <canvas id="ventasSemana" height="110"></canvas>
-                </div>
-                <div style="background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.02);">
-                    <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 20px;">Distribución</h3>
-                    <canvas id="ventasTipo"></canvas>
-                </div>
-            </div>
+<main style="flex: 1; padding: 40px; overflow-y: auto;">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 35px;">
+<div>
+<h1 style="font-weight: 800; color: #111827; font-size: 28px; margin: 0;">Análisis de Ventas</h1>
+<p style="color: #6B7280; font-size: 16px; margin-top: 5px;">Bienvenida, {{ usuario_nombre }}!</p>
+</div>
+<div style="display: flex; gap: 12px;">
+<button id="exportPDF" style="background: #FF8A8A; color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer;">PDF</button>
+</div>
+</div>
 
-            <div style="background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.02);">
-                <h2 style="font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 25px;">Utilidad por Producto</h2>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="text-align:left; border-bottom:2px solid #F3F4F6;">
-                            <th style="padding:15px; color:#9CA3AF; font-size:13px;">PRODUCTO</th>
-                            <th style="padding:15px; color:#9CA3AF; font-size:13px;">VENTA</th>
-                            <th style="padding:15px; color:#9CA3AF; font-size:13px;">UTILIDAD</th>
-                            <th style="padding:15px; color:#9CA3AF; font-size:13px;">RENDIMIENTO</th>
-                        </tr>
-                    </thead>
-                    <tbody style="font-weight:700; color:#374151;">
-                        {% for p in utilidad_productos %}
-                        <tr style="border-bottom:1px solid #F3F4F6;">
-                            <td>{{ p.producto }}</td>
-                            <td>${{ "%.2f"|format(p.venta) }}</td>
-                            <td style="color:#10B981;">${{ "%.2f"|format(p.utilidad) }}</td>
-                            <td>{{ "%.2f"|format((p.utilidad/p.venta*100) if p.venta else 0) }}%</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-bottom: 40px;">
+<div style="background: white; padding: 25px; border-radius: 24px;">
+<h3>Ventas Semanales ($)</h3>
+<div style="height:220px">
+<canvas id="ventasSemana"></canvas>
+</div>
+</div>
 
-        </main>
-    </div>
+<div style="background: white; padding: 25px; border-radius: 24px;">
+<h3>Distribución</h3>
+<div style="height:220px">
+<canvas id="ventasTipo"></canvas>
+</div>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-bottom:40px;">
+<div style="background:white;padding:25px;border-radius:24px;">
+<h3>Top Semana (Unidades)</h3>
+<div style="height:220px">
+<canvas id="topSemana"></canvas>
+</div>
+</div>
+
+<div style="background:white;padding:25px;border-radius:24px;">
+<h3>Top Semana ($)</h3>
+<div style="height:220px">
+<canvas id="topSemanaMonto"></canvas>
+</div>
+</div>
+
+<div style="background:white;padding:25px;border-radius:24px;">
+<h3>Top Mes (Unidades)</h3>
+<div style="height:220px">
+<canvas id="topMes"></canvas>
+</div>
+</div>
+
+<div style="background:white;padding:25px;border-radius:24px;">
+<h3>Top Mes ($)</h3>
+<div style="height:220px">
+<canvas id="topMesMonto"></canvas>
+</div>
+</div>
+</div>
+
+<div style="background: white; padding: 30px; border-radius: 24px;">
+<h2>Utilidad por Producto</h2>
+<table style="width:100%;">
+<thead>
+<tr>
+<th>PRODUCTO</th>
+<th>VENTA</th>
+<th>UTILIDAD</th>
+<th>RENDIMIENTO</th>
+</tr>
+</thead>
+<tbody>
+{% for p in utilidad_productos %}
+<tr>
+<td>{{ p.producto }}</td>
+<td>${{ "%.2f"|format(p.venta) }}</td>
+<td style="color:#10B981">${{ "%.2f"|format(p.utilidad) }}</td>
+<td>{{ "%.2f"|format((p.utilidad/p.venta*100) if p.venta else 0) }}%</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+</main>
+</div>
 </div>
 
 <script>
-const diasES = {'Mon':'LUN','Tue':'MAR','Wed':'MIE','Thu':'JUE','Fri':'VIE','Sat':'SAB','Sun':'DOM'};
+
 window.DASHBOARD_DATA = {
-    ventasSemanaLabels: {{ ventas_semanales.labels | tojson }},
-    ventasSemanaData: {{ ventas_semanales.data | tojson }},
-    distribucionLabels: {{ distribucion.labels | tojson }},
-    distribucionData: {{ distribucion.data | tojson }},
-    utilidadProductos: {{ utilidad_productos | tojson }}
+
+ventasSemanaLabels: {{ ventas_semanales.labels | tojson }},
+ventasSemanaData: {{ ventas_semanales.data | tojson }},
+
+distribucionLabels: {{ distribucion.labels | tojson }},
+distribucionData: {{ distribucion.data | tojson }},
+
+utilidadProductos: {{ utilidad_productos | tojson }},
+
+topSemanaLabels: {{ top_semana.labels | tojson }},
+topSemanaData: {{ top_semana.data | tojson }},
+
+topSemanaMontoLabels: {{ top_semana_monto.labels | tojson }},
+topSemanaMontoData: {{ top_semana_monto.data | tojson }},
+
+topMesLabels: {{ top_mes.labels | tojson }},
+topMesData: {{ top_mes.data | tojson }},
+
+topMesMontoLabels: {{ top_mes_monto.labels | tojson }},
+topMesMontoData: {{ top_mes_monto.data | tojson }}
+
 };
 
-const labelsES = window.DASHBOARD_DATA.ventasSemanaLabels.map(d => diasES[d] || d);
+function crearBarra(id, labels, data){
+new Chart(document.getElementById(id),{
+type:'bar',
+data:{
+labels:labels,
+datasets:[{
+data:data,
+backgroundColor:'#FF8A8A',
+borderRadius:8
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{
+legend:{display:false},
+datalabels:{
+anchor:'end',
+align:'end',
+font:{weight:'bold'}
+}
+}
+},
+plugins:[ChartDataLabels]
+})
+}
 
-const ctxBar = document.getElementById('ventasSemana').getContext('2d');
-new Chart(ctxBar, {
-    type: 'bar',
-    data: { labels: labelsES, datasets: [{label:'Ventas $',data:window.DASHBOARD_DATA.ventasSemanaData,backgroundColor:'#FF8A8A',borderRadius:10}] },
-    options:{
-        plugins:{
-            legend:{display:false},
-            datalabels:{
-                anchor: 'end',
-                align: 'end',
-                formatter: value => `$${value}`
-            }
-        }
-    },
-    plugins: [ChartDataLabels]
-});
+crearBarra("topSemana",window.DASHBOARD_DATA.topSemanaLabels,window.DASHBOARD_DATA.topSemanaData)
+crearBarra("topSemanaMonto",window.DASHBOARD_DATA.topSemanaMontoLabels,window.DASHBOARD_DATA.topSemanaMontoData)
+crearBarra("topMes",window.DASHBOARD_DATA.topMesLabels,window.DASHBOARD_DATA.topMesData)
+crearBarra("topMesMonto",window.DASHBOARD_DATA.topMesMontoLabels,window.DASHBOARD_DATA.topMesMontoData)
 
-const ctxPie = document.getElementById('ventasTipo').getContext('2d');
-new Chart(ctxPie, {
-    type:'doughnut',
-    data: {
-        labels: window.DASHBOARD_DATA.distribucionLabels,
-        datasets:[{data: window.DASHBOARD_DATA.distribucionData, backgroundColor: ['#FF8A8A','#6366F1','#FBBF24'] }]
-    },
-    options:{cutout:'75%', plugins:{legend:{position:'bottom'}}}
-});
+new Chart(document.getElementById('ventasSemana'),{
+type:'bar',
+data:{
+labels:window.DASHBOARD_DATA.ventasSemanaLabels,
+datasets:[{
+data:window.DASHBOARD_DATA.ventasSemanaData,
+backgroundColor:'#FF8A8A',
+borderRadius:8
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{
+legend:{display:false},
+datalabels:{
+anchor:'end',
+align:'end',
+formatter:value=>`$${value}`
+}
+}
+},
+plugins:[ChartDataLabels]
+})
+
+new Chart(document.getElementById('ventasTipo'),{
+type:'doughnut',
+data:{
+labels:window.DASHBOARD_DATA.distribucionLabels,
+datasets:[{
+data:window.DASHBOARD_DATA.distribucionData,
+backgroundColor:['#FF8A8A','#6366F1','#FBBF24']
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false
+}
+})
 
 document.getElementById('exportPDF').addEventListener('click', function() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p','mm','a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 25;
-    let yPos = 20;
 
-    doc.addImage("{{ url_for('static', filename='img/logo.png') }}",'PNG',margin,yPos,30,30);
-    doc.setFontSize(20); doc.setTextColor('#FF8A8A');
-    doc.text("La Casa del Helado", pageWidth/2, yPos+12, {align:'center'});
-    doc.setFontSize(12); doc.setTextColor(0,0,0);
-    doc.text("{{ current_date }}", pageWidth-margin, yPos+20, {align:'right'});
-    yPos += 40;
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF('p','mm','a4');
 
-    doc.setFontSize(14); doc.setTextColor(0,0,0);
-    doc.text("Ventas Semanales ($)", margin, yPos);
-    yPos += 7;
-    const barCanvas = document.getElementById('ventasSemana');
-    doc.addImage(barCanvas.toDataURL('image/png'),'PNG',margin,yPos,pageWidth-2*margin,50);
-    yPos += 60;
+const pageWidth = doc.internal.pageSize.getWidth();
+const margin = 25;
+let yPos = 20;
 
-    doc.setFontSize(14); doc.setTextColor(0,0,0);
-    doc.text("Distribución por Categoría", margin, yPos);
-    yPos += 7;
-    doc.autoTable({
-        startY: yPos,
-        head: [['Categoría','Cantidad']],
-        body: window.DASHBOARD_DATA.distribucionLabels.map((label,i)=>[label, window.DASHBOARD_DATA.distribucionData[i]]),
-        theme: 'grid',
-        headStyles:{fillColor:[255,138,138]},
-        styles:{cellPadding:2,fontSize:10}
-    });
-    yPos = doc.lastAutoTable.finalY + 15;
+doc.addImage("{{ url_for('static', filename='img/logo.png') }}",'PNG',margin,yPos,30,30);
 
-    doc.setFontSize(14); doc.setTextColor(0,0,0);
-    doc.text("Utilidad por Producto", margin, yPos);
-    yPos += 7;
-    doc.autoTable({
-        startY: yPos,
-        head:[['Producto','Venta','Utilidad','Rendimiento (%)']],
-        body: window.DASHBOARD_DATA.utilidadProductos.map(p=>[
-            p.producto,
-            `$${p.venta.toFixed(2)}`,
-            `$${p.utilidad.toFixed(2)}`,
-            `${((p.utilidad/p.venta)*100).toFixed(2)}%`
-        ]),
-        theme:'grid',
-        headStyles:{fillColor:[255,138,138]},
-        styles:{cellPadding:2,fontSize:10}
-    });
+doc.setFontSize(20);
+doc.setTextColor('#FF8A8A');
+doc.text("La Casa del Helado", pageWidth/2, yPos+12, {align:'center'});
 
-    const fechaArchivo = "{{ current_date|replace('/', '-') }}";
-    doc.save(`${fechaArchivo}_reporte_de_ventas.pdf`);
+doc.setFontSize(12);
+doc.setTextColor(0,0,0);
+doc.text("{{ current_date }}", pageWidth-margin, yPos+20, {align:'right'});
+
+yPos += 40;
+
+doc.setFontSize(14);
+doc.text("Ventas Semanales ($)", margin, yPos);
+yPos += 7;
+
+const barCanvas = document.getElementById('ventasSemana');
+
+const imgWidth = pageWidth - 2 * margin;
+const imgHeight = barCanvas.height * imgWidth / barCanvas.width;
+
+doc.addImage(barCanvas.toDataURL('image/png'),'PNG',margin,yPos,imgWidth,imgHeight);
+
+yPos += imgHeight + 15;
+
+doc.text("Distribución por Categoría", margin, yPos);
+yPos += 7;
+
+doc.autoTable({
+startY: yPos,
+head: [['Categoría','Cantidad']],
+body: window.DASHBOARD_DATA.distribucionLabels.map((label,i)=>[
+label,
+window.DASHBOARD_DATA.distribucionData[i]
+]),
+theme: 'grid',
+headStyles:{fillColor:[255,138,138]}
 });
+
+yPos = doc.lastAutoTable.finalY + 15;
+
+doc.text("Utilidad por Producto", margin, yPos);
+yPos += 7;
+
+doc.autoTable({
+startY: yPos,
+head:[['Producto','Venta','Utilidad','Rendimiento (%)']],
+body: window.DASHBOARD_DATA.utilidadProductos.map(p=>[
+p.producto,
+`$${p.venta.toFixed(2)}`,
+`$${p.utilidad.toFixed(2)}`,
+`${((p.utilidad/p.venta)*100).toFixed(2)}%`
+]),
+theme:'grid',
+headStyles:{fillColor:[255,138,138]}
+});
+
+yPos = doc.lastAutoTable.finalY + 15;
+
+doc.text("Top Productos Semana (Unidades)", margin, yPos);
+yPos += 7;
+
+doc.autoTable({
+startY:yPos,
+head:[['Producto','Cantidad']],
+body: window.DASHBOARD_DATA.topSemanaLabels.map((l,i)=>[
+l,
+window.DASHBOARD_DATA.topSemanaData[i]
+]),
+theme:'grid',
+headStyles:{fillColor:[255,138,138]}
+});
+
+yPos = doc.lastAutoTable.finalY + 15;
+
+doc.text("Top Productos Semana ($)", margin, yPos);
+yPos += 7;
+
+doc.autoTable({
+startY:yPos,
+head:[['Producto','Monto']],
+body: window.DASHBOARD_DATA.topSemanaMontoLabels.map((l,i)=>[
+l,
+`$${window.DASHBOARD_DATA.topSemanaMontoData[i]}`
+]),
+theme:'grid',
+headStyles:{fillColor:[255,138,138]}
+});
+
+yPos = doc.lastAutoTable.finalY + 15;
+
+doc.text("Top Productos Mes (Unidades)", margin, yPos);
+yPos += 7;
+
+doc.autoTable({
+startY:yPos,
+head:[['Producto','Cantidad']],
+body: window.DASHBOARD_DATA.topMesLabels.map((l,i)=>[
+l,
+window.DASHBOARD_DATA.topMesData[i]
+]),
+theme:'grid',
+headStyles:{fillColor:[255,138,138]}
+});
+
+yPos = doc.lastAutoTable.finalY + 15;
+
+doc.text("Top Productos Mes ($)", margin, yPos);
+yPos += 7;
+
+doc.autoTable({
+startY:yPos,
+head:[['Producto','Monto']],
+body: window.DASHBOARD_DATA.topMesMontoLabels.map((l,i)=>[
+l,
+`$${window.DASHBOARD_DATA.topMesMontoData[i]}`
+]),
+theme:'grid',
+headStyles:{fillColor:[255,138,138]}
+});
+
+const fechaArchivo = "{{ current_date|replace('/', '-') }}";
+doc.save(`${fechaArchivo}_reporte_de_ventas.pdf`);
+
+});
+
 </script>
+
 {% endblock %}

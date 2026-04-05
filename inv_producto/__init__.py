@@ -36,7 +36,6 @@ def index():
         create_from.unidadBase.data = prod_editar.unidadBase
         create_from.stockActual.data = prod_editar.stockActual
         create_from.stockMinimo.data = prod_editar.stockMinimo
-        create_from.costoUnitario.data = prod_editar.costoUnitario
         create_from.idCategoria.data = prod_editar.idCategoria
         presentaciones = presentacionVenta.query.filter_by(idProductoBase=prod_editar.id).all()
     
@@ -58,7 +57,6 @@ def crear():
         unidadBase= request.form.get('unidadBase'),
         stockActual=request.form.get('stockActual'),
         stockMinimo=request.form.get('stockMinimo'),
-        costoUnitario=request.form.get('costoUnitario'),
         idCategoria=request.form.get('idCategoria'),
     )
     db.session.add(producto)
@@ -80,7 +78,6 @@ def editar():
     producto.unidadBase= request.form.get('unidadBase')
     producto.stockActual= request.form.get('stockActual')
     producto.stockMinimo= request.form.get('stockMinimo')
-    producto.costoUnitario= request.form.get('costoUnitario')
     producto.idCategoria= request.form.get('idCategoria')
 
     db.session.commit()
