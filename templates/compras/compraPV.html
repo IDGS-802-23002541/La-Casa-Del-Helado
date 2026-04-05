@@ -1,151 +1,166 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 {% import "_macros.html" as macros %}
 
-{% block title %}Registrar Entrada — Compras{% endblock %} 
+{% block title %}Registrar Entrada — Compras{% endblock %}
 
 {% block extra_css %}
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/compra.css') }}"
-/>
-{% endblock %} 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/compra.css') }}"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+{% endblock %}
 
 {% block body %}
-  <!-- NAV BAR -->
 <div class="flex h-screen">
-  <!-- SIDEBAR -->
-  
   <div class="flex-1 bg-cream font-sans text-brand-text overflow-y-auto">
-    <div id="page-compras" class="p-6 flex justify-center gap-20">
+    <div class="page-body">
 
-        <div class="mt-6 bg-white rounded-xl shadow p-4">
-          <h2 class="text-lg font-bold mb-3">Compras registradas</h2>
-
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-left border-b">
-                <th>Factura</th>
-                <th>Proveedor</th>
-                <th>Detalles</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for c in compras %}
-              <tr class="border-b hover:bg-gray-50">
-                <td>{{ c.factura }}</td>
-                <td>{{ c.proveedor.razonSocial }}</td>
-                <td>
-                  {% for d in c.detalles_compra %}
-                    <div class="text-xs">
-                      {{ d.materiaPrima.nombre }} 
-                      {{ d.cantidad }} {{ d.contenidoNeto }} 
-                      x ${{ d.precio }}
-                    </div>
-                  {% endfor %}
-                </td>
-                <td>{{ c.fechaCompra.strftime('%Y-%m-%d') }}</td>
-                <td>
-                  <button
-                    onclick="abrirModalEliminar('{{ url_for('compra.eliminar_compra', id=c.id) }}')"
-                    type="button"
-                    class="text-red-600 font-bold hover:underline"
-                  >
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+      <!-- ═══════════════════════════════
+           TABLA DE COMPRAS
+      ════════════════════════════════ -->
+      <div class="table-card">
+        <div class="table-card-header">
+          <div class="table-card-title">Compras registradas</div>
+          <span class="badge-count">{{ compras|length }} registros</span>
         </div>
 
-        <!-- Modal -->
-        <form method="POST"
-          class="bg-white rounded-[20px] shadow-2xl w-full max-w-[300px] overflow-hidden"
-          id="formularioCompra"
-        >
-          <!-- HEADER -->
-          <div class="bg-dark px-6 pt-6 pb-5">
-            <div class="font-display text-2xl text-white mb-1">
-              Registrar Entrada
-            </div>
-            <div class="text-xs text-white/60">
-              Completa los campos para registrar la entrada de mercancía
-            </div>
+        {% if compras %}
+        <table class="compras-table">
+          <thead>
+            <tr>
+              <th>Factura</th>
+              <th>Proveedor</th>
+              <th>Detalles</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in compras %}
+            <tr>
+              <td>
+                <span class="factura-badge">🧾 {{ c.factura }}</span>
+              </td>
+              <td>
+                <span class="proveedor-name">{{ c.proveedor.razonSocial }}</span>
+              </td>
+              <td>
+                {% for d in c.detalles_compra %}
+                  <span class="detalle-pill">
+                    <span class="qty">{{ d.cantidad }}</span>
+                    {{ d.materiaPrima.nombre }} {{ d.contenidoNeto }}
+                  </span>
+                {% endfor %}
+              </td>
+              <td>
+                <span class="fecha-chip">{{ c.fechaCompra.strftime('%Y-%m-%d') }}</span>
+              </td>
+              <td>
+                <button
+                  onclick="abrirModalEliminar('{{ url_for('compra.eliminar_compra', id=c.id) }}')"
+                  type="button"
+                  class="btn-eliminar"
+                >
+                  ✕ Eliminar
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <p>No hay compras registradas aún.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- ═══════════════════════════════
+           FORMULARIO
+      ════════════════════════════════ -->
+      <form method="POST" class="form-card" id="formularioCompra">
+
+        <!-- Header -->
+        <div class="form-header">
+          <h2>Registrar Entrada</h2>
+          <p>Completa los campos para registrar la entrada de mercancía</p>
+        </div>
+
+        <!-- Body -->
+        <div class="form-body">
+
+          <!-- FACTURA -->
+          <div>
+            {{ macros.campoCompra(
+                compra_form.factura,
+                clase='input-style',
+                placeholder='FAC-2026-001'
+            ) }}
           </div>
 
-          <!-- BODY -->
-          <div class="px-6 py-5 flex flex-col gap-3.5">
-
-            <!-- FACTURA -->
-            <div class="flex flex-col gap-1.5">
-
-              {{ macros.campoCompra(  
-                  compra_form.factura,
-                  clase='w-full p-2 border rounded',
-                  placeholder='FAC-2026-001'
-              ) }}
-            </div>
-
-            <!-- PROVEEDOR -->
-            <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-extrabold text-brand-text">
-                Proveedor <span class="text-orange">*</span>
-              </label>
+          <!-- PROVEEDOR -->
+          <div>
+            <label class="field-label">
+              Proveedor <span class="req">*</span>
+            </label>
+            <div class="select-wrap">
               <select name="idProveedor" class="custom-select">
                 <option value="">— Seleccionar proveedor —</option>
                 {% for id, nombre in compra_form.idProveedor.choices %}
                   <option value="{{ id }}"
-                    {% if compra_form.idProveedor.data == id %}selected{% endif %}
-                  >
+                    {% if compra_form.idProveedor.data == id %}selected{% endif %}>
                     {{ nombre }}
                   </option>
                 {% endfor %}
               </select>
             </div>
+          </div>
 
-            <hr class="h-px bg-border border-0 my-0.5" />
+          <div class="divider"></div>
 
-            <!-- PRODUCTO -->
-             <label class="text-xs font-extrabold text-brand-text">
-                PRODUCTO <span class="text-orange">*</span>
+          <!-- PRODUCTO -->
+          <div>
+            <label class="field-label">
+              Producto <span class="req">*</span>
             </label>
-             {% if errores_detalle %}
-              <div class="bg-red-100 border border-red-400 text-red-700 p-2 rounded text-xs">
+
+            {% if errores_detalle %}
+              <div class="bg-red-100 border border-red-400 text-red-700 p-2 rounded text-xs mb-2">
                 {% for error in errores_detalle %}
                   <div>{{ error }}</div>
                 {% endfor %}
               </div>
             {% endif %}
-            <div class="flex flex-col gap-2.5">
+
+            <div style="display:flex; flex-direction:column; gap:0.55rem;">
 
               <!-- Materia Prima -->
-              <select name="idMateriaPrima" class="custom-select">
-                <option value=" {{ id }}"
-                  {% if request.form.get('idMateriaPrima') == id|string %}selected{% endif %}
-                >— Seleccionar producto —</option>
-                {% for id, nombre in detalle_form.idMateriaPrima.choices %}
-                  <option value="{{ id }}">{{ nombre }}</option>
-                {% endfor %}
-              </select>
+              <div class="select-wrap">
+                <select name="idMateriaPrima" class="custom-select">
+                  <option value="">— Seleccionar producto —</option>
+                  {% for id, nombre in detalle_form.idMateriaPrima.choices %}
+                    <option value="{{ id }}"
+                      {% if request.form.get('idMateriaPrima') == id|string %}selected{% endif %}>
+                      {{ nombre }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
 
-              <!-- Presentaicon -->
-              <select name="contenidoNeto" class="custom-select">
-                <option value="">— Seleccionar presentación —</option>
-
-                {% for p in presentaciones %}
-                  <option value="{{ p[0] }}"
-                    {% if request.form.get('contenidoNeto') == p[0]|string %}selected{% endif %}
-                  >
-                    {{ p[1] }}
-                  </option>
-                {% endfor %}
-              </select>
+              <!-- Presentación -->
+              <div class="select-wrap">
+                <select name="contenidoNeto" class="custom-select">
+                  <option value="">— Seleccionar presentación —</option>
+                  {% for p in presentaciones %}
+                    <option value="{{ p[0] }}"
+                      {% if request.form.get('contenidoNeto') == p[0]|string %}selected{% endif %}>
+                      {{ p[1] }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
 
               <!-- Cantidad -->
-               <input
+              <input
                 type="number"
                 name="cantidad"
                 value="{{ request.form.get('cantidad', '') }}"
@@ -153,7 +168,6 @@
                 placeholder="Cantidad"
                 class="input-style"
               />
-              
 
               <!-- Precio -->
               <input
@@ -161,133 +175,99 @@
                 name="precio"
                 value="{{ request.form.get('precio', '') }}"
                 step="0.01"
-                placeholder="Precio"
+                placeholder="Precio $"
                 class="input-style"
               />
 
-              <!-- BOTÓN AGREGAR -->
-              <button
-                type="submit"
-                name="accion"
-                value="agregar_detalle"
-                class="btn-secondary"
-              >
+              <!-- Botón agregar -->
+              <button type="submit" name="accion" value="agregar_detalle" class="btn-secondary">
                 + Agregar producto
               </button>
 
             </div>
-
-            <!-- LISTA DE PRODUCTOS AGREGADOS -->
-            {% if detalles %}
-              <div class="mt-3">
-                <p class="text-xs font-bold">Productos agregados:</p>
-
-                {% for d in detalles %}
-                  <div class="bg-cream p-2 rounded">
-                    {{ d.nombre }} - {{ d.cantidad }} {{ d.contenidoNeto }} x ${{ d.precio }}
-                  </div>
-                {% endfor %}
-              </div>
-            {% endif %}
-
           </div>
 
-          <!-- FOOTER -->
-          <div class="px-6 pb-5 pt-4 flex gap-3 border-t border-border">
-
-            <button type="reset" class="flex-1 btn-cancel" onclick="cancelarCompra()">
-              Cancelar
-            </button>
-
-            <button
-              type="submit"
-              name="accion"
-              value="guardar_compra"
-              class="flex-[2] btn-primary"
-            >
-              Guardar compra
-            </button>
-
-          </div>
-        </form>
-        <!-- /.cp-modal -->
-
-      <div id="modalEliminar" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
-        <div class="bg-white rounded-xl p-6 w-[320px] shadow-xl text-center">
-          
-          <h2 class="text-lg font-bold mb-2 text-red-600">Eliminar compra</h2>
-          
-          <p class="text-sm text-gray-600 mb-4">
-            ¿Estás seguro? Esta acción no se puede deshacer.
-          </p>
-
-          <div class="flex gap-3">
-            <button 
-            type="button"
-            onclick="cerrarModal()" 
-            class="flex-1 py-2 border rounded-lg">
-              Cancelar
-            </button>
-
-            <button
-              type="submit"
-              form="formEliminar"
-              class="flex-1 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 active:scale-95 transition"
-            >
-              Eliminar
-            </button>
-
-            <form id="formEliminar" method="POST"></form>
-          </div>
+          <!-- PRODUCTOS AGREGADOS -->
+          {% if detalles %}
+            <div>
+              <p class="field-label">Productos agregados</p>
+              {% for d in detalles %}
+                <div class="detalle-item">
+                  {{ d.nombre }} — {{ d.cantidad }} {{ d.contenidoNeto }} x ${{ d.precio }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
 
         </div>
-      </div>
+
+        <!-- Footer -->
+        <div class="form-footer">
+          <button type="reset" class="btn-cancel" onclick="cancelarCompra()">
+            Cancelar
+          </button>
+          <button type="submit" name="accion" value="guardar_compra" class="btn-primary">
+            Guardar compra
+          </button>
+        </div>
+
+      </form>
+
     </div>
   </div>
-
 </div>
-  
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
-    <script>
-      let formAction = "";
-      
-      document.querySelector('[name="idMateriaPrima"]').addEventListener('change', function () {
-        const idMateria = this.value;
 
-        fetch(`/get_presentaciones/${idMateria}`)
-          .then(res => res.json())
-          .then(data => {
-            const select = document.querySelector('[name="contenidoNeto"]');
-            select.innerHTML = '<option value="">— Seleccionar —</option>';
+<!-- MODAL ELIMINAR -->
+<div id="modalEliminar" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Eliminar compra</h2>
+    <p>¿Estás seguro? Esta acción no se puede deshacer.</p>
+    <div class="modal-actions">
+      <button type="button" onclick="cerrarModal()" class="btn-cancel" style="flex:1; padding:.7rem;">
+        Cancelar
+      </button>
+      <button type="submit" form="formEliminar" class="btn-primary"
+        style="flex:1; padding:.7rem; background:linear-gradient(135deg,#e05a5a,#ff6b6b);">
+        Eliminar
+      </button>
+    </div>
+    <form id="formEliminar" method="POST"></form>
+  </div>
+</div>
 
-            data.presentaciones.forEach(p => {
-              const option = document.createElement("option");
-              option.value = p[0];
-              option.textContent = p[1];
-              select.appendChild(option);
-            });
-          });
+<script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
+<script>
+  // Carga dinámica de presentaciones al cambiar materia prima
+  document.querySelector('[name="idMateriaPrima"]').addEventListener('change', function () {
+    const idMateria = this.value;
+    fetch(`/get_presentaciones/${idMateria}`)
+      .then(res => res.json())
+      .then(data => {
+        const select = document.querySelector('[name="contenidoNeto"]');
+        select.innerHTML = '<option value="">— Seleccionar —</option>';
+        data.presentaciones.forEach(p => {
+          const option = document.createElement("option");
+          option.value = p[0];
+          option.textContent = p[1];
+          select.appendChild(option);
+        });
       });
+  });
 
-      function abrirModalEliminar(url) {
-        const modal = document.getElementById("modalEliminar");
-        const form = document.getElementById("formEliminar");
+  function abrirModalEliminar(url) {
+    const modal = document.getElementById("modalEliminar");
+    document.getElementById("formEliminar").action = url;
+    modal.style.display = "flex";
+  }
 
-        form.action = url;
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-      }
+  function cerrarModal() {
+    document.getElementById("modalEliminar").style.display = "none";
+  }
 
-      function cerrarModal() {
-        const modal = document.getElementById("modalEliminar");
-        modal.classList.add("hidden");
-      }
-
-      function cancelarCompra() {
-        fetch("/compra/cancelar", { method: "POST" })
-          .then(() => window.location.reload());
-      }
-      
-    </script>
+  function cancelarCompra() {
+    fetch("/compra/cancelar", { method: "POST" })
+      .then(() => window.location.reload());
+  }
+</script>
 
 {% endblock %}

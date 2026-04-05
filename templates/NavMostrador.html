@@ -46,9 +46,10 @@
       <span class="tab-icon">🛒</span> Punto de Venta
     </a>
 
-    <a href="#" class="nav-tab">
-      <span class="tab-icon">📦</span> Compras Proveedores
-    </a>
+    <a href="{{ url_for('compra.compra') }}" 
+   class="nav-tab {% if request.endpoint == 'compra.registrar_compra' %}active{% endif %}">
+  <span class="tab-icon">📦</span> Compras Proveedores
+</a>
 
     {# Asegúrate de que el blueprint se llame SolicitudProduccion con mayúsculas, si no cámbialo a minúsculas #}
     <a href="{{ url_for('SolicitudProduccion.solicitud_produccion') }}" 
