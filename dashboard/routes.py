@@ -63,12 +63,99 @@ def auth():
         } for u in utilidad_query
     ]
 
+    fecha_semana = datetime.now() - timedelta(days=7)
+    fecha_mes = datetime.now() - timedelta(days=30)
+
+    mas_vendidos_semana = (
+        DetalleVenta.query
+        .join(Producto)
+        .join(Venta)
+        .filter(Venta.fecha >= fecha_semana)
+        .with_entities(
+            Producto.nombre,
+            func.sum(DetalleVenta.cantidad).label("cantidad")
+        )
+        .group_by(Producto.nombre)
+        .order_by(func.sum(DetalleVenta.cantidad).desc())
+        .limit(5)
+        .all()
+    )
+
+    mas_vendidos_semana_monto = (
+        DetalleVenta.query
+        .join(Producto)
+        .join(Venta)
+        .filter(Venta.fecha >= fecha_semana)
+        .with_entities(
+            Producto.nombre,
+            func.sum(DetalleVenta.cantidad * DetalleVenta.precioUnitario).label("total")
+        )
+        .group_by(Producto.nombre)
+        .order_by(func.sum(DetalleVenta.cantidad * DetalleVenta.precioUnitario).desc())
+        .limit(5)
+        .all()
+    )
+
+    mas_vendidos_mes = (
+        DetalleVenta.query
+        .join(Producto)
+        .join(Venta)
+        .filter(Venta.fecha >= fecha_mes)
+        .with_entities(
+            Producto.nombre,
+            func.sum(DetalleVenta.cantidad).label("cantidad")
+        )
+        .group_by(Producto.nombre)
+        .order_by(func.sum(DetalleVenta.cantidad).desc())
+        .limit(5)
+        .all()
+    )
+
+    mas_vendidos_mes_monto = (
+        DetalleVenta.query
+        .join(Producto)
+        .join(Venta)
+        .filter(Venta.fecha >= fecha_mes)
+        .with_entities(
+            Producto.nombre,
+            func.sum(DetalleVenta.cantidad * DetalleVenta.precioUnitario).label("total")
+        )
+        .group_by(Producto.nombre)
+        .order_by(func.sum(DetalleVenta.cantidad * DetalleVenta.precioUnitario).desc())
+        .limit(5)
+        .all()
+    )
+
+    top_semana = {
+        "labels": [p.nombre for p in mas_vendidos_semana],
+        "data": [float(p.cantidad) for p in mas_vendidos_semana]
+    }
+
+    top_semana_monto = {
+        "labels": [p.nombre for p in mas_vendidos_semana_monto],
+        "data": [float(p.total) for p in mas_vendidos_semana_monto]
+    }
+
+    top_mes = {
+        "labels": [p.nombre for p in mas_vendidos_mes],
+        "data": [float(p.cantidad) for p in mas_vendidos_mes]
+    }
+
+    top_mes_monto = {
+        "labels": [p.nombre for p in mas_vendidos_mes_monto],
+        "data": [float(p.total) for p in mas_vendidos_mes_monto]
+    }
+
     return render_template(
         "dashboard/dash.html",
         fecha_hoy=fecha_hoy,
         ventas_semanales=ventas_semanales,
         distribucion=distribucion,
         utilidad_productos=utilidad_productos,
+        top_semana=top_semana,
+        top_semana_monto=top_semana_monto,
+        top_mes=top_mes,
+        top_mes_monto=top_mes_monto,
         current_date=datetime.now().strftime('%d/%m/%Y'),
         usuario_nombre=current_user.nombre if current_user.is_authenticated else "Usuario"
     )
