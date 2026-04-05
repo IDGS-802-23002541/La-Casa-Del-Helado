@@ -5,11 +5,17 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/compra.css') }}"/>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
 {% endblock %}
 
 {% block body %}
 <div class="flex h-screen">
+  <aside class="sidebar">
+    <div class="sb-section">Gestión</div>
+    <a href="{{ url_for('compra.compra') }}" class="sb-item active">
+      🛍️ Compra
+      <span class="sb-badge">{{ compras|length }}</span>
+    </a>
+  </aside>
   <div class="flex-1 bg-cream font-sans text-brand-text overflow-y-auto">
     <div class="page-body">
 
@@ -17,6 +23,24 @@
            TABLA DE COMPRAS
       ════════════════════════════════ -->
       <div class="table-card">
+        <!-- FILTRO POR FECHA -->
+        <form method="GET" action="{{ url_for('compra.compra') }}" class="filtro-fechas">
+          <label class="field-label">📅 Filtrar por fecha</label>
+          <div class="filtro-grupo">
+            <input
+              type="date"
+              name="fecha"
+              class="input-style"
+              value="{{ request.args.get('fecha', '') }}"
+            />
+          </div>
+          <div class="filtro-acciones">
+            <button type="submit" class="btn-filtrar">🔍 Filtrar</button>
+            {% if request.args.get('fecha') %}
+              <a href="{{ url_for('compra.compra') }}" class="btn-limpiar">✕ Limpiar</a>
+            {% endif %}
+          </div>
+        </form>
         <div class="table-card-header">
           <div class="table-card-title">Compras registradas</div>
           <span class="badge-count">{{ compras|length }} registros</span>
@@ -188,17 +212,23 @@
           </div>
 
           <!-- PRODUCTOS AGREGADOS -->
-          {% if detalles %}
-            <div>
-              <p class="field-label">Productos agregados</p>
-              {% for d in detalles %}
-                <div class="detalle-item">
-                  {{ d.nombre }} — {{ d.cantidad }} {{ d.contenidoNeto }} x ${{ d.precio }}
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
+          {% for d in detalles %}
+            <div class="detalle-item flex justify-between items-center">
+              
+              <div>
+                {{ d.nombre }} — {{ d.cantidad }} {{ d.contenidoNeto }} x ${{ d.precio }}
+              </div>
 
+              <button
+                type="button"
+                onclick="eliminarDetalle({{ loop.index0 }})"
+                class="text-red-500 hover:text-red-700 hover:scale-125 transition"
+              >
+                ✕
+              </button>
+
+            </div>
+          {% endfor %}
         </div>
 
         <!-- Footer -->
@@ -240,6 +270,9 @@
   // Carga dinámica de presentaciones al cambiar materia prima
   document.querySelector('[name="idMateriaPrima"]').addEventListener('change', function () {
     const idMateria = this.value;
+    
+    if (!idMateria) return; 
+
     fetch(`/get_presentaciones/${idMateria}`)
       .then(res => res.json())
       .then(data => {
@@ -257,16 +290,30 @@
   function abrirModalEliminar(url) {
     const modal = document.getElementById("modalEliminar");
     document.getElementById("formEliminar").action = url;
-    modal.style.display = "flex";
+    modal.classList.add("show");;
   }
 
   function cerrarModal() {
-    document.getElementById("modalEliminar").style.display = "none";
+    document.getElementById("modalEliminar").classList.remove("show");
   }
 
   function cancelarCompra() {
     fetch("/compra/cancelar", { method: "POST" })
       .then(() => window.location.reload());
+  }
+
+  function eliminarDetalle(index) {
+    fetch("/compra/eliminar_detalle", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ index: index })
+    })
+    .then(res => res.json())
+    .then(() => {
+      location.reload();
+    });
   }
 </script>
 
