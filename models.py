@@ -219,4 +219,14 @@ class DetalleVenta(db.Model):
 
     producto = db.relationship('Producto')
 
-    
+class presentacionVenta(db.Model):
+    __tablename__ = "presentacion_venta"
+
+    id = db.Column(db.Integer, primary_key=True) 
+    nombre = db.Column(db.String(100), nullable=False)
+    precio = db.Column(db.Numeric(10,2), nullable=False)
+    idProductoBase = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False) 
+    equivalencia = db.Column(db.Numeric(10,4), nullable=False)
+    estatus = db.Column(db.Boolean, default=True)
+
+    productoBase = db.relationship('Producto', backref='presentaciones')
