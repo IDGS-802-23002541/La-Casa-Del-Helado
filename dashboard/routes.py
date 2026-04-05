@@ -49,12 +49,14 @@ def auth():
         .with_entities(
             Producto.nombre.label("producto"),
             func.sum(DetalleVenta.cantidad * DetalleVenta.precioUnitario).label("venta_total"),
-            (func.sum(DetalleVenta.cantidad * DetalleVenta.precioUnitario) - func.sum(DetalleVenta.cantidad * Producto.costoUnitario)).label("utilidad")
+            func.sum(DetalleVenta.cantidad * DetalleVenta.precioUnitario).label("utilidad")
         )
         .group_by(Producto.id)
         .all()
     )
-
+    print("Utilidad query:")
+    for u in utilidad_query:
+        print(f"producto:{u.producto} venta:{u.venta_total} utilidad:{u.utilidad}")
     utilidad_productos = [
         {
             "producto": u.producto,
@@ -125,6 +127,10 @@ def auth():
         .limit(5)
         .all()
     )
+
+    print("Detalles de venta:")
+    for d in DetalleVenta.query.all():
+        print(f"id:{d.id} idProducto:{d.idProducto} cantidad:{d.cantidad} precio:{d.precioUnitario}")
 
     top_semana = {
         "labels": [p.nombre for p in mas_vendidos_semana],
