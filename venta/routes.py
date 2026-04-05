@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, session, flash
-from models import db, Producto, Venta, DetalleVenta, Categoria 
+from models import db, Producto, Venta, DetalleVenta, Categoria, presentacionVenta
 from . import venta_bp 
 from datetime import datetime
 from flask_security import login_required, roles_accepted, current_user
@@ -10,11 +10,11 @@ from flask_security import login_required, roles_accepted, current_user
 def punto_venta():
     vista = 'vd'
     categorias = Categoria.query.all()
-    productos = Producto.query.all() 
+    presentaciones = presentacionVenta.query.filter_by(estatus=True).all()
     carrito = session.get('carrito_pos', [])
     total_v = sum(float(item['subtotal']) for item in carrito)
     return render_template("punto_venta/venta.html", 
-                           productos=productos, 
+                           presentaciones=presentaciones, 
                            categorias=categorias, 
                            total=total_v, 
                            carrito=carrito,
@@ -27,20 +27,21 @@ def punto_venta():
 def filtrar_productos():
     categoria_id = request.args.get('cat_id', type=int)
     busqueda = request.args.get('q', '').strip()
-    query = Producto.query
+
+    query = presentacionVenta.query.filter_by(estatus=True)
     
     if busqueda:
-        query = query.filter(Producto.nombre.ilike(f"%{busqueda}%"))
+        query = query.filter(presentacionVenta.nombre.ilike(f"%{busqueda}%"))
     if categoria_id:
-        query = query.filter(Producto.idCategoria == categoria_id)
+        query = query.join(Producto).filter(Producto.idCategoria == categoria_id)
         
-    productos = query.all()
+    presentaciones = query.all()
     categorias = Categoria.query.all()
     carrito = session.get('carrito_pos', [])
     total_v = sum(float(item['subtotal']) for item in carrito)
     
     return render_template("punto_venta/venta.html", 
-                           productos=productos, 
+                           presentaciones=presentaciones, 
                            categorias=categorias, 
                            total=total_v, 
                            carrito=carrito,
@@ -52,18 +53,19 @@ def filtrar_productos():
 # @login_required
 # @roles_accepted('Mostrador')
 def vender_agregar():
-    id_prod = request.form.get('idProducto')
-    if not id_prod:
+    id_pres = request.form.get('id')
+
+    if not id_pres:
         return redirect(url_for('venta.punto_venta'))
     
-    producto = Producto.query.get_or_404(id_prod)
-    # Usamos el costoUnitario de la base de datos o un precio fijo si prefieres
-    precio_unitario = float(producto.costoUnitario) if producto.costoUnitario else 35.0
+    pres = presentacionVenta.query.get_or_404(id_pres)
+    # se usa el precio que se registro al momento de crear una presentacion
+    precio_unitario = float(pres.precio)
     
     carrito = session.get('carrito_pos', [])
     encontrado = False
     for item in carrito:
-        if item['id'] == int(id_prod):
+        if item['id'] == int(id_pres):
             item['cantidad'] += 1
             item['subtotal'] = float(item['cantidad']) * precio_unitario
             encontrado = True
@@ -71,11 +73,13 @@ def vender_agregar():
     
     if not encontrado:
         carrito.append({
-            'id': producto.id,
-            'nombre': producto.nombre,
+            'id': pres.id,
+            'nombre':pres.nombre,
             'cantidad': 1,
             'precio': precio_unitario,
-            'subtotal': precio_unitario
+            'subtotal': precio_unitario,
+            'idProductoBase': pres.idProductoBase,
+            'equivalencia': float(pres.equivalencia)
         })
     
     session['carrito_pos'] = carrito
@@ -95,31 +99,25 @@ def finalizar_venta():
         total_v = sum(float(item['subtotal']) for item in carrito)
         
         # Registramos la venta vinculada al usuario logueado
-        nueva_venta = Venta(
-            fecha=datetime.now(), 
-            total=total_v, 
-            idUsuario=current_user.id 
+        # agregando el uso de procedures
+        result = db.session.execute(
+            db.text("CALL finalizar_VEnta(:idUsuario, :total, @idVenta)") , {'idUsuario':current_user.id, 'total': total_v}           
         )
-        
-        db.session.add(nueva_venta)
-        db.session.flush() 
+        id_venta = db.session.execute(db.text("select @idVenta")).scalar()
 
         for item in carrito:
-            p = Producto.query.get(item['id'])
-            if p:
-                if p.stockActual >= item['cantidad']:
-                    p.stockActual -= item['cantidad']         
-                    detalle = DetalleVenta(
-                        idProducto=item['id'],
-                        idVenta=nueva_venta.id,
-                        cantidad=item['cantidad'],
-                        precioUnitario=item['precio']
-                    )
-                    db.session.add(detalle)
-                else:
-                    flash(f"Stock insuficiente para {p.nombre}", "error")
-                    db.session.rollback()
-                    return redirect(url_for('venta.punto_venta'))
+            db.session.execute(
+                db.text("call agregar_detalle_Venta(:idVenta, :idProductoBase, :idPresentacion, :cantidad, :precio, :equivalencia)"),
+                {
+                    "idVenta":id_venta,
+                    "idProductoBase":item['idProductoBase'],
+                    "idPresentacion":item['id'],
+                    "cantidad":item['cantidad'],
+                    "precio":item['precio'],
+                    "equivalencia":item['equivalencia'],
+                }
+            )
+          
 
         db.session.commit()
         session.pop('carrito_pos', None)

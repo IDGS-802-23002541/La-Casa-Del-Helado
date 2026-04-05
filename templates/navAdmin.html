@@ -1,82 +1,132 @@
 <nav class="navbar">
   <a href="{{ url_for('index') }}" class="nav-brand">
     <div class="nav-brand-avatar">🍦</div>
-    <div style="display: flex; flex-direction: column; line-height: 1;">
-      <span class="nav-brand-name">La Casa del Helado</span>
-      <small style="font-size: 9px; color: #ff7043; font-weight: 800; letter-spacing: 0.5px;">ADMINISTRACIÓN</small>
-    </div>
+    <span class="nav-brand-name">La Casa del Helado</span>
   </a>
 
   <div class="nav-links">
+    <!-- Inicio: asumo que está en el blueprint principal, ruta 'index' -->
+    <a href="{{ url_for('dash.auth') }}" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a>
 
-
+    <!-- Proveedores -->
     <a href="{{ url_for('proveedores.proveedoresTabla') }}"
        class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
-       🚚 Proveedores
+        Proveedores
+    </a>
+
+    <a href="{{ url_for('compra.compra') }}"
+       class="nav-link {% if request.endpoint == 'proveedores.compra' %}active{% endif %}">
+       Compra
     </a>
 
     <a href="{{ url_for('materia.materia') }}"
-       class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
+       class="nav-link {% if request.endpoint == 'materia.materia' %}active{% endif %}">
         Materia Prima
     </a>
 
     <a href="{{ url_for('producto.index') }}"
        class="nav-link {% if request.endpoint == 'producto.index' %}active{% endif %}">
-       📦 Productos
-    </a>
-  
-    <a href="{{ url_for('usuarios.index') }}"
-       class="nav-link {% if request.endpoint == 'usuarios.index' %}active{% endif %}">
-       👥 Usuarios
+       Productos
+    
     </a>
 
-    <a href="{{ url_for('recetas.index') }}"
-       class="nav-link {% if request.endpoint == 'recetas.index' %}active{% endif %}">
-       📖 Recetas
+    <!-- Usuarios -->
+    <a href="{{ url_for('usuarios.index') }}" class="nav-link {% if active_page == 'usuarios' %}active{% endif %}">
+      Usuarios
+    </a>
+
+    <!-- Recetas -->
+    <a href="{{ url_for('recetas.index') }}" class="nav-link {% if active_page == 'recetas' %}active{% endif %}">
+      Recetas
+    </a>
+
+    <a href="{{ url_for('merma.merma') }}"
+       class="nav-link {% if request.endpoint == 'merma.merma' %}active{% endif %}">
+        Mermas
     </a>
 
     <a href="{{ url_for('dash.auth') }}"
        class="nav-link {% if request.endpoint == 'dash_bp.auth' %}active{% endif %}">
-       📊 Dashboard
+        Dashboard
     </a>
   </div>
 
   <div class="nav-right">
-    <div class="time-container" style="text-align: right; line-height: 1.2; margin-right: 15px;">
-      <div id="current-date" style="font-size: 10px; color: #888; font-weight: 700; text-transform: capitalize;">
-        Cargando fecha...
-      </div>
-      <div id="clock" style="font-weight: 800; color: #2d3436; font-size: 17px; letter-spacing: -0.5px;">
-        00:00
-      </div>
+    <div class="nav-date" id="navDate">
+      <div id="fecha"></div>
+      <div id="hora"></div>
     </div>
 
-    <div class="nav-user-avatar" title="{{ current_user.nombreUsuario if current_user else 'Invitado' }}">
-      {{ current_user.nombreUsuario[0] | upper if current_user and current_user.nombreUsuario else '?' }}
+    <div class="nav-user-avatar" title="{{ current_user.nombre if current_user.is_authenticated else '' }}">
+      {% if current_user.is_authenticated %}
+      {{ current_user.nombreUsuario[0] | upper }}
+      {% else %}
+      ?
+      {% endif %}
     </div>
-    
     <a href="{{ url_for('auth.logout') }}" class="btn-logout"
-       style="padding: 7px 15px; border-radius: 20px; font-size: 11px; text-decoration: none; background: rgba(255, 71, 87, 0.1); color: #FF4757; font-weight: 800; transition: 0.3s;">
-      CERRAR SESIÓN
+      style="width:auto; padding:6px 12px; border-radius:20px; font-size:11px; text-decoration:none;">
+      Salir
     </a>
   </div>
 </nav>
 
 <script>
-  function actualizarTiempo() {
-    const ahora = new Date();
-    
-    const horas = String(ahora.getHours()).padStart(2, '0');
-    const minutos = String(ahora.getMinutes()).padStart(2, '0');
-    const elReloj = document.getElementById('clock');
-    if(elReloj) elReloj.textContent = `${horas}:${minutos}`;
+  function actualizarHora() {
+    const now = new Date();
+    const dia = now.getDate().toString().padStart(2, '0');
+    const mes = (now.getMonth() + 1).toString().padStart(2, '0');
+    const anio = now.getFullYear();
+    const horas = now.getHours().toString().padStart(2, '0');
+    const minutos = now.getMinutes().toString().padStart(2, '0');
+    const segundos = now.getSeconds().toString().padStart(2, '0');
 
-    const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
-    const fechaTexto = ahora.toLocaleDateString('es-ES', opciones);
-    const elFecha = document.getElementById('current-date');
-    if(elFecha) elFecha.textContent = fechaTexto;
+    const fecha = `${dia}/${mes}/${anio}`;
+    const hora = `${horas}:${minutos}:${segundos}`;
+
+    document.getElementById('fecha').textContent = fecha;
+    document.getElementById('hora').textContent = hora;
   }
-  
-  setInterval(actualizarTiempo, 1000);
-  actualizarTiempo();
+
+  // Actualiza cada segundo
+  setInterval(actualizarHora, 1000);
+
+  // Inicializa inmediatamente
+  actualizarHora();
 </script>
+
+<style>
+  /* Asegúrate de que la fuente Baloo 2 se cargue correctamente */
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500&display=swap');
+
+  /* Aplica la fuente de manera forzada a todos los elementos relevantes */
+  body,
+  .nav-date,
+  .nav-date #fecha,
+  .nav-date #hora,
+  .nav-links,
+  .nav-link {
+    font-family: 'Baloo 2', sans-serif !important;
+    /* Forzar el uso de la fuente Baloo */
+    color: #000000 !important;
+    /* Forzar color negro para el texto */
+  }
+
+  .nav-date {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: right;
+    background: transparent !important;
+    /* Eliminar cualquier fondo blanco */
+  }
+
+  .nav-date #fecha {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .nav-date #hora {
+    font-size: 18px;
+  }
+</style>

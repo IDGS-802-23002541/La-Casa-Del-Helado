@@ -16,10 +16,6 @@
       <div class="sb-divider"></div>
       <div class="sb-section">Filtrar por estatus</div>
 
-      <a href="{{ url_for('usuarios.index', busqueda=busqueda, idRol=idRol) }}"
-         class="sb-item {{ 'active-teal' if not request.args.get('estatus') }}">
-        📋 Todos
-      </a>
       <a href="{{ url_for('usuarios.index', estatus='activo', busqueda=busqueda, idRol=idRol) }}"
          class="sb-item {{ 'active-teal' if request.args.get('estatus') == 'activo' }}">
         ✅ Activos

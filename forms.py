@@ -1,5 +1,5 @@
 from wtforms import Form 
-from wtforms import StringField, IntegerField, DateField, EmailField, SelectField, BooleanField, DecimalField
+from wtforms import StringField, IntegerField, DateField, EmailField, SelectField, BooleanField, FloatField, DecimalField
 
 from wtforms import validators 
 
@@ -37,6 +37,40 @@ class UserForm(Form):
         validators.DataRequired(message="El campo es requerido")
     ])
     
+class CompraForm(Form):
+    factura = StringField("Factura", [
+        validators.DataRequired(message="El campo es requerido"), 
+    ])
+   
+    idProveedor = SelectField("Proveedor", coerce=int, validators=[
+        validators.DataRequired(message="Selecciona un proveedor")
+    ])
+
+class DetalleCompraForm(Form):
+    idMateriaPrima = SelectField("Materia Prima", coerce=int, validators=[
+        validators.DataRequired(message="Selecciona una materia prima")
+    ])
+
+    cantidad = FloatField("Cantidad", [
+        validators.DataRequired(message="El campo es requerido")
+    ])
+
+    contenidoNeto = StringField("Contenido Neto")
+
+    precio = FloatField("Precio", [
+        validators.DataRequired(message="El campo es requerido")
+    ])
+
+class MermaForm(Form):
+    idMateriaPrima = SelectField("Materia Prima", coerce=int)
+    idProducto = SelectField("Producto", coerce=int)
+    cantidad = FloatField("Cantidad", [
+        validators.DataRequired(message="El campo es requerido")
+    ])
+    unidad = StringField("Unidad Base")
+    justificacion = StringField("Justificación", [
+        validators.DataRequired(message="El campo es requerido"), 
+    ])
 class RecetaForm(Form):
     
     nombre = StringField("Nombre", [
@@ -78,3 +112,15 @@ class ProductoForm(Form):
         validators.DataRequired(message="El campo es requerido"), 
     ])
 
+class PresentacionVentaForm(Form):
+    nombre = StringField("Nombre", [
+        validators.DataRequired(message="El campo es requerido"), 
+    ])
+    
+    precio = DecimalField("Precio", [
+        validators.DataRequired(message="El campo es requerido"), 
+    ])
+
+    equivalencia = DecimalField("Equivalencia", [
+        validators.DataRequired(message="El campo es requerido"), 
+    ])

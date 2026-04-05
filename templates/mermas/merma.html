@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Registrar Merma{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/merma.css') }}"/>
+{% endblock %}
+
+{% block body %}
+<div class="flex h-screen">
+  <aside class="sidebar">
+    <div class="sb-section">Gestión</div>
+    <a href="{{ url_for('merma.merma') }}" class="sb-item active">
+      🗑️ Mermas
+      <span class="sb-badge">{{ mermas|length }}</span>
+    </a>
+  </aside>
+  <div class="flex-1 overflow-y-auto" style="background: var(--bg-panel);">
+    <div class="page-body">
+
+      <!-- ═══════════════════════════════
+           TABLA DE MERMAS
+      ════════════════════════════════ -->
+      <div class="table-card">
+        <form method="GET" action="{{ url_for('merma.merma') }}" class="filtro-fechas">
+          <label class="field-label">📅 Filtrar por fecha</label>
+          <div class="filtro-grupo">
+            <input
+              type="date"
+              name="fecha"
+              class="input-style"
+              value="{{ request.args.get('fecha', '') }}"
+            />
+          </div>
+          <div class="filtro-acciones">
+            <button type="submit" class="btn-filtrar">🔍 Filtrar</button>
+            {% if request.args.get('fecha') %}
+              <a href="{{ url_for('merma.merma') }}" class="btn-limpiar">✕ Limpiar</a>
+            {% endif %}
+          </div>
+        </form>
+        <div class="table-card-header">
+          <div class="table-card-title">Mermas registradas</div>
+          <span class="badge-count">{{ mermas|length }} registros</span>
+        </div>
+
+        {% if mermas %}
+        <table class="mermas-table">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Artículo</th>
+              <th>Cantidad</th>
+              <th>Unidad</th>
+              <th>Justificación</th>
+              <th>Fecha</th>
+              <th>Usuario</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in mermas %}
+            <tr>
+              <td>
+                {% if m.materia_prima %}
+                  <span class="tipo-badge tipo-materia">🐮 Materia</span>
+                {% elif m.producto %}
+                  <span class="tipo-badge tipo-producto">🍦 Producto</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="articulo-name">
+                  {% if m.materia_prima %}{{ m.materia_prima.nombre }}
+                  {% elif m.producto %}{{ m.producto.nombre }}
+                  {% endif %}
+                </span>
+              </td>
+              <td>
+                <span class="cantidad-chip">{{ m.cantidad }}</span>
+              </td>
+              <td>
+                <span class="fecha-chip">{{ m.unidad }}</span>
+              </td>
+              <td>
+                <span class="justificacion-text">{{ m.justificacion }}</span>
+              </td>
+              <td>
+                <span class="fecha-chip">{{ m.fecha.strftime('%Y-%m-%d') }}</span>
+              </td>
+              <td>
+                <span class="usuario-chip">{{ m.usuario.nombreUsuario }}</span>
+              </td>
+              <td>
+                <button
+                  onclick="abrirModalEliminar('{{ url_for('merma.eliminar_merma', id=m.id) }}')"
+                  type="button"
+                  class="btn-eliminar"
+                >
+                  ✕ Eliminar
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">🗑️</div>
+          <p>No hay mermas registradas aún.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- ═══════════════════════════════
+           FORMULARIO
+      ════════════════════════════════ -->
+      <form method="POST" class="form-card" id="formularioMerma">
+
+        <!-- Header -->
+        <div class="form-header">
+          <h2>Registrar Merma</h2>
+          <p>Selecciona el tipo y completa los datos</p>
+        </div>
+
+        <!-- Body -->
+        <div class="form-body">
+
+          <!-- TIPO DE MERMA -->
+          <div>
+            <label class="field-label">Tipo <span class="req">*</span></label>
+            <div class="tipo-selector">
+
+              <button type="button" onclick="seleccionarTipo('producto')" id="btnProducto"
+                class="tipo-btn" data-tipo="producto">
+                <span class="tipo-btn-icon">🍦</span>
+                <span class="tipo-btn-label">Producto</span>
+              </button>
+
+              <button type="button" onclick="seleccionarTipo('materia')" id="btnMateria"
+                class="tipo-btn" data-tipo="materia">
+                <span class="tipo-btn-icon">🐮</span>
+                <span class="tipo-btn-label">Materia Prima</span>
+              </button>
+
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- SELECT PRODUCTO -->
+          <div id="selectProducto" class="merma-field hidden-field">
+            <label class="field-label">Producto <span class="req">*</span></label>
+            <div class="select-wrap">
+              <select name="idProducto" id="productoSelect" class="custom-select" onchange="setUnidad(this)">
+                <option value="">— Seleccionar producto —</option>
+                {% for p in productos %}
+                  <option value="{{ p.id }}" data-unidad="{{ p.unidadBase }}">
+                    {{ p.nombre }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- SELECT MATERIA PRIMA -->
+          <div id="selectMateria" class="merma-field hidden-field">
+            <label class="field-label">Materia Prima <span class="req">*</span></label>
+            <div class="select-wrap">
+              <select name="idMateriaPrima" id="materiaSelect" class="custom-select" onchange="setUnidad(this)">
+                <option value="">— Seleccionar materia prima —</option>
+                {% for m in materias %}
+                  <option value="{{ m.id }}" data-unidad="{{ m.unidadBase }}">
+                    {{ m.nombre }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- UNIDAD (readonly) -->
+          <div>
+            <label class="field-label">Unidad</label>
+            <input
+              type="text"
+              id="unidadInput"
+              name="unidad"
+              readonly
+              class="input-style input-readonly"
+              placeholder="Se asigna automáticamente"
+            />
+          </div>
+
+          <!-- CANTIDAD -->
+          <div>
+            <label class="field-label">Cantidad <span class="req">*</span></label>
+            <input
+              type="number"
+              name="cantidad"
+              step="0.01"
+              required
+              placeholder="0.00"
+              class="input-style"
+            />
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- JUSTIFICACIÓN -->
+          <div>
+            <label class="field-label">Justificación <span class="req">*</span></label>
+            <textarea
+              name="justificacion"
+              rows="4"
+              required
+              class="input-style"
+              placeholder="Describe el motivo de la merma..."
+            ></textarea>
+          </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="form-footer">
+          <button type="reset" class="btn-cancel" onclick="cancelarMerma()">
+            Cancelar
+          </button>
+          <button type="submit" name="accion" value="guardar_merma" class="btn-primary">
+            Guardar merma
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ELIMINAR -->
+<div id="modalEliminar" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Eliminar merma</h2>
+    <p>¿Estás seguro? Esta acción no se puede deshacer.</p>
+    <div class="modal-actions">
+      <button type="button" onclick="cerrarModal()" class="btn-cancel" style="flex:1; padding:.7rem;">
+        Cancelar
+      </button>
+      <button type="submit" form="formEliminar" class="btn-eliminar-confirm">
+        Eliminar
+      </button>
+    </div>
+    <form id="formEliminar" method="POST"></form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
+<script>
+  function seleccionarTipo(tipo) {
+    // Reset todos los botones
+    document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('selectProducto').classList.add('hidden-field');
+    document.getElementById('selectMateria').classList.add('hidden-field');
+    document.getElementById('productoSelect').value = '';
+    document.getElementById('materiaSelect').value = '';
+    document.getElementById('unidadInput').value = '';
+
+    if (tipo === 'producto') {
+      document.getElementById('btnProducto').classList.add('active');
+      document.getElementById('selectProducto').classList.remove('hidden-field');
+    } else {
+      document.getElementById('btnMateria').classList.add('active');
+      document.getElementById('selectMateria').classList.remove('hidden-field');
+    }
+  }
+
+  function setUnidad(select) {
+    const unidad = select.options[select.selectedIndex].dataset.unidad;
+    document.getElementById('unidadInput').value = unidad || '';
+  }
+
+  function abrirModalEliminar(url) {
+    document.getElementById('formEliminar').action = url;
+    document.getElementById('modalEliminar').classList.add('show');
+  }
+
+  function cerrarModal() {
+    document.getElementById('modalEliminar').classList.remove('show');
+  }
+
+  function cancelarMerma() {
+    fetch('/merma/cancelar', { method: 'POST' })
+      .then(() => window.location.reload());
+  }
+</script>
+{% endblock %}

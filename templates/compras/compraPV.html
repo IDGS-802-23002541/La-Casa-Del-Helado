@@ -1,272 +1,320 @@
-{% extends "base.html" %} {% block title %}Registrar Entrada — Compras{% endblock %} 
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Registrar Entrada — Compras{% endblock %}
 
 {% block extra_css %}
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='dist/output.css') }}"
-/>
-{% endblock %} 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/compra.css') }}"/>
+{% endblock %}
 
 {% block body %}
-  <!-- NAV BAR -->
-  {% include 'navAdmin.html' %}
 <div class="flex h-screen">
-  <!-- SIDEBAR -->
-  {% include 'asideAdmin.html' %}
-  
+  <aside class="sidebar">
+    <div class="sb-section">Gestión</div>
+    <a href="{{ url_for('compra.compra') }}" class="sb-item active">
+      🛍️ Compra
+      <span class="sb-badge">{{ compras|length }}</span>
+    </a>
+  </aside>
   <div class="flex-1 bg-cream font-sans text-brand-text overflow-y-auto">
-    <div id="page-compras" class="p-6 flex justify-center">
+    <div class="page-body">
 
-        <!-- Modal -->
-        <form method="POST" 
-          class="bg-white rounded-[20px] shadow-2xl w-full max-w-[560px] overflow-hidden"
-        >
-          <!-- ── Header oscuro ── -->
-          <div class="bg-dark px-6 pt-6 pb-5">
-            <div class="font-display text-2xl text-white mb-1">
-              Registrar Entrada
-            </div>
-            <div class="text-xs text-white/60">
-              Completa los campos para registrar la entrada de mercancía al
-              sistema
-            </div>
+      <!-- ═══════════════════════════════
+           TABLA DE COMPRAS
+      ════════════════════════════════ -->
+      <div class="table-card">
+        <!-- FILTRO POR FECHA -->
+        <form method="GET" action="{{ url_for('compra.compra') }}" class="filtro-fechas">
+          <label class="field-label">📅 Filtrar por fecha</label>
+          <div class="filtro-grupo">
+            <input
+              type="date"
+              name="fecha"
+              class="input-style"
+              value="{{ request.args.get('fecha', '') }}"
+            />
           </div>
-
-          <!-- ── Body ── -->
-          <div class="px-6 py-5 flex flex-col gap-3.5">
-            <!-- INFORMACIÓN GENERAL -->
-            <p
-              class="text-[10px] font-black tracking-[1.2px] text-muted uppercase"
-            >
-              Información General
-            </p>
-
-            <!-- Número de factura -->
-            <div class="flex flex-col gap-1.5">
-              <label class="text-[11px] font-extrabold text-brand-text">
-                Número de factura / referencia
-                <span class="text-orange">*</span>
-              </label>
-              <input
-                type="text"
-                id="factura"
-                placeholder="Ej. FAC-2026-0042"
-                class="font-sans text-sm text-brand-text bg-cream border border-border rounded-[11px] px-3 py-2.5 w-full outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 focus:bg-white transition-all"
-              />
-            </div>
-
-            <!-- Proveedor -->
-            <div class="flex flex-col gap-1.5">
-              <label class="text-[11px] font-extrabold text-brand-text">
-                Proveedor <span class="text-orange">*</span>
-              </label>
-              <select
-                id="proveedor"
-                class="custom-select font-sans text-sm text-brand-text border border-border rounded-[11px] px-3 py-2.5 w-full outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 transition-all cursor-pointer"
-              >
-                <option value="">— Seleccionar proveedor —</option>
-                <option>Lácteos del Norte</option>
-                <option>Frutería El Vergel</option>
-                <option>Insumos Criollo</option>
-                <option>Distribuidora Azúcar SA</option>
-                <option>Empaques y Paletas MX</option>
-                <option>Otro</option>
-              </select>
-            </div>
-
-            <!-- Divider -->
-            <hr class="h-px bg-border border-0 my-0.5" />
-
-            <!-- PRODUCTOS RECIBIDOS -->
-            <p
-              class="text-[10px] font-black tracking-[1.2px] text-muted uppercase"
-            >
-              Productos Recibidos
-            </p>
-
-            <!-- Product lines container -->
-            <div id="productLines" class="flex flex-col gap-3">
-              <!-- Línea de producto #1 -->
-              <div
-                class="flex gap-2.5 items-start bg-cream rounded-xl p-3 border border-border relative"
-              >
-                <!-- Número de línea -->
-                <span
-                  class="bg-orange text-white text-[10px] font-black px-2 py-0.5 rounded-[7px] mt-[22px] shrink-0"
-                >
-                  #1
-                </span>
-
-                <!-- Campos -->
-                <div class="flex-1 flex flex-col gap-2.5">
-                  <!-- Producto recibido -->
-                  <div class="flex flex-col gap-1.5">
-                    <label class="text-[11px] font-extrabold text-brand-text">
-                      Producto recibido <span class="text-orange">*</span>
-                    </label>
-                    <select
-                      class="custom-select font-sans text-sm text-brand-text border border-border rounded-[11px] px-3 py-2.5 w-full outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 transition-all cursor-pointer"
-                    >
-                      <option value="">— Seleccionar —</option>
-                      <optgroup label="Lácteos">
-                        <option>Leche entera</option>
-                        <option>Crema para batir</option>
-                        <option>Leche condensada</option>
-                        <option>Leche evaporada</option>
-                      </optgroup>
-                      <optgroup label="Frutas y saborizantes">
-                        <option>Pulpa de fresa</option>
-                        <option>Pulpa de mango</option>
-                        <option>Pulpa de tamarindo</option>
-                        <option>Pulpa de guanábana</option>
-                        <option>Esencia de vainilla</option>
-                        <option>Cacao en polvo</option>
-                      </optgroup>
-                      <optgroup label="Azúcares y bases">
-                        <option>Azúcar blanca</option>
-                        <option>Glucosa líquida</option>
-                        <option>Estabilizante para helado</option>
-                      </optgroup>
-                      <optgroup label="Empaque">
-                        <option>Palitos de madera</option>
-                        <option>Bolsas para paleta</option>
-                        <option>Conos de barquillo</option>
-                        <option>Vasos desechables</option>
-                        <option>Tapas para vaso</option>
-                      </optgroup>
-                      <option>Otro</option>
-                    </select>
-                  </div>
-
-                  <!-- Cantidad + Presentación -->
-                  <div class="grid grid-cols-2 gap-3">
-                    <div class="flex flex-col gap-1.5">
-                      <label class="text-[11px] font-extrabold text-brand-text">
-                        Cantidad <span class="text-orange">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        placeholder="0"
-                        min="0"
-                        step="0.1"
-                        class="font-sans text-sm text-brand-text bg-cream border border-border rounded-[11px] px-3 py-2.5 w-full outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 focus:bg-white transition-all"
-                      />
-                    </div>
-                    <div class="flex flex-col gap-1.5">
-                      <label class="text-[11px] font-extrabold text-brand-text">
-                        Presentación <span class="text-orange">*</span>
-                      </label>
-                      <select
-                        class="custom-select font-sans text-sm text-brand-text border border-border rounded-[11px] px-3 py-2.5 w-full outline-none focus:border-orange focus:ring-2 focus:ring-orange/10 transition-all cursor-pointer"
-                      >
-                        <option value="">— Seleccionar —</option>
-                        <option>Galón (3.8 L)</option>
-                        <option>Cartón 1 L</option>
-                        <option>Bolsa 1 kg</option>
-                        <option>Bolsa 500 g</option>
-                        <option>Lata 800 g</option>
-                        <option>Caja 12 pzas</option>
-                        <option>Unidades</option>
-                        <option>Litros</option>
-                        <option>Kilogramos</option>
-                        <option>Paquete</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <!-- /Campos -->
-
-                <!-- Botón eliminar línea -->
-                <button
-                  onclick="removeLine(this)"
-                  title="Eliminar"
-                  class="w-7 h-7 rounded-lg border border-[#FFD0D0] bg-[#FFF0F0] text-[#E06060] text-sm cursor-pointer flex items-center justify-center mt-[22px] shrink-0 hover:bg-[#FFD8D8] hover:border-[#E06060] transition-all"
-                >
-                  ✕
-                </button>
-              </div>
-              <!-- /Línea #1 -->
-            </div>
-            <!-- /productLines -->
-
-            <!-- Agregar producto -->
-            <button
-              onclick="addLine()"
-              class="w-full py-2.5 border-2 border-dashed border-border rounded-xl bg-transparent font-sans text-xs font-extrabold text-muted cursor-pointer hover:border-orange hover:text-orange hover:bg-orange-light transition-all"
-            >
-              + Agregar otro producto
-            </button>
-          </div>
-          <!-- /.cp-modal-body -->
-
-          <!-- ── Footer ── -->
-          <div class="px-6 pb-5 pt-4 flex gap-3 border-t border-border">
-            <button
-              onclick="resetForm()"
-              class="flex-1 py-3 bg-white border border-border rounded-xl font-sans text-sm font-extrabold text-muted cursor-pointer hover:border-muted hover:text-brand-text transition-all"
-            >
-              Cancelar
-            </button>
-            <button
-              onclick="saveCompra()"
-              class="flex-[2] py-3 bg-orange border-0 rounded-xl font-display text-base text-white cursor-pointer shadow-[0_4px_14px_rgba(255,107,53,0.35)] hover:bg-[#E85C28] hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(255,107,53,0.45)] transition-all"
-            >
-              Guardar
-            </button>
+          <div class="filtro-acciones">
+            <button type="submit" class="btn-filtrar">🔍 Filtrar</button>
+            {% if request.args.get('fecha') %}
+              <a href="{{ url_for('compra.compra') }}" class="btn-limpiar">✕ Limpiar</a>
+            {% endif %}
           </div>
         </form>
-        <!-- /.cp-modal -->
+        <div class="table-card-header">
+          <div class="table-card-title">Compras registradas</div>
+          <span class="badge-count">{{ compras|length }} registros</span>
+        </div>
+
+        {% if compras %}
+        <table class="compras-table">
+          <thead>
+            <tr>
+              <th>Factura</th>
+              <th>Proveedor</th>
+              <th>Detalles</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in compras %}
+            <tr>
+              <td>
+                <span class="factura-badge">🧾 {{ c.factura }}</span>
+              </td>
+              <td>
+                <span class="proveedor-name">{{ c.proveedor.razonSocial }}</span>
+              </td>
+              <td>
+                {% for d in c.detalles_compra %}
+                  <span class="detalle-pill">
+                    <span class="qty">{{ d.cantidad }}</span>
+                    {{ d.materiaPrima.nombre }} {{ d.contenidoNeto }}
+                  </span>
+                {% endfor %}
+              </td>
+              <td>
+                <span class="fecha-chip">{{ c.fechaCompra.strftime('%Y-%m-%d') }}</span>
+              </td>
+              <td>
+                <button
+                  onclick="abrirModalEliminar('{{ url_for('compra.eliminar_compra', id=c.id) }}')"
+                  type="button"
+                  class="btn-eliminar"
+                >
+                  ✕ Eliminar
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <p>No hay compras registradas aún.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- ═══════════════════════════════
+           FORMULARIO
+      ════════════════════════════════ -->
+      <form method="POST" class="form-card" id="formularioCompra">
+
+        <!-- Header -->
+        <div class="form-header">
+          <h2>Registrar Entrada</h2>
+          <p>Completa los campos para registrar la entrada de mercancía</p>
+        </div>
+
+        <!-- Body -->
+        <div class="form-body">
+
+          <!-- FACTURA -->
+          <div>
+            {{ macros.campoCompra(
+                compra_form.factura,
+                clase='input-style',
+                placeholder='FAC-2026-001'
+            ) }}
+          </div>
+
+          <!-- PROVEEDOR -->
+          <div>
+            <label class="field-label">
+              Proveedor <span class="req">*</span>
+            </label>
+            <div class="select-wrap">
+              <select name="idProveedor" class="custom-select">
+                <option value="">— Seleccionar proveedor —</option>
+                {% for id, nombre in compra_form.idProveedor.choices %}
+                  <option value="{{ id }}"
+                    {% if compra_form.idProveedor.data == id %}selected{% endif %}>
+                    {{ nombre }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- PRODUCTO -->
+          <div>
+            <label class="field-label">
+              Producto <span class="req">*</span>
+            </label>
+
+            {% if errores_detalle %}
+              <div class="bg-red-100 border border-red-400 text-red-700 p-2 rounded text-xs mb-2">
+                {% for error in errores_detalle %}
+                  <div>{{ error }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div style="display:flex; flex-direction:column; gap:0.55rem;">
+
+              <!-- Materia Prima -->
+              <div class="select-wrap">
+                <select name="idMateriaPrima" class="custom-select">
+                  <option value="">— Seleccionar producto —</option>
+                  {% for id, nombre in detalle_form.idMateriaPrima.choices %}
+                    <option value="{{ id }}"
+                      {% if request.form.get('idMateriaPrima') == id|string %}selected{% endif %}>
+                      {{ nombre }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Presentación -->
+              <div class="select-wrap">
+                <select name="contenidoNeto" class="custom-select">
+                  <option value="">— Seleccionar presentación —</option>
+                  {% for p in presentaciones %}
+                    <option value="{{ p[0] }}"
+                      {% if request.form.get('contenidoNeto') == p[0]|string %}selected{% endif %}>
+                      {{ p[1] }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Cantidad -->
+              <input
+                type="number"
+                name="cantidad"
+                value="{{ request.form.get('cantidad', '') }}"
+                step="1"
+                placeholder="Cantidad"
+                class="input-style"
+              />
+
+              <!-- Precio -->
+              <input
+                type="number"
+                name="precio"
+                value="{{ request.form.get('precio', '') }}"
+                step="0.01"
+                placeholder="Precio $"
+                class="input-style"
+              />
+
+              <!-- Botón agregar -->
+              <button type="submit" name="accion" value="agregar_detalle" class="btn-secondary">
+                + Agregar producto
+              </button>
+
+            </div>
+          </div>
+
+          <!-- PRODUCTOS AGREGADOS -->
+          {% for d in detalles %}
+            <div class="detalle-item flex justify-between items-center">
+              
+              <div>
+                {{ d.nombre }} — {{ d.cantidad }} {{ d.contenidoNeto }} x ${{ d.precio }}
+              </div>
+
+              <button
+                type="button"
+                onclick="eliminarDetalle({{ loop.index0 }})"
+                class="text-red-500 hover:text-red-700 hover:scale-125 transition"
+              >
+                ✕
+              </button>
+
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Footer -->
+        <div class="form-footer">
+          <button type="reset" class="btn-cancel" onclick="cancelarCompra()">
+            Cancelar
+          </button>
+          <button type="submit" name="accion" value="guardar_compra" class="btn-primary">
+            Guardar compra
+          </button>
+        </div>
+
+      </form>
 
     </div>
   </div>
-
 </div>
-  
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
-    <script>
-      /* ─── Lógica del formulario ─── */
-      let lineCount = 1;
 
-      function removeLine(btn) {
-        const lines = document.querySelectorAll("#productLines > div");
-        if (lines.length > 1) btn.closest("div.flex").remove();
-        renumberLines();
-      }
+<!-- MODAL ELIMINAR -->
+<div id="modalEliminar" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Eliminar compra</h2>
+    <p>¿Estás seguro? Esta acción no se puede deshacer.</p>
+    <div class="modal-actions">
+      <button type="button" onclick="cerrarModal()" class="btn-cancel" style="flex:1; padding:.7rem;">
+        Cancelar
+      </button>
+      <button type="submit" form="formEliminar" class="btn-primary"
+        style="flex:1; padding:.7rem; background:linear-gradient(135deg,#e05a5a,#ff6b6b);">
+        Eliminar
+      </button>
+    </div>
+    <form id="formEliminar" method="POST"></form>
+  </div>
+</div>
 
-      function renumberLines() {
-        document
-          .querySelectorAll("#productLines .bg-orange.text-white")
-          .forEach((el, i) => {
-            el.textContent = `#${i + 1}`;
-          });
-      }
+<script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
+<script>
+  // Carga dinámica de presentaciones al cambiar materia prima
+  document.querySelector('[name="idMateriaPrima"]').addEventListener('change', function () {
+    const idMateria = this.value;
+    
+    if (!idMateria) return; 
 
-      function addLine() {
-        lineCount++;
-        const container = document.getElementById("productLines");
-        const first = container.querySelector("div.flex");
-        const clone = first.cloneNode(true);
-        clone.querySelector(".bg-orange.text-white").textContent =
-          `#${lineCount}`;
-        clone
-          .querySelectorAll("input, select")
-          .forEach((el) => (el.value = ""));
-        container.appendChild(clone);
-      }
+    fetch(`/get_presentaciones/${idMateria}`)
+      .then(res => res.json())
+      .then(data => {
+        const select = document.querySelector('[name="contenidoNeto"]');
+        select.innerHTML = '<option value="">— Seleccionar —</option>';
+        data.presentaciones.forEach(p => {
+          const option = document.createElement("option");
+          option.value = p[0];
+          option.textContent = p[1];
+          select.appendChild(option);
+        });
+      });
+  });
 
-      function resetForm() {
-        document.getElementById("factura").value = "";
-        document.getElementById("proveedor").value = "";
-        const container = document.getElementById("productLines");
-        while (container.children.length > 1) container.lastChild.remove();
-        container.querySelector("input[type=number]").value = "";
-        container.querySelectorAll("select").forEach((s) => (s.value = ""));
-        setStatus("activo");
-      }
+  function abrirModalEliminar(url) {
+    const modal = document.getElementById("modalEliminar");
+    document.getElementById("formEliminar").action = url;
+    modal.classList.add("show");;
+  }
 
-      function saveCompra() {
-        alert("¡Compra guardada!");
-      }
-    </script>
+  function cerrarModal() {
+    document.getElementById("modalEliminar").classList.remove("show");
+  }
+
+  function cancelarCompra() {
+    fetch("/compra/cancelar", { method: "POST" })
+      .then(() => window.location.reload());
+  }
+
+  function eliminarDetalle(index) {
+    fetch("/compra/eliminar_detalle", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ index: index })
+    })
+    .then(res => res.json())
+    .then(() => {
+      location.reload();
+    });
+  }
+</script>
 
 {% endblock %}

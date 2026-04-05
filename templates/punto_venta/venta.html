@@ -44,55 +44,56 @@
         </div>
 
         <div class="product-grid" id="productGrid">
-  {% for p in productos %}
-    {% set nombre_cat = p.relacion_categoria.nombre | lower if p.relacion_categoria else 'general' %}
-    
-    {# Lógica de emojis y colores de fondo según categoría #}
-    {% if 'paleta' in nombre_cat %} {% set emoji, color_clase = '🍡', 'bg-mint' %}
-    {% elif 'cono' in nombre_cat %} {% set emoji, color_clase = '🍦', 'bg-peach' %}
-    {% elif 'vaso' in nombre_cat or 'nieve' in nombre_cat %} {% set emoji, color_clase = '🥤', 'bg-sky' %}
-    {% elif 'especial' in nombre_cat %} {% set emoji, color_clase = '⭐', 'bg-lavender' %}
-    {% elif 'leche' in nombre_cat %} {% set emoji, color_clase = '🍨', 'bg-yellow' %}
-    {% else %} {% set emoji, color_clase = '🍧', '' %} {% endif %}
+        {% for p in presentaciones %}
 
-    <form action="{{ url_for('venta.vender_agregar') }}" method="POST" style="display: contents;">
-        <input type="hidden" name="idProducto" value="{{ p.id }}">
-        
-        {# El botón se desactiva si el stock es 0 #}
-        <button type="submit" class="card {{ color_clase }}" {% if p.stockActual <= 0 %}disabled style="opacity:0.6; cursor:not-allowed;"{% endif %}>
+          {% set nombre_cat = p.relacion_categoria.nombre | lower if p.relacion_categoria else 'general' %}
           
-          {# --- ALERTAS DE STOCK --- #}
-          <div class="card-badge 
-            {% if p.stockActual <= 0 %}
-                badge-sinstock" style="background-color: #ff4757;">Agotado
-            {% elif p.stockActual <= p.stockMinimo %}
-                badge-bajo" style="background-color: #ffa502;">¡Stock Bajo!
-            {% else %}
-                badge-nuevo" style="background-color: #2ed573;">Disponible
-            {% endif %}
-          </div>
-          {# ------------------------ #}
+          {# Lógica de emojis y colores de fondo según categoría #}
 
-          <div class="card-emoji">{{ emoji }}</div>
-          <div class="card-name">{{ p.nombre }}</div>
-          
-          {# Mostramos el stock con color según el estado #}
-          <div class="card-sub" style="font-weight: bold; color: {{ '#ff4757' if p.stockActual <= 0 else '#57606f' }};">
-            Stock: {{ p.stockActual }}
-          </div>
+          {% if 'paleta' in p.nombre | lower %} {% set emoji, color_clase = '🍡', 'bg-mint' %}
+          {% elif 'cono' in p.nombre | lower %} {% set emoji, color_clase = '🍦', 'bg-peach' %}
+          {% elif 'vaso' in p.nombre | lower %} {% set emoji, color_clase = '🥤', 'bg-sky' %}
+          {% elif 'trol' in p.nombre | lower %} {% set emoji, color_clase = '🍨', 'bg-lavender' %}
+          {% else %} {% set emoji, color_clase = '🍧', '' %} {% endif %}
 
-          <div class="card-footer">
-            <span class="card-price">$35.00</span>
-            {% if p.stockActual > 0 %}
-                <div class="btn-add">+</div>
-            {% else %}
-                <div class="btn-add" style="background: #ccc;">✕</div>
-            {% endif %}
-          </div>
-        </button>
-    </form>
-  {% endfor %}
-</div>
+          <form action="{{ url_for('venta.vender_agregar') }}" method="POST" style="display: contents;">
+              <input type="hidden" name="id" value="{{ p.id }}">
+              
+              {# El botón se desactiva si el stock es 0 #}
+              <button type="submit" class="card {{ color_clase }}" {% if p.productoBase.stockActual <= 0 %}disabled style="opacity:0.6; cursor:not-allowed;"{% endif %}>
+                
+                {# --- ALERTAS DE STOCK --- #}
+                <div class="card-badge 
+                  {% if p.productoBase.stockActual <= 0 %}
+                      badge-sinstock" style="background-color: #ff4757;">Agotado
+                  {% elif p.productoBase.stockActual <= p.productoBase.stockMinimo %}
+                      badge-bajo" style="background-color: #ffa502;">¡Stock Bajo!
+                  {% else %}
+                      badge-nuevo" style="background-color: #2ed573;">Disponible
+                  {% endif %}
+                </div>
+
+                <div class="card-emoji">{{ emoji }}</div>
+                <div class="card-name">{{ p.nombre }}</div>
+                
+                {# Mostramos el stock con color según el estado #}
+                <div class="card-sub" style="font-weight: bold; color: {{ '#ff4757' if p.productoBase.stockActual <= 0 else '#57606f' }};">
+                  Stock: {{ p.productoBase.stockActual }}
+                </div>
+
+                <div class="card-footer">
+                  <span class="card-price">{{p.precio}}</span>
+                  {% if p.productoBase.stockActual > 0 %}
+                      <div class="btn-add">+</div>
+                  {% else %}
+                      <div class="btn-add" style="background: #ccc;">✕</div>
+                  {% endif %}
+                </div>
+              </button>
+          </form>
+        {% endfor %}
+        </div>
+
       </div>
 {% else %}
       {# --- PANEL DE PEDIDOS EN LÍNEA (DISEÑO FIGMA) --- #}

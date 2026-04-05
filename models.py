@@ -42,6 +42,8 @@ class Usuario(db.Model, UserMixin):
 
     rol = db.relationship('Rol', foreign_keys=[idRol])
 
+    compras = db.relationship('Compra', back_populates='usuario')
+
     @property
     def active(self):
         return self.estatus
@@ -55,8 +57,7 @@ class Proveedor(db.Model):
     telefono = db.Column(db.String(15), nullable=False)
     direccion = db.Column(db.String(200), nullable=False)
     estatus = db.Column(db.String(20), default='Activo')
-    # compras = db.relationship('Compra', backref='proveedor', lazy=True)
-    materiasPrimas = db.relationship('MateriaPrima', back_populates='proveedor')
+    compras = db.relationship('Compra', back_populates='proveedor')
     
 class SolicitudProduccion(db.Model):
     __tablename__ = 'solicitud_produccion'
@@ -111,46 +112,99 @@ class Compra(db.Model):
     __tablename__='compra'
 
     id=db.Column(db.Integer, primary_key=True)
-    factura=db.Column(db.String(50))
-    fechaCompra=db.Column(db.Date, default=datetime.now)
-    idProveedor=db.Column(db.Integer, db.ForeignKey('proveedor.id'))
-    idUsuario=db.Column(db.Integer)
+    factura=db.Column(db.String(50), nullable=False)
+    fechaCompra=db.Column(db.Date, default=datetime.utcnow)
+    idProveedor=db.Column(db.Integer, db.ForeignKey('proveedor.id'), nullable=False)
+    idUsuario=db.Column(db.Integer,db.ForeignKey('usuario.id'), nullable=False)
+    estatus=db.Column(db.Boolean, default=True)
+    fechaEliminacion = db.Column(db.DateTime)
 
-    proveedor=db.relationship('Proveedor', foreign_keys=[idProveedor])
+    proveedor = db.relationship('Proveedor', back_populates='compras')
+    usuario = db.relationship('Usuario', back_populates='compras')
+
+    detalles_compra = db.relationship('DetalleCompra', back_populates='compra', cascade="all, delete-orphan")
     
-class MateriaPrima(db.Model): 
+class DetalleCompra(db.Model):
+    __tablename__='detalle_compra'
+
+    id=db.Column(db.Integer, primary_key=True)
+    idCompra=db.Column(db.Integer, db.ForeignKey('compra.id'), nullable=False)
+    idMateriaPrima=db.Column(db.Integer, db.ForeignKey('materia_prima.id'), nullable=False)
+    cantidad=db.Column(db.Float, nullable=False)
+    contenidoNeto=db.Column(db.String(20))
+    precio=db.Column(db.Float, nullable=False)
+
+    compra = db.relationship('Compra', back_populates='detalles_compra')
+    materiaPrima=db.relationship('MateriaPrima', back_populates='detalles_compra')
+
+class MateriaPrima(db.Model):
     __tablename__ = 'materia_prima'
 
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(100), nullable=False, unique=True)
-    unidadBase = db.Column(db.String(20), nullable=False)
-
-    stockActual = db.Column(db.Numeric(10, 2), default=0)
-    stockMinimo = db.Column(db.Numeric(10, 2), nullable=False)
-
+    nombre = db.Column(db.String(100), nullable=False)
+    unidadBase = db.Column(db.String(20), nullable=False)  # kg, litros, piezas
+    stockActual = db.Column(db.Float, default=0)
+    stockMinimo = db.Column(db.Float, default=0)
+    idCategoria=db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
     estatus = db.Column(db.Boolean, default=True)
 
-    idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
-    idProveedor = db.Column(db.Integer, db.ForeignKey('proveedor.id'))
-
-    # Relaciones
-    categoria = db.relationship('Categoria', back_populates='materiasPrimas')
-    proveedor = db.relationship('Proveedor', back_populates='materiasPrimas')
+    categoria = db.relationship('Categoria', back_populates='materias_primas')
+    detalles_compra = db.relationship('DetalleCompra', back_populates='materiaPrima')
 
     def __repr__(self):
         return f'<MateriaPrima {self.nombre}>'
+    
+class Categoria(db.Model):
+    __tablename__='categoria'
+
+    id=db.Column(db.Integer, primary_key=True)
+    nombre=db.Column(db.String(100), nullable=False)
+
+    materias_primas=db.relationship('MateriaPrima', back_populates='categoria')
+
+class Merma(db.Model):
+    __tablename__ = 'merma'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    idMateriaPrima = db.Column(db.Integer, db.ForeignKey('materia_prima.id'), nullable=True)
+    idProducto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=True)
+    
+    cantidad = db.Column(db.Numeric(10,2), nullable=False)
+    unidad = db.Column(db.String(20), nullable=False)
+    justificacion = db.Column(db.String(200), nullable=False)
+    fecha = db.Column(db.Date, nullable=False)
+
+    estatus=db.Column(db.Boolean, default=True)
+    fechaEliminacion = db.Column(db.DateTime)
+
+    
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+
+    materia_prima = db.relationship('MateriaPrima', backref='mermas')
+    producto = db.relationship('Producto', backref='mermas')
+    usuario = db.relationship('Usuario', backref='mermas')
+
+    # Check constraint
+    __table_args__ = (
+        db.CheckConstraint(
+            '(idMateriaPrima IS NOT NULL AND idProducto IS NULL) OR '
+            '(idMateriaPrima IS NULL AND idProducto IS NOT NULL)',
+            name='check_merma_origen'
+        ),
+    )
+
 
 class Turno(db.Model):
     __tablename__ = 'turno'
     id = db.Column(db.Integer, primary_key=True)
     idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
-    apertura = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    apertura = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     cierre = db.Column(db.DateTime, nullable=True) 
 
 class Venta(db.Model):
     __tablename__ = 'venta'
     id = db.Column(db.Integer, primary_key=True)
-    fecha = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    fecha = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     total = db.Column(db.Numeric(10, 2), nullable=False)
     idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     detalles = db.relationship('DetalleVenta', backref='venta_rel', cascade="all, delete-orphan")
@@ -165,16 +219,24 @@ class DetalleVenta(db.Model):
 
     producto = db.relationship('Producto')
 
-class Categoria(db.Model):
-    __tablename__ = 'categoria'
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(50), nullable=False)
-    productos = db.relationship('Producto', backref='categoria_rel')
+class presentacionVenta(db.Model):
+    __tablename__ = "presentacion_venta"
 
-    # Relaciones
-    materiasPrimas = db.relationship('MateriaPrima', back_populates='categoria')
-    productos = db.relationship('Producto', backref='categoria_rel')
+    id = db.Column(db.Integer, primary_key=True) 
+    nombre = db.Column(db.String(100), nullable=False)
+    precio = db.Column(db.Numeric(10,2), nullable=False)
+    idProductoBase = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False) 
+    equivalencia = db.Column(db.Numeric(10,4), nullable=False)
+    estatus = db.Column(db.Boolean, default=True)
+
+    productoBase = db.relationship('Producto', backref='presentaciones')
+    
+class Conversion(db.Model):
+    __tablename__ = 'conversiones'
+
+    unidadBase = db.Column(db.String(20), primary_key=True)
+    presentacion = db.Column(db.String(20), primary_key=True)
+    factor = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
-        return f'<Categoria {self.nombre}>'
-    
+        return f'<Conversion {self.presentacion} -> {self.unidadBase} = {self.factor}>'
