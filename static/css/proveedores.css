@@ -4,10 +4,17 @@
    ============================================================ */
 
 /* ── Grid de stats (3 columnas para proveedores) ── */
-.stats-row { grid-template-columns: repeat(3, 1fr); }
+.stats-row {
+  grid-template-columns: repeat(3, 1fr);
+}
 
 /* ── Avatar de proveedor en tabla ── */
-.prov-cell   { display: flex; align-items: center; gap: 10px; }
+.prov-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .prov-avatar {
   width: 36px;
   height: 36px;
@@ -20,21 +27,34 @@
   color: white;
   flex-shrink: 0;
 }
-.prov-name  { font-weight: 600; font-size: 13px; color: var(--dark); }
-.prov-email { font-size: 10px; color: var(--light-text); margin-top: 1px; }
+
+.prov-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--dark);
+}
+
+.prov-email {
+  font-size: 10px;
+  color: var(--light-text);
+  margin-top: 1px;
+}
 
 /* ── Modal de detalle ── */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(30,24,48,0.5);
+  background: rgba(30, 24, 48, 0.5);
   z-index: 300;
   display: none;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(2px);
 }
-.modal-overlay.show { display: flex; }
+
+.modal-overlay.show {
+  display: flex;
+}
 
 .modal {
   background: var(--white);
@@ -54,9 +74,15 @@
   align-items: center;
   justify-content: space-b etween;
 }
-.modal-hdr h3  { font-family: var(--font-display); font-size: 17px; color: white; }
-.modal-close   {
-  background: rgba(255,255,255,0.15);
+
+.modal-hdr h3 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: white;
+}
+
+.modal-close {
+  background: rgba(255, 255, 255, 0.15);
   border: none;
   color: white;
   border-radius: 8px;
@@ -69,22 +95,64 @@
   justify-content: center;
   transition: all 0.2s;
 }
-.modal-close:hover { background: rgba(255,255,255,0.3); }
 
-.modal-body { padding: 20px 22px 24px; }
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
 
-.modal-row      { display: flex; gap: 8px; margin-bottom: 12px; }
-.modal-field    { flex: 1; }
-.mf-label       { font-size: 10px; font-weight: 700; color: var(--light-text); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-.mf-val         { font-size: 13px; font-weight: 600; color: var(--dark); }
-.mf-val.email   { color: var(--blue); text-decoration: underline; font-weight: 400; }
-.modal-divider  { height: 1px; background: var(--border); margin: 14px 0; }
-.modal-footer   { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.modal-body {
+  padding: 20px 22px 24px;
+}
+
+.modal-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.modal-field {
+  flex: 1;
+}
+
+.mf-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--light-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.mf-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.mf-val.email {
+  color: var(--blue);
+  text-decoration: underline;
+  font-weight: 400;
+}
+
+.modal-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 14px 0;
+}
+
+.modal-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 16px;
+}
 
 /* ── Layout principal ── */
 .app-body {
   display: grid;
-  grid-template-columns: 220px 1fr 380px; /* sidebar | contenido | panel */
+  grid-template-columns: 220px 1fr 380px;
+  /* sidebar | contenido | panel */
   min-height: calc(100vh - 70px);
 }
 
