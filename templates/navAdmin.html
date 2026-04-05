@@ -13,8 +13,13 @@
        🚚 Proveedores
     </a>
 
+    <a href="{{ url_for('compra.compra') }}"
+       class="nav-link {% if request.endpoint == 'proveedores.compra' %}active{% endif %}">
+       🛍️ Compra
+    </a>
+
     <a href="{{ url_for('materia.materia') }}"
-       class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
+       class="nav-link {% if request.endpoint == 'materia.materia' %}active{% endif %}">
         Materia Prima
     </a>
 
@@ -31,6 +36,11 @@
     <a href="{{ url_for('recetas.index') }}"
        class="nav-link {% if request.endpoint == 'recetas.index' %}active{% endif %}">
        📖 Recetas
+    </a>
+
+    <a href="{{ url_for('merma.merma') }}"
+       class="nav-link {% if request.endpoint == 'merma.merma' %}active{% endif %}">
+       🗑️ Mermas
     </a>
 
     <a href="{{ url_for('dash.auth') }}"
