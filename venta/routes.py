@@ -83,8 +83,8 @@ def vender_agregar():
     return redirect(url_for('venta.punto_venta'))
 
 @venta_bp.route("/finalizar_venta", methods=["POST"])
-# @login_required
-# @roles_accepted('Mostrador')
+#@login_required
+#@roles_accepted('Administrador')
 def finalizar_venta():
     carrito = session.get('carrito_pos', [])
     if not carrito:
@@ -94,7 +94,7 @@ def finalizar_venta():
     try:
         total_v = sum(float(item['subtotal']) for item in carrito)
         
-        # Registramos la venta vinculada al usuario logueado
+        # 1. Crear la cabecera de la venta
         nueva_venta = Venta(
             fecha=datetime.now(), 
             total=total_v, 
@@ -104,11 +104,30 @@ def finalizar_venta():
         db.session.add(nueva_venta)
         db.session.flush() 
 
+        # 2. Procesar cada artículo del carrito y descontar volumen
         for item in carrito:
             p = Producto.query.get(item['id'])
             if p:
-                if p.stockActual >= item['cantidad']:
-                    p.stockActual -= item['cantidad']         
+                # --- LÓGICA DE VOLUMEN (ML) ---
+                nombre_prod = p.nombre.lower()
+                
+                # Definimos cuántos ml gasta cada unidad vendida
+                if "doble" in nombre_prod:
+                    ml_por_unidad = 500  # 2 bolas de 250ml
+                elif "sencillo" in nombre_prod:
+                    ml_por_unidad = 250  # 1 bola de 250ml
+                else:
+                    ml_por_unidad = 250  # Valor por defecto
+                
+                # Total a quitar de la tina de helado
+                consumo_total = item['cantidad'] * ml_por_unidad
+                
+                # Verificamos si hay suficiente helado (en mililitros)
+                if float(p.stockActual) >= consumo_total:
+                    # Descontamos del inventario
+                    p.stockActual = float(p.stockActual) - consumo_total
+                    
+                    # Registramos el detalle
                     detalle = DetalleVenta(
                         idProducto=item['id'],
                         idVenta=nueva_venta.id,
@@ -117,13 +136,14 @@ def finalizar_venta():
                     )
                     db.session.add(detalle)
                 else:
-                    flash(f"Stock insuficiente para {p.nombre}", "error")
                     db.session.rollback()
+                    flash(f"Insuficiente: {p.nombre}. Tienes {p.stockActual}ml, necesitas {consumo_total}ml", "error")
                     return redirect(url_for('venta.punto_venta'))
 
+        # 3. Guardar cambios definitivos
         db.session.commit()
         session.pop('carrito_pos', None)
-        flash("Venta realizada con éxito", "success")
+        flash("Venta completada. Inventario actualizado por volumen (ml).", "success")
 
     except Exception as e:
         db.session.rollback()

@@ -80,8 +80,14 @@ class Receta(db.Model):
     cantidadProducida = db.Column(db.Numeric(10,2), nullable=False)
     estatus = db.Column(db.Boolean, default=True, nullable=False)
 
+    # Relaciones
     producto = db.relationship('Producto', backref='recetas', passive_deletes=True)
-    detalles = db.relationship('DetalleReceta', backref='receta', cascade='all, delete-orphan')
+    
+    # COMBINAMOS LAS DOS LÍNEAS EN UNA SOLA:
+    detalles = db.relationship('DetalleReceta', 
+                               backref='receta', 
+                               lazy='joined', # Cambiamos a 'joined' para que cargue los ingredientes de inmediato
+                               cascade='all, delete-orphan')
 
 class DetalleReceta(db.Model):
     __tablename__ = 'detalle_receta'
