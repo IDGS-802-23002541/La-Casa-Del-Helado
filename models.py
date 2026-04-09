@@ -1,6 +1,7 @@
 from flask_security import UserMixin, RoleMixin
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import uuid
 
 db= SQLAlchemy()    
 
@@ -130,9 +131,9 @@ class DetalleCompra(db.Model):
     id=db.Column(db.Integer, primary_key=True)
     idCompra=db.Column(db.Integer, db.ForeignKey('compra.id'), nullable=False)
     idMateriaPrima=db.Column(db.Integer, db.ForeignKey('materia_prima.id'), nullable=False)
-    cantidad=db.Column(db.Float, nullable=False)
+    cantidad=db.Column(db.Numeric(10,2), nullable=False)
     contenidoNeto=db.Column(db.String(20))
-    precio=db.Column(db.Float, nullable=False)
+    precio=db.Column(db.Numeric(10,2), nullable=False)
 
     compra = db.relationship('Compra', back_populates='detalles_compra')
     materiaPrima=db.relationship('MateriaPrima', back_populates='detalles_compra')
@@ -143,8 +144,8 @@ class MateriaPrima(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
     unidadBase = db.Column(db.String(20), nullable=False)  # kg, litros, piezas
-    stockActual = db.Column(db.Float, default=0)
-    stockMinimo = db.Column(db.Float, default=0)
+    stockActual = db.Column(db.Numeric(10,2), default=0)
+    stockMinimo = db.Column(db.Numeric(10,2), default=0)
     idCategoria=db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
     estatus = db.Column(db.Boolean, default=True)
 
@@ -236,7 +237,33 @@ class Conversion(db.Model):
 
     unidadBase = db.Column(db.String(20), primary_key=True)
     presentacion = db.Column(db.String(20), primary_key=True)
-    factor = db.Column(db.Float, nullable=False)
+    factor = db.Column(db.Numeric(10,2), nullable=False)
 
     def __repr__(self):
         return f'<Conversion {self.presentacion} -> {self.unidadBase} = {self.factor}>'
+
+class Pedido(db.Model):
+    __tablename__ = 'pedido'
+
+    id= db.Column(db.Integer, primary_key=True)
+    folio= db.Column(db.String(20), nullable=False, unique=True, default=lambda: f"PED-{uuid.uuid4().hex[:8].upper()}")
+    nombreCliente= db.Column(db.String(100), nullable=False)
+    telefono= db.Column(db.String(10),  nullable=False)
+    fechaPedido= db.Column(db.DateTime, nullable=False, default=datetime.now)
+    fechaRecogida= db.Column(db.DateTime, nullable=True)
+    estatus= db.Column(db.String(30), nullable=False, default='Pago en proceso')
+    total= db.Column(db.Numeric(10, 2), nullable=False)
+
+    detalles = db.relationship('DetallePedido', backref='pedido', cascade='all, delete-orphan')
+
+
+class DetallePedido(db.Model):
+    __tablename__ = 'detalle_pedido'
+
+    id= db.Column(db.Integer, primary_key=True)
+    idPedido= db.Column(db.Integer, db.ForeignKey('pedido.id'), nullable=False)
+    idPresentacion= db.Column(db.Integer, db.ForeignKey('presentacion_venta.id'), nullable=False)
+    cantidad= db.Column(db.Integer, nullable=False)
+    precioUnitario= db.Column(db.Numeric(10, 2), nullable=False)
+
+    presentacion = db.relationship('presentacionVenta')
