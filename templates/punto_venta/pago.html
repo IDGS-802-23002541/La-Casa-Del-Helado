@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pago – La Casa del Helado</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pago.css') }}?v">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">🍦</div>
+    <div>
+      <div class="nav-name">La Casa del Helado</div>
+      <div class="nav-sub">Pago seguro</div>
+    </div>
+  </div>
+  <div class="nav-folio">Folio: <strong>{{ pedido.folio }}</strong></div>
+</nav>
+
+<main>
+  <div class="pago-wrap">
+
+    <!-- COLUMNA IZQUIERDA: formulario de pago -->
+    <div>
+
+      <!-- Timer -->
+      <div class="timer-bar">
+        <div class="timer-icon">⏱</div>
+        <div class="timer-text">Completa tu pago antes de que expire el tiempo</div>
+        <div class="timer-count" id="timer">10:00</div>
+      </div>
+
+      <!-- Steps -->
+      <div class="steps">
+        <div class="step done">
+          <div class="step-dot">✓</div>
+          <span>Pedido</span>
+        </div>
+        <div class="step-line done"></div>
+        <div class="step active">
+          <div class="step-dot">2</div>
+          <span>Pago</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-dot">3</div>
+          <span>Confirmado</span>
+        </div>
+      </div>
+
+      <!-- Formulario Pago -->
+      <div class="card" id="pago-form-section">
+
+        <div class="security-row">
+          <div class="sec-badge">🔒 Pago seguro</div>
+          <div class="sec-badge">✅ Simulación</div>
+        </div>
+
+        <div class="section-title">💳 Datos de tu tarjeta</div>
+
+        <!-- Tarjeta visual -->
+        <div class="card-art">
+          <div class="card-art-logo">Heladería Card</div>
+          <div class="card-art-num" id="card-display">•••• •••• •••• ••••</div>
+          <div class="card-art-footer">
+            <div>
+              <div class="card-art-label">Titular</div>
+              <div class="card-art-val" id="card-name-display">NOMBRE TITULAR</div>
+            </div>
+            <div>
+              <div class="card-art-label">Vence</div>
+              <div class="card-art-val" id="card-exp-display">MM/AA</div>
+            </div>
+            <div class="card-art-brand">🍦</div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <div class="form-group">
+          <label class="form-label-sm">Número de tarjeta</label>
+          <input type="text" class="form-input" id="inp-card"
+                 placeholder="1234 5678 9012 3456" maxlength="19"
+                 oninput="formatCard(this)" autocomplete="cc-number">
+        </div>
+        <div class="form-group">
+          <label class="form-label-sm">Nombre del titular</label>
+          <input type="text" class="form-input" id="inp-card-name"
+                 placeholder="Tal como aparece en la tarjeta"
+                 oninput="document.getElementById('card-name-display').textContent = this.value.toUpperCase() || 'NOMBRE TITULAR'"
+                 autocomplete="cc-name">
+        </div>
+        <div class="form-row2">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label-sm">Fecha de vencimiento</label>
+            <input type="text" class="form-input" id="inp-exp"
+                   placeholder="MM/AA" maxlength="5"
+                   oninput="formatExp(this)" autocomplete="cc-exp">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label-sm">CVV</label>
+            <input type="password" class="form-input" id="inp-cvv"
+                   placeholder="•••" maxlength="3"
+                   oninput="this.value=this.value.replace(/\D/g,'')" autocomplete="cc-csc">
+          </div>
+        </div>
+
+        <div style="margin-top:20px">
+          <button class="btn-pagar" id="btn-pagar" onclick="procesarPago()">
+            Pagar ${{ pedido.total | int }} →
+          </button>
+          <button class="btn-cancelar" onclick="confirmarCancelacion()">
+            Cancelar pedido
+          </button>
+        </div>
+
+      </div><!-- /pago-form-section -->
+
+      <!-- Pantalla: procesando -->
+      <div class="card result-screen" id="screen-procesando">
+        <div class="result-icon">⚙️</div>
+        <div class="result-title" style="color:var(--orange)">Procesando pago...</div>
+        <div class="result-sub">Estamos verificando tu información. No cierres esta ventana.</div>
+        <div style="margin-top:20px">
+          <div class="spinner" style="width:36px;height:36px;border-width:4px;border-top-color:var(--orange);display:block;margin:0 auto"></div>
+        </div>
+      </div>
+
+      <!-- Pantalla: éxito -->
+      <div class="card result-screen" id="screen-exito">
+        <div class="result-icon">🎉</div>
+        <div class="result-title success">¡Pago exitoso!</div>
+        <div class="result-sub">Tu pedido ha sido confirmado. Guarda tu folio para recogerlo.</div>
+        <div class="folio-grande">{{ pedido.folio }}</div>
+        <div class="pickup-card">
+          <div class="pick-row">🏪 <span>Recoge en sucursal · La Casa del Helado</span></div>
+          <div class="pick-row">🕐 <span>Horario: 1:00 PM – 7:00 PM</span></div>
+          <div class="pick-row">📅 <span id="fecha-recogida-txt"></span></div>
+          <div class="pick-row">📱 <span>Muestra este folio al recoger</span></div>
+        </div>
+        <button class="btn-volver" onclick="window.location.href='/venta_cliente'">
+          Hacer otro pedido 🍦
+        </button>
+      </div>
+
+      <!-- Pantalla: cancelado -->
+      <div class="card result-screen" id="screen-cancelado">
+        <div class="result-icon">😔</div>
+        <div class="result-title error">Pedido cancelado</div>
+        <div class="result-sub">Tu pedido fue cancelado y el stock ha sido liberado. Puedes hacer un nuevo pedido cuando quieras.</div>
+        <button class="btn-volver" onclick="window.location.href='/venta_cliente'">
+          Volver al catálogo
+        </button>
+      </div>
+
+      <!-- Pantalla: expirado -->
+      <div class="card result-screen" id="screen-expirado">
+        <div class="result-icon">⏰</div>
+        <div class="result-title error">Tiempo agotado</div>
+        <div class="result-sub">El tiempo para completar el pago expiró. Tu pedido fue cancelado y el stock liberado.</div>
+        <button class="btn-volver" onclick="window.location.href='/venta_cliente'">
+          Volver al catálogo
+        </button>
+      </div>
+
+    </div><!-- /col izquierda -->
+
+
+    <!-- COLUMNA DERECHA: resumen del pedido -->
+    <div class="card" style="position:sticky;top:24px">
+      <div class="resumen-title">🧾 Resumen del pedido</div>
+
+      {% for detalle in pedido.detalles %}
+        <div class="resumen-item">
+          <span class="resumen-item-name">{{ detalle.presentacion.nombre }} × {{ detalle.cantidad }}</span>
+          <span class="resumen-item-price">${{ (detalle.precioUnitario * detalle.cantidad) | int }}</span>
+        </div>
+      {% endfor %}
+
+      <hr class="resumen-divider">
+
+      <div class="resumen-total-row">
+        <span class="resumen-total-label">Total a pagar</span>
+        <span class="resumen-total-price">${{ pedido.total | int }}</span>
+      </div>
+
+      <div class="cliente-info">
+        <div>👤 {{ pedido.nombreCliente }}</div>
+        <div>📱 {{ pedido.telefono }}</div>
+        {% if pedido.fechaRecogida %}
+          <div>📅 {{ pedido.fechaRecogida.strftime('%d/%m/%Y %I:%M %p') }}</div>
+        {% endif %}
+      </div>
+
+      <div class="folio-badge">
+        <span>Folio</span>
+        <span>{{ pedido.folio }}</span>
+      </div>
+    </div>
+
+  </div><!-- /pago-wrap -->
+</main><!-- /main -->
+
+
+<!-- MODAL: Confirmar cancelación -->
+<div class="modal-overlay" id="modal-cancelar">
+  <div class="modal">
+    <div class="modal-title">⚠️ ¿Cancelar el pedido?</div>
+    <div class="modal-sub">
+      Si cancelas, tu pedido será eliminado y el stock reservado será liberado.
+      Esta acción no se puede deshacer.
+    </div>
+    <div class="modal-btns">
+      <button class="btn-keep" onclick="cerrarModalCancelar()">No, volver</button>
+      <button class="btn-confirm-cancel" onclick="ejecutarCancelacion()">Sí, cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
+<script>
+  const FOLIO = "{{ pedido.folio }}";
+  const FECHA_RECOGIDA = "{% if pedido.fechaRecogida %}{{ pedido.fechaRecogida.strftime('%d/%m/%Y a las %I:%M %p') }}{% endif %}";
+
+  /* ── timer 10 minutos ── */
+  let segundos = 600;
+  let timerInterval;
+
+  function iniciarTimer() {
+    timerInterval = setInterval(() => {
+      segundos--;
+      const m = Math.floor(segundos / 60);
+      const s = segundos % 60;
+      const el = document.getElementById('timer');
+      el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      if (segundos <= 60) el.classList.add('urgent');
+      if (segundos <= 0) {
+        clearInterval(timerInterval);
+        tiempoAgotado();
+      }
+    }, 1000);
+  }
+
+  async function tiempoAgotado() {
+    mostrarScreen('screen-expirado');
+    // cancelar automáticamente en el backend
+    try {
+      await fetch('/pedido/cancelar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folio: FOLIO })
+      });
+    } catch(e) {}
+  }
+
+  /* ── formato tarjeta ── */
+  function formatCard(inp) {
+    let v = inp.value.replace(/\D/g, '').slice(0, 16);
+    inp.value = v.replace(/(.{4})/g, '$1 ').trim();
+    const display = v.padEnd(16,'•').replace(/(.{4})/g, '$1 ').trim();
+    document.getElementById('card-display').textContent = display;
+  }
+
+  function formatExp(inp) {
+    let v = inp.value.replace(/\D/g, '').slice(0, 4);
+    if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+    inp.value = v;
+    document.getElementById('card-exp-display').textContent = v || 'MM/AA';
+  }
+
+  /* ── pantallas ── */
+  function mostrarScreen(id) {
+    document.getElementById('pago-form-section').classList.remove('show');
+    document.getElementById('pago-form-section').style.display = 'none';
+    ['screen-procesando','screen-exito','screen-cancelado','screen-expirado'].forEach(s => {
+      document.getElementById(s).classList.remove('show');
+    });
+    document.getElementById(id).classList.add('show');
+  }
+
+  /* ── procesar pago ── */
+  async function procesarPago() {
+    const num  = document.getElementById('inp-card').value.replace(/\s/g,'');
+    const name = document.getElementById('inp-card-name').value.trim();
+    const exp  = document.getElementById('inp-exp').value.trim();
+    const cvv  = document.getElementById('inp-cvv').value.trim();
+
+    if (num.length < 16)  { toast('Ingresa un número de tarjeta válido (16 dígitos).', 'error'); return; }
+    if (!name)            { toast('Ingresa el nombre del titular.', 'error'); return; }
+    if (exp.length < 5)   { toast('Ingresa la fecha de vencimiento (MM/AA).', 'error'); return; }
+    if (cvv.length < 3)   { toast('Ingresa el CVV (3 dígitos).', 'error'); return; }
+
+    clearInterval(timerInterval);
+    mostrarScreen('screen-procesando');
+
+    // simular delay de procesador de pago
+    await new Promise(r => setTimeout(r, 2500));
+
+    try {
+      const res  = await fetch('/pedido/pagar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folio: FOLIO })
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        mostrarScreen('screen-cancelado');
+        return;
+      }
+
+      // éxito
+      document.getElementById('fecha-recogida-txt').textContent = FECHA_RECOGIDA || 'Consulta el horario en tienda';
+      mostrarScreen('screen-exito');
+
+    } catch(e) {
+      mostrarScreen('screen-cancelado');
+    }
+  }
+
+  /* ── cancelar ── */
+  function confirmarCancelacion() {
+    document.getElementById('modal-cancelar').classList.add('open');
+  }
+  function cerrarModalCancelar() {
+    document.getElementById('modal-cancelar').classList.remove('open');
+  }
+
+  async function ejecutarCancelacion() {
+    cerrarModalCancelar();
+    clearInterval(timerInterval);
+    mostrarScreen('screen-procesando');
+
+    try {
+      const res  = await fetch('/pedido/cancelar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folio: FOLIO })
+      });
+      const data = await res.json();
+      mostrarScreen(data.ok ? 'screen-cancelado' : 'screen-cancelado');
+    } catch(e) {
+      mostrarScreen('screen-cancelado');
+    }
+  }
+
+  /* ── toast ── */
+  function toast(msg, tipo = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className   = 'toast show' + (tipo ? ' ' + tipo : '');
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.className = 'toast', 2800);
+  }
+
+  /* ── cerrar modal con Escape ── */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') cerrarModalCancelar();
+  });
+  document.getElementById('modal-cancelar').addEventListener('click', e => {
+    if (e.target === e.currentTarget) cerrarModalCancelar();
+  });
+
+  /* ── init ── */
+  iniciarTimer();
+</script>
+
+</body>
+</html>
