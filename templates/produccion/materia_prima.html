@@ -230,7 +230,6 @@
                     <tr>
                         <th>Insumo</th>
                         <th>Categoría</th>
-                        <th>Proveedor</th>
                         <th>Stock</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -242,7 +241,6 @@
                         <td><strong>{{ mp.nombre }}</strong><br><span class="text-xs text-muted">{{ mp.unidadBase
                                 }}</span></td>
                         <td>{{ mp.categoria.nombre }}</td>
-                        <td>{{ mp.proveedor.razonSocial if mp.proveedor else 'Sin proveedor' }}</td>
                         <td>{{ mp.stockActual }} {{ mp.unidadBase }}</td>
                         <td>{% if mp.estatus %}Activo{% else %}Inactivo{% endif %}</td>
                         <td><button class="action-btn btnVer" data-id="{{ mp.id }}">Ver</button></td>

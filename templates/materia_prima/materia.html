@@ -190,7 +190,6 @@
     <span id="closeCard">✖</span>
     <h3 id="cardNombre"></h3>
     <p><strong>Categoría:</strong> <span id="cardCategoria"></span></p>
-    <p><strong>Proveedor:</strong> <span id="cardProveedor"></span></p>
     <p><strong>Stock:</strong> <span id="cardStock"></span></p>
     <p><strong>Estatus:</strong> <span id="cardEstatus"></span></p>
 </div>
@@ -232,7 +231,6 @@ const card = document.getElementById("card");
 const closeCard = document.getElementById("closeCard");
 const cardNombre = document.getElementById("cardNombre");
 const cardCategoria = document.getElementById("cardCategoria");
-const cardProveedor = document.getElementById("cardProveedor");
 const cardStock = document.getElementById("cardStock");
 const cardEstatus = document.getElementById("cardEstatus");
 
@@ -241,7 +239,6 @@ document.querySelectorAll(".btnVer").forEach(btn=>{
         const mp = materias.find(m=>m.id==btn.dataset.id);
         cardNombre.textContent = mp.nombre;
         cardCategoria.textContent = mp.categoria.nombre;
-        cardProveedor.textContent = mp.proveedor ? mp.proveedor.razonSocial : "Sin proveedor";
         cardStock.textContent = mp.stockActual + " " + mp.unidadBase;
         cardEstatus.textContent = mp.estatus ? "Activo" : "Inactivo";
         overlay.style.display="block"; card.style.display="block";

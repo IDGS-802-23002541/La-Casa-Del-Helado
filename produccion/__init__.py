@@ -85,10 +85,6 @@ def materiales():
             "categoria": {
                 "id": mp.categoria.id if mp.categoria else None,
                 "nombre": mp.categoria.nombre if mp.categoria else "Sin categoría"
-            },
-            "proveedor": {
-                "id": mp.proveedor.id if mp.proveedor else None,
-                "razonSocial": mp.proveedor.razonSocial if mp.proveedor else "Sin proveedor"
             }
         })
 

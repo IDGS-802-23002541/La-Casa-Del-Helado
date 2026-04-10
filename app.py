@@ -8,7 +8,6 @@ from flask_migrate import Migrate
 from proveedores.routes import proveedores
 from autenticacion import autenticacion_bp
 from dashboard import dash_bp
-from finanzas import finanzas_bp
 from inv_producto import prod_bp
 from materia_prima import materia_bp
 from produccion import produccion_bp
@@ -32,7 +31,6 @@ security = Security(app, user_datastore)
 # Blueprint register
 app.register_blueprint(autenticacion_bp)
 app.register_blueprint(dash_bp)
-app.register_blueprint(finanzas_bp)
 app.register_blueprint(prod_bp)
 app.register_blueprint(materia_bp)
 app.register_blueprint(produccion_bp)
@@ -49,6 +47,14 @@ app.register_blueprint(clientes)
 @app.route("/", methods=['POST', 'GET'])
 def index():
     return render_template("inicio.html")
+
+@app.errorhandler(404)
+def page_not_found(e):
+	return render_template("404.html"), 404
+
+@app.errorhandler(403)
+def access_denied(e):
+	return render_template("403.html"), 403
 
 if __name__ == '__main__':
 	with app.app_context():

@@ -5,7 +5,7 @@ from . import dash_bp
 from sqlalchemy import func
 from models import Producto, Categoria, Venta, DetalleVenta
 
-@dash_bp.route("/", methods=["GET", "POST"])
+@dash_bp.route("/dash", methods=["GET", "POST"])
 def auth():
     fecha_hoy = datetime.now().strftime('%d de %B %Y')
     
