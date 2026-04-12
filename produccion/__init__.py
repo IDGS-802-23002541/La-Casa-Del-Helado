@@ -53,10 +53,6 @@ def materiales():
             "categoria": {
                 "id": mp.categoria.id if mp.categoria else None,
                 "nombre": mp.categoria.nombre if mp.categoria else "Sin categoría"
-            },
-            "proveedor": {
-                "id": mp.proveedor.id if mp.proveedor else None,
-                "razonSocial": mp.proveedor.razonSocial if mp.proveedor else "Sin proveedor"
             }
         })
 
@@ -68,7 +64,6 @@ def materiales():
 @produccion_bp.route("/produccion/terminar/<int:sol_id>", methods=["POST"])
 def terminar_produccion(sol_id):
     solicitud = SolicitudProduccion.query.get_or_404(sol_id)
-    print(f"\n>>> INICIANDO TERMINACIÓN: Solicitud ID {sol_id} para Producto ID {solicitud.idProducto}")
 
     if solicitud.estatus != 'En Proceso':
         flash("La solicitud no está en proceso", "warning")
@@ -78,11 +73,8 @@ def terminar_produccion(sol_id):
     receta = Receta.query.filter_by(idProducto=solicitud.idProducto).first()
 
     if not receta:
-        print(f">>> ERROR: No se encontró receta para el producto {solicitud.idProducto}")
         flash(f"No hay receta para {solicitud.producto.nombre}", "danger")
         return redirect(url_for('produccion.tablero'))
-
-    print(f">>> RECETA ENCONTRADA: {receta.nombre}. Cantidad de ingredientes: {len(receta.detalles)}")
 
     try:
         # Iniciamos el ciclo de descuento
@@ -90,37 +82,28 @@ def terminar_produccion(sol_id):
             materia = MateriaPrima.query.get(detalle.idMateriaPrima)
             
             if materia:
-                # CÁLCULO DE PROPORCIÓN (Importante: usamos cantidadProducida de la receta)
-                # Si tu receta rinde 10 litros y usas 5kg, por cada 1 litro usas 0.5kg
+                # CÁLCULO DE PROPORCIÓN
                 proporcion = decimal.Decimal(str(detalle.cantidad)) / decimal.Decimal(str(receta.cantidadProducida))
                 cantidad_a_descontar = proporcion * decimal.Decimal(str(solicitud.cantidad_solicitada))
-
-                print(f">>> DESCONTANDO: {materia.nombre} | Actual: {materia.stockActual} | Restando: {cantidad_a_descontar}")
                 
                 # RESTA FÍSICA EN EL OBJETO
                 materia.stockActual = decimal.Decimal(str(materia.stockActual)) - cantidad_a_descontar
-            else:
-                print(f">>> ERROR: No se encontró la materia prima con ID {detalle.idMateriaPrima}")
 
         # SUMAR AL STOCK DEL PRODUCTO TERMINADO
         producto = Producto.query.get(solicitud.idProducto)
         if producto:
             producto.stockActual = decimal.Decimal(str(producto.stockActual or 0)) + decimal.Decimal(str(solicitud.cantidad_solicitada))
-            print(f">>> PRODUCTO ACTUALIZADO: {producto.nombre} nuevo stock: {producto.stockActual}")
 
         # CAMBIAR ESTATUS
         solicitud.estatus = 'Terminado'
         
-        # EL PASO FINAL: GUARDAR TODO
-        print(">>> INTENTANDO HACER COMMIT A LA BASE DE DATOS...")
+        # GUARDAR CAMBIOS
         db.session.commit()
-        print(">>> COMMIT EXITOSO.")
         
         flash(f"Producción terminada e inventarios actualizados", "success")
 
     except Exception as e:
         db.session.rollback()
-        print(f">>> ¡ERROR CRÍTICO!: {str(e)}")
         flash(f"Error en el proceso: {str(e)}", "danger")
 
     return redirect(url_for('produccion.tablero'))

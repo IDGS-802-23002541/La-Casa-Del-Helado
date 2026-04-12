@@ -216,7 +216,7 @@
         <div class="toolbar">
             <div class="search-inp">
                 🔎
-                <input type="text" id="search" placeholder="Buscar insumo, categoría o proveedor...">
+                <input type="text" id="search" placeholder="Buscar insumo o categoría...">
             </div>
             <div class="sep"></div>
             <div class="filter-chip fc-all">Todos</div>
@@ -230,7 +230,6 @@
                     <tr>
                         <th>Insumo</th>
                         <th>Categoría</th>
-                        <th>Proveedor</th>
                         <th>Stock</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -242,7 +241,6 @@
                         <td><strong>{{ mp.nombre }}</strong><br><span class="text-xs text-muted">{{ mp.unidadBase
                                 }}</span></td>
                         <td>{{ mp.categoria.nombre }}</td>
-                        <td>{{ mp.proveedor.razonSocial if mp.proveedor else 'Sin proveedor' }}</td>
                         <td>{{ mp.stockActual }} {{ mp.unidadBase }}</td>
                         <td>{% if mp.estatus %}Activo{% else %}Inactivo{% endif %}</td>
                         <td><button class="action-btn btnVer" data-id="{{ mp.id }}">Ver</button></td>
@@ -261,7 +259,6 @@
     <span id="closeCard">✖</span>
     <h3 id="cardNombre"></h3>
     <p><strong>Categoría:</strong> <span id="cardCategoria"></span></p>
-    <p><strong>Proveedor:</strong> <span id="cardProveedor"></span></p>
     <p><strong>Stock:</strong> <span id="cardStock"></span></p>
     <p><strong>Estatus:</strong> <span id="cardEstatus"></span></p>
 </div>
@@ -299,7 +296,6 @@
     const closeCard = document.getElementById("closeCard");
     const cardNombre = document.getElementById("cardNombre");
     const cardCategoria = document.getElementById("cardCategoria");
-    const cardProveedor = document.getElementById("cardProveedor");
     const cardStock = document.getElementById("cardStock");
     const cardEstatus = document.getElementById("cardEstatus");
 
@@ -308,12 +304,11 @@
             const mp = materias.find(m => m.id == btn.dataset.id);
             cardNombre.textContent = mp.nombre;
             cardCategoria.textContent = mp.categoria.nombre;
-            cardProveedor.textContent = mp.proveedor ? mp.proveedor.razonSocial : "Sin proveedor";
             cardStock.textContent = mp.stockActual + " " + mp.unidadBase;
             cardEstatus.textContent = mp.estatus ? "Activo" : "Inactivo";
             overlay.style.display = "block"; card.style.display = "block";
         });
-    });
+    });  
     closeCard.onclick = () => { overlay.style.display = "none"; card.style.display = "none"; };
 </script>
 

@@ -66,7 +66,7 @@ def proveedorNuevo():
     return redirect(url_for('proveedores.proveedoresTabla'))
 
 @proveedores.route("/proveedorModificar", methods=["GET", "POST"])
-# @login_required
+#  @login_required
 # @roles_accepted('Administrador') # Solo el jefe puede editar
 def proveedorModificar():
     id_proveedor = request.args.get('id', type=int)

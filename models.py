@@ -151,18 +151,12 @@ class MateriaPrima(db.Model):
     unidadBase = db.Column(db.String(20), nullable=False)  # kg, litros, piezas
     stockActual = db.Column(db.Float, default=0)
     stockMinimo = db.Column(db.Float, default=0)
-    idCategoria=db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
+    idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
     estatus = db.Column(db.Boolean, default=True)
 
     categoria = db.relationship('Categoria', back_populates='materias_primas')
     detalles_compra = db.relationship('DetalleCompra', back_populates='materiaPrima')
     
-# se la agregue porque faltaba la relacion con proveedor, pero no se si es necesario o si se puede manejar solo con el idProveedor
-    idProveedor = db.Column(db.Integer, db.ForeignKey('proveedor.id'), nullable=True)
-    categoria = db.relationship('Categoria', back_populates='materias_primas')
-    detalles_compra = db.relationship('DetalleCompra', back_populates='materiaPrima')
-    proveedor = db.relationship('Proveedor', backref='materias_primas')
-
 
     def __repr__(self):
         return f'<MateriaPrima {self.nombre}>'
