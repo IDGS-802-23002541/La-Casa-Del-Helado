@@ -96,12 +96,10 @@
                 🔎
                 <input type="text" id="search" placeholder="Buscar insumo, categoría ...">
             </div>
-
-            <div class="sep"></div>
-
-            <div class="filter-chip fc-all">Todos</div>
-            <div class="filter-chip fc-activo inactive-filter">Activos</div>
-            <div class="filter-chip fc-inactivo inactive-filter">Inactivos</div>
+            <button class="btn-primary-teal"
+                  style="padding:8px 16px; border-radius:10px; font-size:12px;">
+            Buscar
+          </button>
         </div>
 
         <!-- TABLA -->
@@ -118,23 +116,51 @@
                 </thead>
                 <tbody>
                     {% for mp in materias_primas %}
-                    <tr data-id="{{ mp.id }}" class="{% if not mp.estatus %}inactive-row{% endif %}">
-                        <td><strong>{{ mp.nombre }}</strong><br><span class="text-xs text-muted">{{ mp.unidadBase }}</span></td>
-                        <td><span class="cat-badge cat-insumo">{{ mp.categoria.nombre }}</span></td>
-                        <td><strong>{{ mp.stockActual }} {{ mp.unidadBase }}</strong></td>
-                        <td>{% if mp.estatus %}<span class="status-badge s-activo">Activo</span>{% else %}<span class="status-badge s-inactivo">Inactivo</span>{% endif %}</td>
+                    <tr 
+                        data-id="{{ mp.id }}" 
+                        class="{% if not mp.estatus %}inactive-row{% endif %}"
+                    >
                         <td>
-                            <button class="action-btn ab-ver btnVer" data-id="{{ mp.id }}">Ver</button>
-                            <button class="action-btn ab-editar btnEditar" data-id="{{ mp.id }}">Editar</button>
+                            <span class="td-nombre">{{ mp.nombre }}</span><br>
+                            <span class="td-muted">{{ mp.unidadBase }}</span>
+                        </td>
+
+                        <td>
+                            <span class="tag-count">
+                                {{ mp.categoria.nombre }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="td-muted">
+                                {{ mp.stockActual }} {{ mp.unidadBase }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if mp.estatus %}
+                                <span class="status-badge s-activo">● Activo</span>
+                            {% else %}
+                                <span class="status-badge s-inactivo">● Inactivo</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <button class="action-btn ab-ver btnVer" data-id="{{ mp.id }}">
+                                Ver
+                            </button>
+                            <button class="action-btn ab-editar btnEditar" data-id="{{ mp.id }}">
+                                Editar
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-
     </main>
 
+    {% if current_user.rol.nombre == 'Administrador' %}
     <!-- PANEL DERECHO -->
     <aside class="right-panel">
         <div class="panel-hdr-dark">
@@ -181,6 +207,7 @@
             <button type="submit" form="materiaForm" class="btn-save">Guardar</button>
         </div>
     </aside>
+    {% endif %}
 
 </div>
 

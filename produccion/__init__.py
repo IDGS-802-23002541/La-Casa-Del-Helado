@@ -69,27 +69,27 @@ def terminar_produccion(sol_id):
     return redirect(url_for('produccion.tablero'))
 
 
-@produccion_bp.route("/produccion/materiales")
-def materiales():
-    materias_db = MateriaPrima.query.all()
+# @produccion_bp.route("/produccion/materiales")
+# def materiales():
+#     materias_db = MateriaPrima.query.all()
 
-    materias_primas = []
-    for mp in materias_db:
-        materias_primas.append({
-            "id": mp.id,
-            "nombre": mp.nombre,
-            "unidadBase": mp.unidadBase,
-            "stockActual": float(mp.stockActual or 0),
-            "stockMinimo": float(mp.stockMinimo or 0),
-            "estatus": mp.estatus,
-            "categoria": {
-                "id": mp.categoria.id if mp.categoria else None,
-                "nombre": mp.categoria.nombre if mp.categoria else "Sin categoría"
-            }
-        })
+#     materias_primas = []
+#     for mp in materias_db:
+#         materias_primas.append({
+#             "id": mp.id,
+#             "nombre": mp.nombre,
+#             "unidadBase": mp.unidadBase,
+#             "stockActual": float(mp.stockActual or 0),
+#             "stockMinimo": float(mp.stockMinimo or 0),
+#             "estatus": mp.estatus,
+#             "categoria": {
+#                 "id": mp.categoria.id if mp.categoria else None,
+#                 "nombre": mp.categoria.nombre if mp.categoria else "Sin categoría"
+#             }
+#         })
 
-    return render_template(
-        "produccion/materia_prima.html",
-        materias_primas=materias_primas
-    )
+#     return render_template(
+#         "produccion/materia_prima.html",
+#         materias_primas=materias_primas
+#     )
     

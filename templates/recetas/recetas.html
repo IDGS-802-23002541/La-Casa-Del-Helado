@@ -69,7 +69,7 @@
 
       <!-- Tabla -->
       <div class="table-wrap fade-up-2">
-        <table>
+        <table class="table">
           <thead>
             <tr>
               <th>#</th>
@@ -98,20 +98,19 @@
               data-cantidades="{{ receta.detalles | map(attribute='cantidad') | list | tojson | forceescape }}"
               data-unidades="{{ receta.detalles | map(attribute='unidad') | list | tojson | forceescape }}"
             >
-              <td style="color:var(--light-text); font-size:11px;">{{ receta.id }}</td>
-              <td style="font-weight:600; color:var(--dark);">{{ receta.nombre }}</td>
-              <td style="color:var(--mid);">
+              <td class="td-id">{{ receta.id }}</td>
+              <td class="td-nombre">{{ receta.nombre }}</td>
+              <td class="td-muted">
                 {{ receta.producto.nombre if receta.producto else '—' }}
               </td>
-              <td style="color:var(--mid);">
+              <td class="td-muted">
                 {{ receta.cantidadProducida }}
                 <span style="font-size:10px; color:var(--light-text);">
                   {{ receta.producto.unidadBase if receta.producto else '' }}
                 </span>
               </td>
               <td>
-                <span style="background:var(--lavender); color:var(--purple);
-                            border-radius:8px; padding:3px 9px; font-size:10px; font-weight:700;">
+                <span class="tag-count">
                   {{ receta.detalles | length }}
                   ingrediente{{ 's' if receta.detalles | length != 1 }}
                 </span>

@@ -1,132 +1,94 @@
 <nav class="navbar">
+
   <a href="{{ url_for('index') }}" class="nav-brand">
     <div class="nav-brand-avatar">🍦</div>
-    <span class="nav-brand-name">La Casa del Helado</span>
+    <div class="nav-brand-text">
+      <span class="nav-brand-name">La Casa del Helado</span>
+      <small class="nav-brand-sub">
+        SISTEMA INTEGRAL
+      </small>
+    </div>
   </a>
 
   <div class="nav-links">
-    <!-- Inicio: asumo que está en el blueprint principal, ruta 'index' -->
-    <a href="{{ url_for('dash.auth') }}" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a>
 
-    <!-- Proveedores -->
+    <a href="{{ url_for('dash.auth') }}"
+       class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">
+      Dashboard
+    </a>
+
     <a href="{{ url_for('proveedores.proveedoresTabla') }}"
        class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
-        Proveedores
+      Proveedores
     </a>
 
     <a href="{{ url_for('compra.compra') }}"
        class="nav-link {% if request.endpoint == 'proveedores.compra' %}active{% endif %}">
-       Compra
+      Compra
     </a>
 
     <a href="{{ url_for('materia.materia') }}"
        class="nav-link {% if request.endpoint == 'materia.materia' %}active{% endif %}">
-        Materia Prima
+      Materia Prima
     </a>
 
     <a href="{{ url_for('producto.index') }}"
        class="nav-link {% if request.endpoint == 'producto.index' %}active{% endif %}">
-       Productos
-    
+      Productos
     </a>
 
-    <!-- Usuarios -->
-    <a href="{{ url_for('usuarios.index') }}" class="nav-link {% if active_page == 'usuarios' %}active{% endif %}">
+    <a href="{{ url_for('usuarios.index') }}"
+       class="nav-link {% if active_page == 'usuarios' %}active{% endif %}">
       Usuarios
     </a>
 
-    <!-- Recetas -->
-    <a href="{{ url_for('recetas.index') }}" class="nav-link {% if active_page == 'recetas' %}active{% endif %}">
+    <a href="{{ url_for('recetas.index') }}"
+       class="nav-link {% if active_page == 'recetas' %}active{% endif %}">
       Recetas
     </a>
 
     <a href="{{ url_for('merma.merma') }}"
        class="nav-link {% if request.endpoint == 'merma.merma' %}active{% endif %}">
-        Mermas
+      Mermas
     </a>
 
-    <a href="{{ url_for('dash.auth') }}"
-       class="nav-link {% if request.endpoint == 'dash_bp.auth' %}active{% endif %}">
-        Dashboard
-    </a>
   </div>
 
   <div class="nav-right">
-    <div class="nav-date" id="navDate">
-      <div id="fecha"></div>
-      <div id="hora"></div>
+
+    <div class="nav-date">
+      <div id="fecha" class="nav-date-fecha"></div>
+      <div id="hora" class="nav-date-hora"></div>
     </div>
 
-    <div class="nav-user-avatar" title="{{ current_user.nombre if current_user.is_authenticated else '' }}">
+    <div class="nav-user-avatar"
+         title="{{ current_user.nombre if current_user.is_authenticated else '' }}">
       {% if current_user.is_authenticated %}
-      {{ current_user.nombreUsuario[0] | upper }}
+        {{ current_user.nombreUsuario[0] | upper }}
       {% else %}
-      ?
+        ?
       {% endif %}
     </div>
-    <a href="{{ url_for('auth.logout') }}" class="btn-logout"
-      style="width:auto; padding:6px 12px; border-radius:20px; font-size:11px; text-decoration:none;">
-      Salir
-    </a>
-  </div>
-</nav>
 
+    <a href="{{ url_for('auth.logout') }}" class="nav-logout">
+      SALIR
+    </a>
+
+  </div>
+
+</nav>
 <script>
   function actualizarHora() {
     const now = new Date();
-    const dia = now.getDate().toString().padStart(2, '0');
-    const mes = (now.getMonth() + 1).toString().padStart(2, '0');
+    const dia = String(now.getDate()).padStart(2, '0');
+    const mes = String(now.getMonth() + 1).padStart(2, '0');
     const anio = now.getFullYear();
-    const horas = now.getHours().toString().padStart(2, '0');
-    const minutos = now.getMinutes().toString().padStart(2, '0');
-    const segundos = now.getSeconds().toString().padStart(2, '0');
-
-    const fecha = `${dia}/${mes}/${anio}`;
-    const hora = `${horas}:${minutos}:${segundos}`;
-
-    document.getElementById('fecha').textContent = fecha;
-    document.getElementById('hora').textContent = hora;
+    const horas = String(now.getHours()).padStart(2, '0');
+    const minutos = String(now.getMinutes()).padStart(2, '0');
+    const segundos = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('fecha').textContent = `${dia}/${mes}/${anio}`;
+    document.getElementById('hora').textContent = `${horas}:${minutos}:${segundos}`;
   }
-
-  // Actualiza cada segundo
   setInterval(actualizarHora, 1000);
-
-  // Inicializa inmediatamente
   actualizarHora();
 </script>
-
-<style>
-  /* Asegúrate de que la fuente Baloo 2 se cargue correctamente */
-  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500&display=swap');
-
-  /* Aplica la fuente de manera forzada a todos los elementos relevantes */
-  body,
-  .nav-date,
-  .nav-date #fecha,
-  .nav-date #hora,
-  .nav-links,
-  .nav-link {
-    font-family: 'Baloo 2', sans-serif !important;
-    /* Forzar el uso de la fuente Baloo */
-    color: #000000 !important;
-    /* Forzar color negro para el texto */
-  }
-
-  .nav-date {
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 1.4;
-    text-align: right;
-    background: transparent !important;
-    /* Eliminar cualquier fondo blanco */
-  }
-
-  .nav-date #fecha {
-    font-size: 14px;
-    margin-bottom: 4px;
-  }
-
-  .nav-date #hora {
-    font-size: 18px;
-  }
-</style>

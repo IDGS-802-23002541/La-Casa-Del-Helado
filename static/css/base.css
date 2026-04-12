@@ -1,0 +1,176 @@
+/* ============================================================
+   base.css | Estilos compartidos/repetidos
+   ============================================================ */
+
+/* ── Navbar ── */
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.nav-brand-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #ff7043;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+}
+
+.nav-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+    gap: 2px;
+}
+
+.nav-brand-name {
+    font-weight: 700;
+    color: #2d3436;
+    font-size: 16px;
+}
+
+.nav-brand-sub {
+    font-size: 9px;
+    color: #ff7043;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 15px;
+}
+
+.nav-link {
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+}
+
+.nav-link.active {
+    color: #ff7043;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.nav-user-avatar {
+    background: #ff7043;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.nav-logout {
+    text-decoration: none;
+    font-size: 11px;
+    color: #ff7675;
+    font-weight: 800;
+    padding: 6px 12px;
+    background: rgba(255, 118, 117, 0.1);
+    border-radius: 20px;
+}
+
+.nav-date {
+    text-align: right;
+    line-height: 1.2;
+}
+
+.nav-date-fecha {
+    font-size: 11px;
+    color: #888;
+    font-weight: 700;
+}
+
+.nav-date-hora {
+    font-weight: 800;
+    color: #2d3436;
+    font-size: 17px;
+}
+
+/* ── Tablas ── */
+
+/* ── TABLAS ── */
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.table thead th {
+    text-align: left;
+    font-size: 11px;
+    color: var(--light-text);
+    font-weight: 700;
+    padding: 10px;
+}
+
+.table tbody td {
+    padding: 10px;
+}
+
+/* Variantes de texto */
+.td-id {
+    color: var(--light-text);
+    font-size: 11px;
+}
+
+.td-nombre {
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.td-muted {
+    color: var(--mid);
+}
+
+.td-unit {
+    font-size: 10px;
+    color: var(--light-text);
+}
+
+/* Tag ingredientes */
+.tag-count {
+    background: var(--lavender);
+    color: var(--purple);
+    border-radius: 8px;
+    padding: 3px 9px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* Fila seleccionada */
+.table tr.selected {
+    background: #f5f3ff;
+    cursor: pointer;
+}
+
+.table tbody tr:hover {
+    background: #f9f7ff;
+    cursor: pointer;
+}
