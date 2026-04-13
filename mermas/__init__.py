@@ -15,7 +15,16 @@ merma_bp = Blueprint(
 
 @merma_bp.route('/merma', methods=["GET", "POST"])
 def merma():
-    mermas = Merma.query.filter_by(estatus=True).all()
+    # Filtro por fecha
+    fecha = request.args.get("fecha")
+    query = Merma.query.filter_by(estatus=True)
+    if fecha:
+        dia = datetime.strptime(fecha, "%Y-%m-%d")
+        query = query.filter(
+            Merma.fecha >= dia.replace(hour=0, minute=0, second=0),
+            Merma.fecha <= dia.replace(hour=23, minute=59, second=59)
+        )
+    mermas = query.order_by(Merma.fecha.desc()).all()
     merma_form = forms.MermaForm(request.form)
 
     materias = MateriaPrima.query.all()
@@ -29,7 +38,7 @@ def merma():
         try:
             idMateriaPrima = request.form.get("idMateriaPrima") or None
             idProducto = request.form.get("idProducto") or None
-            cantidad = int(request.form.get("cantidad"))
+            cantidad = float(request.form.get("cantidad"))
             justificacion = request.form.get("justificacion")
 
             # convertir a int o None
@@ -53,8 +62,8 @@ def merma():
 
         except Exception as e:
             db.session.rollback()
-            # print({str(e)})
-            # flash(f"Error: {str(e)}", "error")
+            print({str(e)})
+            flash(f"Error: {str(e)}", "error")
             flash(f"Vuelve a intentarlo más tarde", "error")
 
         return redirect(url_for('merma.merma'))

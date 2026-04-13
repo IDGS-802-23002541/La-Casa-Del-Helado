@@ -22,32 +22,56 @@
   </aside>
 
   <main class="main">
-    <div class="page-hdr">
-      <div>
-        <h1>Proveedor</h1>
+    <div class="page-hdr fade-up">
+      <div class="page-hdr-left">
+        <h1>Proveedores</h1>
         <p>Administración de proveedores</p>
       </div>
     </div>
 
-    <form method="GET" action="{{ url_for('proveedores.proveedoresTabla') }}" style="display: flex; gap: 10px; margin-bottom: 20px;">
-      <input type="text" name="q" value="{{ busqueda or '' }}" placeholder="Buscar por razón social..." style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #ddd;" />
-      <button type="submit" class="btn-primary" style="white-space: nowrap;">
-        Buscar
-      </button>
+    <form method="GET" action="{{ url_for('proveedores.proveedoresTabla') }}">
+      <div class="toolbar fade-up-1">
+
+        <div class="search-inp">
+          <span style="color:var(--light-text); font-size:14px;">🔍</span>
+          <input 
+            type="text" 
+            name="q" 
+            value="{{ busqueda or '' }}" 
+            placeholder="Buscar proveedor…" 
+          />
+        </div>
+
+        <button type="submit" class="btn-primary-teal">
+          Buscar
+        </button>
+
+        {% if busqueda %}
+          <a href="{{ url_for('proveedores.proveedoresTabla') }}" 
+            class="btn-cancel"
+            style="text-decoration:none;">
+            Limpiar
+          </a>
+        {% endif %}
+
+      </div>
     </form>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Razón Social</th>
-          <th>Correo</th>
-          <th>Teléfono</th>
-          <th>Dirección</th>
-          <th>Estatus</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
+    <!-- TABLA -->
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Proveedor</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
+            <th>Estatus</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
 
+<<<<<<< HEAD
       <tbody>
   {% for p in proveedores %}
     {# Agregamos esta validación #}
@@ -90,6 +114,75 @@
   {% endfor %}
 </tbody>
     </table>
+=======
+        <tbody>
+          {% for p in proveedores %}
+          <tr>
+
+            <!-- PROVEEDOR -->
+            <td>
+              <div style="display:flex; align-items:center; gap:10px;">
+                
+                <!-- Avatar -->
+                <div class="prov-avatar" style="background: {{ p.avatar_color }}">
+                  {{ p.razonSocial[0] | upper }}
+                </div>
+
+                <div>
+                  <div class="td-nombre">{{ p.razonSocial }}</div>
+                </div>
+
+              </div>
+            </td>
+
+            <!-- CORREO -->
+            <td class="td-muted">
+              {{ p.correo }}
+            </td>
+
+            <!-- TELÉFONO -->
+            <td class="cell-main">
+              {{ p.telefono }}
+            </td>
+
+            <!-- DIRECCIÓN -->
+            <td class="td-muted">
+              {{ p.direccion }}
+            </td>
+
+            <!-- ESTATUS -->
+            <td>
+              {% if p.estatus == 'Activo' %}
+                <span class="status-badge s-activo">● Activo</span>
+              {% else %}
+                <span class="status-badge s-inactivo">● Inactivo</span>
+              {% endif %}
+            </td>
+
+            <!-- ACCIONES -->
+            <td>
+              <a href="{{ url_for('proveedores.proveedorModificar', id=p.id) }}" 
+                class="action-btn ab-editar">
+                Editar
+              </a>
+
+              <form method="POST"
+                    action="{{ url_for('proveedores.proveedorToggle') }}"
+                    style="display:inline;">
+                <input type="hidden" name="id" value="{{ p.id }}">
+                <button type="submit"
+                        class="action-btn {{ 'ab-desact' if p.estatus == 'Activo' else 'ab-activar' }}">
+                  {{ 'Desactivar' if p.estatus == 'Activo' else 'Activar' }}
+                </button>
+              </form>
+            </td>
+
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+>>>>>>> a31179699f9d0f79c865fc3da88aa7df211a58c5
   </main>
 
   <aside class="right-panel" style="padding: 0; overflow: hidden;">

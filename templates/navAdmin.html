@@ -1,38 +1,58 @@
 <nav class="navbar">
+
   <a href="{{ url_for('index') }}" class="nav-brand">
     <div class="nav-brand-avatar">🍦</div>
-    <div style="display: flex; flex-direction: column; line-height: 1;">
+    <div class="nav-brand-text">
       <span class="nav-brand-name">La Casa del Helado</span>
-      <small style="font-size: 9px; color: #ff7043; font-weight: 800; letter-spacing: 0.5px;">ADMINISTRACIÓN</small>
+      <small class="nav-brand-sub">
+        SISTEMA INTEGRAL
+      </small>
     </div>
   </a>
 
   <div class="nav-links">
+
+    <a href="{{ url_for('dash.auth') }}"
+       class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">
+      Dashboard
+    </a>
+
     <a href="{{ url_for('proveedores.proveedoresTabla') }}"
        class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
-       🚚 Proveedores
+      Proveedores
+    </a>
+
+    <a href="{{ url_for('compra.compra') }}"
+       class="nav-link {% if request.endpoint == 'proveedores.compra' %}active{% endif %}">
+      Compra
     </a>
 
     <a href="{{ url_for('materia.materia') }}"
+<<<<<<< HEAD
        class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
         🍎 Materia Prima
+=======
+       class="nav-link {% if request.endpoint == 'materia.materia' %}active{% endif %}">
+      Materia Prima
+>>>>>>> a31179699f9d0f79c865fc3da88aa7df211a58c5
     </a>
 
     <a href="{{ url_for('producto.index') }}"
        class="nav-link {% if request.endpoint == 'producto.index' %}active{% endif %}">
-       📦 Productos
+      Productos
     </a>
-  
+
     <a href="{{ url_for('usuarios.index') }}"
-       class="nav-link {% if request.endpoint == 'usuarios.index' %}active{% endif %}">
-       👥 Usuarios
+       class="nav-link {% if active_page == 'usuarios' %}active{% endif %}">
+      Usuarios
     </a>
 
     <a href="{{ url_for('recetas.index') }}"
-       class="nav-link {% if request.endpoint == 'recetas.index' %}active{% endif %}">
-       📖 Recetas
+       class="nav-link {% if active_page == 'recetas' %}active{% endif %}">
+      Recetas
     </a>
 
+<<<<<<< HEAD
    <a href="{{ url_for('merma.merma') }}"
    class="nav-link {% if request.endpoint == 'mermas.index' %}active{% endif %}">
     📋 Mermas
@@ -41,45 +61,50 @@
     <a href="{{ url_for('dash.auth') }}"
        class="nav-link {% if request.endpoint == 'dash_bp.auth' %}active{% endif %}">
        📊 Dashboard
+=======
+    <a href="{{ url_for('merma.merma') }}"
+       class="nav-link {% if request.endpoint == 'merma.merma' %}active{% endif %}">
+      Mermas
+>>>>>>> a31179699f9d0f79c865fc3da88aa7df211a58c5
     </a>
+
   </div>
 
   <div class="nav-right">
-    <div class="time-container" style="text-align: right; line-height: 1.2; margin-right: 15px;">
-      <div id="current-date" style="font-size: 10px; color: #888; font-weight: 700; text-transform: capitalize;">
-        Cargando fecha...
-      </div>
-      <div id="clock" style="font-weight: 800; color: #2d3436; font-size: 17px; letter-spacing: -0.5px;">
-        00:00
-      </div>
+
+    <div class="nav-date">
+      <div id="fecha" class="nav-date-fecha"></div>
+      <div id="hora" class="nav-date-hora"></div>
     </div>
 
-    <div class="nav-user-avatar" title="{{ current_user.nombreUsuario if current_user else 'Invitado' }}">
-      {{ current_user.nombreUsuario[0] | upper if current_user and current_user.nombreUsuario else '?' }}
+    <div class="nav-user-avatar"
+         title="{{ current_user.nombre if current_user.is_authenticated else '' }}">
+      {% if current_user.is_authenticated %}
+        {{ current_user.nombreUsuario[0] | upper }}
+      {% else %}
+        ?
+      {% endif %}
     </div>
-    
-    <a href="{{ url_for('auth.logout') }}" class="btn-logout"
-       style="padding: 7px 15px; border-radius: 20px; font-size: 11px; text-decoration: none; background: rgba(255, 71, 87, 0.1); color: #FF4757; font-weight: 800; transition: 0.3s;">
-      CERRAR SESIÓN
+
+    <a href="{{ url_for('auth.logout') }}" class="nav-logout">
+      SALIR
     </a>
+
   </div>
+
 </nav>
-
 <script>
-  function actualizarTiempo() {
-    const ahora = new Date();
-    
-    const horas = String(ahora.getHours()).padStart(2, '0');
-    const minutos = String(ahora.getMinutes()).padStart(2, '0');
-    const elReloj = document.getElementById('clock');
-    if(elReloj) elReloj.textContent = `${horas}:${minutos}`;
-
-    const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
-    const fechaTexto = ahora.toLocaleDateString('es-ES', opciones);
-    const elFecha = document.getElementById('current-date');
-    if(elFecha) elFecha.textContent = fechaTexto;
+  function actualizarHora() {
+    const now = new Date();
+    const dia = String(now.getDate()).padStart(2, '0');
+    const mes = String(now.getMonth() + 1).padStart(2, '0');
+    const anio = now.getFullYear();
+    const horas = String(now.getHours()).padStart(2, '0');
+    const minutos = String(now.getMinutes()).padStart(2, '0');
+    const segundos = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('fecha').textContent = `${dia}/${mes}/${anio}`;
+    document.getElementById('hora').textContent = `${horas}:${minutos}:${segundos}`;
   }
-  
-  setInterval(actualizarTiempo, 1000);
-  actualizarTiempo();
+  setInterval(actualizarHora, 1000);
+  actualizarHora();
 </script>

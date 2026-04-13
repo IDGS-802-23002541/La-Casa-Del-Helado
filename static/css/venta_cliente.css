@@ -1,0 +1,952 @@
+    /* ── reset & tokens ── */
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    :root {
+        --cream: #FFF8F0;
+        --warm: #FFF0DC;
+        --orange: #F97316;
+        --orange2: #EA580C;
+        --pink: #FB7185;
+        --mint: #34D399;
+        --sky: #38BDF8;
+        --lav: #A78BFA;
+        --yellow: #FBBF24;
+        --dark: #1C1917;
+        --mid: #57534E;
+        --soft: #A8A29E;
+        --border: #E7E2DC;
+        --card-r: 16px;
+        --shadow: 0 2px 12px rgba(0, 0, 0, .07);
+        --shadow-lg: 0 8px 32px rgba(0, 0, 0, .12);
+    }
+
+    body {
+        font-family: 'Nunito', sans-serif;
+        background: var(--cream);
+        color: var(--dark);
+        min-height: 100vh;
+    }
+
+    /* ── navbar ── */
+    nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(255, 248, 240, .92);
+        backdrop-filter: blur(12px);
+        border-bottom: 1.5px solid var(--border);
+        padding: 0 24px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .nav-logo {
+        font-size: 28px;
+        line-height: 1;
+    }
+
+    .nav-name {
+        font-family: 'Fredoka One', cursive;
+        font-size: 20px;
+        color: var(--orange);
+        line-height: 1.1;
+    }
+
+    .nav-sub {
+        font-size: 11px;
+        color: var(--soft);
+        font-weight: 600;
+        letter-spacing: .5px;
+    }
+
+    .nav-cart-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--orange);
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        padding: 8px 18px;
+        font-family: 'Nunito', sans-serif;
+        font-weight: 800;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background .2s, transform .15s;
+    }
+
+    .nav-cart-btn:hover {
+        background: var(--orange2);
+        transform: scale(1.03);
+    }
+
+    .nav-badge {
+        background: #fff;
+        color: var(--orange);
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 900;
+    }
+
+    /* ── hero ── */
+    .hero {
+        background: linear-gradient(135deg, #FFF0DC 0%, #FFE4F0 50%, #E0F2FE 100%);
+        padding: 48px 24px 40px;
+        text-align: center;
+        border-bottom: 1.5px solid var(--border);
+    }
+
+    .hero h1 {
+        font-family: 'Fredoka One', cursive;
+        font-size: clamp(28px, 5vw, 44px);
+        color: var(--dark);
+        margin-bottom: 10px;
+    }
+
+    .hero p {
+        color: var(--mid);
+        font-size: 15px;
+        font-weight: 600;
+        line-height: 1.6;
+    }
+
+    .hero-pills {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .hero-pill {
+        background: rgba(255, 255, 255, .7);
+        border: 1.5px solid var(--border);
+        border-radius: 50px;
+        padding: 6px 16px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--mid);
+    }
+
+    /* ── layout ── */
+    .layout {
+        max-width: 1280px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 0;
+        align-items: start;
+        padding: 0;
+    }
+
+    @media(max-width:900px) {
+        .layout {
+            grid-template-columns: 1fr;
+        }
+
+        .ticket-panel {
+            display: none;
+        }
+    }
+
+    /* ── product panel ── */
+    .product-panel {
+        padding: 28px 24px;
+    }
+
+    .search-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fff;
+        border: 1.5px solid var(--border);
+        border-radius: 50px;
+        padding: 10px 18px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow);
+    }
+
+    .search-bar input {
+        border: none;
+        outline: none;
+        font-family: 'Nunito', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--dark);
+        width: 100%;
+        background: transparent;
+    }
+
+    .search-bar input::placeholder {
+        color: var(--soft);
+    }
+
+    .categories {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    .cat-pill {
+        border: 1.5px solid var(--border);
+        border-radius: 50px;
+        padding: 6px 16px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        background: #fff;
+        color: var(--mid);
+        transition: all .2s;
+        user-select: none;
+    }
+
+    .cat-pill.active,
+    .cat-pill:hover {
+        background: var(--orange);
+        border-color: var(--orange);
+        color: #fff;
+    }
+
+    /* ── product grid ── */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+    }
+
+    .card {
+        background: #fff;
+        border: 1.5px solid var(--border);
+        border-radius: var(--card-r);
+        padding: 18px 16px 14px;
+        cursor: pointer;
+        text-align: left;
+        width: 100%;
+        transition: transform .18s, box-shadow .18s;
+        box-shadow: var(--shadow);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .card:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .card:disabled {
+        opacity: .55;
+        cursor: not-allowed;
+    }
+
+    .card.bg-mint {
+        background: #ECFDF5;
+    }
+
+    .card.bg-yellow {
+        background: #FFFBEB;
+    }
+
+    .card.bg-peach {
+        background: #FFF7ED;
+    }
+
+    .card.bg-sky {
+        background: #F0F9FF;
+    }
+
+    .card.bg-lav {
+        background: #F5F3FF;
+    }
+
+    .card-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        border-radius: 50px;
+        padding: 2px 10px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: .5px;
+    }
+
+    .badge-local {
+        background: #D1FAE5;
+        color: #065F46;
+    }
+
+    .badge-pop {
+        background: #FEE2E2;
+        color: #991B1B;
+    }
+
+    .badge-viral {
+        background: #EDE9FE;
+        color: #5B21B6;
+    }
+
+    .badge-art {
+        background: #FEF3C7;
+        color: #92400E;
+    }
+
+    .badge-new {
+        background: #DBEAFE;
+        color: #1E40AF;
+    }
+
+    .badge-ok {
+        background: #F3F4F6;
+        color: #374151;
+    }
+
+    .badge-out {
+        background: #F3F4F6;
+        color: #9CA3AF;
+    }
+
+    .card-emoji {
+        font-size: 32px;
+        margin-bottom: 6px;
+    }
+
+    .card-name {
+        font-weight: 800;
+        font-size: 14px;
+        color: var(--dark);
+    }
+
+    .card-sub {
+        font-size: 12px;
+        color: var(--soft);
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+    }
+
+    .card-price {
+        font-family: 'Fredoka One', cursive;
+        font-size: 20px;
+        color: var(--orange);
+    }
+
+    .card-stock {
+        font-size: 11px;
+        color: var(--soft);
+        font-weight: 700;
+    }
+
+    .btn-add {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--orange);
+        color: #fff;
+        border: none;
+        font-size: 20px;
+        font-weight: 900;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background .15s, transform .15s;
+        line-height: 1;
+    }
+
+    .btn-add:hover {
+        background: var(--orange2);
+        transform: scale(1.1);
+    }
+
+    .btn-add.disabled {
+        background: #D1D5DB;
+        cursor: not-allowed;
+    }
+
+    /* ── ticket panel ── */
+    .ticket-panel {
+        position: sticky;
+        top: 64px;
+        height: calc(100vh - 64px);
+        border-left: 1.5px solid var(--border);
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .ticket-header {
+        padding: 20px 20px 16px;
+        border-bottom: 1.5px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .ticket-title {
+        font-family: 'Fredoka One', cursive;
+        font-size: 18px;
+        color: var(--dark);
+    }
+
+    .ticket-num {
+        color: var(--orange);
+    }
+
+    .btn-limpiar {
+        background: none;
+        border: 1.5px solid var(--border);
+        border-radius: 50px;
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--soft);
+        cursor: pointer;
+        transition: all .15s;
+    }
+
+    .btn-limpiar:hover {
+        border-color: var(--pink);
+        color: var(--pink);
+    }
+
+    .ticket-limits {
+        padding: 10px 20px;
+        background: var(--warm);
+        border-bottom: 1.5px solid var(--border);
+        display: flex;
+        gap: 16px;
+    }
+
+    .limit-item {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--mid);
+    }
+
+    .limit-val {
+        font-family: 'Fredoka One', cursive;
+        font-size: 15px;
+    }
+
+    .limit-val.warn {
+        color: var(--orange);
+    }
+
+    .limit-val.ok {
+        color: var(--mint);
+    }
+
+    .ticket-items {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px 20px;
+    }
+
+    .ticket-empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        gap: 10px;
+        color: var(--soft);
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .ticket-empty span {
+        font-size: 40px;
+    }
+
+    .ticket-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .ticket-item:last-child {
+        border-bottom: none;
+    }
+
+    .item-icon {
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .item-name {
+        font-weight: 800;
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .item-price-unit {
+        font-size: 11px;
+        color: var(--soft);
+        font-weight: 600;
+    }
+
+    .qty-ctrl {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .qty-btn {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1.5px solid var(--border);
+        background: #fff;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all .15s;
+        font-weight: 900;
+    }
+
+    .qty-btn:hover {
+        border-color: var(--orange);
+        color: var(--orange);
+    }
+
+    .qty-val {
+        font-weight: 800;
+        font-size: 14px;
+        min-width: 20px;
+        text-align: center;
+    }
+
+    .item-total {
+        font-family: 'Fredoka One', cursive;
+        font-size: 15px;
+        color: var(--dark);
+        min-width: 44px;
+        text-align: right;
+    }
+
+    .ticket-footer {
+        border-top: 1.5px solid var(--border);
+        padding: 16px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .total-label {
+        font-weight: 800;
+        font-size: 14px;
+        color: var(--mid);
+    }
+
+    .total-val {
+        font-family: 'Fredoka One', cursive;
+        font-size: 26px;
+        color: var(--orange);
+    }
+
+    .btn-cobrar {
+        width: 100%;
+        padding: 14px;
+        background: var(--orange);
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        font-family: 'Fredoka One', cursive;
+        font-size: 17px;
+        cursor: pointer;
+        transition: background .2s, transform .15s;
+    }
+
+    .btn-cobrar:hover:not(:disabled) {
+        background: var(--orange2);
+        transform: scale(1.02);
+    }
+
+    .btn-cobrar:disabled {
+        background: #D1D5DB;
+        cursor: not-allowed;
+    }
+
+    /* ── modales ── */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(28, 25, 23, .55);
+        backdrop-filter: blur(4px);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .modal-overlay.open {
+        display: flex;
+    }
+
+    .modal {
+        background: #fff;
+        border-radius: 24px;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, .18);
+        animation: modalIn .25s cubic-bezier(.34, 1.56, .64, 1);
+        overflow: hidden;
+    }
+
+    @keyframes modalIn {
+        from {
+            opacity: 0;
+            transform: scale(.92) translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .modal-head {
+        padding: 24px 24px 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .modal-title {
+        font-family: 'Fredoka One', cursive;
+        font-size: 22px;
+        color: var(--dark);
+    }
+
+    .modal-close {
+        background: var(--border);
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--mid);
+        transition: background .15s;
+    }
+
+    .modal-close:hover {
+        background: #E5E7EB;
+    }
+
+    .modal-body {
+        padding: 16px 24px 24px;
+    }
+
+    .modal-body p {
+        font-size: 14px;
+        color: var(--mid);
+        font-weight: 600;
+        line-height: 1.7;
+    }
+
+    /* condiciones */
+    .cond-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 16px 0;
+    }
+
+    .cond-item {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        background: var(--warm);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .cond-icon {
+        font-size: 16px;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .cond-accept {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        background: #ECFDF5;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 1.5px solid #A7F3D0;
+        margin-bottom: 16px;
+    }
+
+    .cond-accept input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--mint);
+        cursor: pointer;
+    }
+
+    .cond-accept label {
+        font-weight: 800;
+        font-size: 13px;
+        color: #065F46;
+        cursor: pointer;
+    }
+
+    /* datos del cliente */
+    .form-input {
+        width: 100%;
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-family: 'Nunito', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--dark);
+        outline: none;
+        transition: border-color .15s;
+        margin-bottom: 10px;
+        background: var(--cream);
+    }
+
+    .form-input:focus {
+        border-color: var(--orange);
+    }
+
+    .form-input.error {
+        border-color: var(--pink);
+    }
+
+    .form-label {
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--soft);
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+        margin-top: 4px;
+    }
+
+    .hint-box {
+        background: var(--warm);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--mid);
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    /* resumen del pedido en modal */
+    .resumen-items {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin: 12px 0;
+    }
+
+    .resumen-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .resumen-item:last-child {
+        border-bottom: none;
+    }
+
+    .resumen-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0 0;
+    }
+
+    .resumen-total span:first-child {
+        font-weight: 800;
+        font-size: 14px;
+    }
+
+    .resumen-total span:last-child {
+        font-family: 'Fredoka One', cursive;
+        font-size: 24px;
+        color: var(--orange);
+    }
+
+    /* botones de modal */
+    .modal-btn {
+        width: 100%;
+        padding: 13px;
+        border: none;
+        border-radius: 50px;
+        font-family: 'Fredoka One', cursive;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all .2s;
+    }
+
+    .modal-btn.primary {
+        background: var(--orange);
+        color: #fff;
+    }
+
+    .modal-btn.primary:hover:not(:disabled) {
+        background: var(--orange2);
+    }
+
+    .modal-btn.primary:disabled {
+        background: #D1D5DB;
+        cursor: not-allowed;
+    }
+
+    .modal-btn.secondary {
+        background: none;
+        border: 1.5px solid var(--border);
+        color: var(--mid);
+        margin-top: 8px;
+    }
+
+    .modal-btn.secondary:hover {
+        border-color: var(--pink);
+        color: var(--pink);
+    }
+
+    /* toast */
+    .toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--dark);
+        color: #fff;
+        border-radius: 50px;
+        padding: 10px 22px;
+        font-size: 13px;
+        font-weight: 700;
+        z-index: 999;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity .3s;
+        white-space: nowrap;
+    }
+
+    .toast.show {
+        opacity: 1;
+    }
+
+    .toast.error {
+        background: #EF4444;
+    }
+
+    .toast.success {
+        background: var(--mint);
+        color: var(--dark);
+    }
+
+    /* spinner */
+    .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2.5px solid rgba(255, 255, 255, .3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin .7s linear infinite;
+        display: inline-block;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* mobile cart fab */
+    .fab-cart {
+        display: none;
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: var(--orange);
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        padding: 14px 22px;
+        font-family: 'Fredoka One', cursive;
+        font-size: 15px;
+        box-shadow: 0 4px 20px rgba(249, 115, 22, .4);
+        cursor: pointer;
+        z-index: 90;
+        align-items: center;
+        gap: 8px;
+    }
+
+    @media(max-width:900px) {
+        .fab-cart {
+            display: flex;
+        }
+    }

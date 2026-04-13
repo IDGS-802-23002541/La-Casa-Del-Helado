@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Casa del Helado – Pedido en línea</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/venta_cliente.css') }}?v">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">🍦</div>
+    <div>
+      <div class="nav-name">La Casa del Helado</div>
+      <div class="nav-sub">Pedidos en línea · Desde 1995</div>
+    </div>
+  </div>
+  <button class="nav-cart-btn" onclick="abrirModalDatos()">
+    🛒 Mi pedido <span class="nav-badge" id="nav-count">0</span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>¿Qué se te antoja hoy? 🍧</h1>
+  <p>Elige tus productos, deja tus datos y pasa a recoger cuando quieras.</p>
+  <div class="hero-pills">
+    <div class="hero-pill">⏱ Mín. 1h de anticipación</div>
+    <div class="hero-pill">💳 Pago en línea</div>
+    <div class="hero-pill">📅 Hasta 2 días adelante</div>
+    <div class="hero-pill">🕐 Recogida: 1 PM – 7 PM</div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- CATÁLOGO PANEL IZQUIERDO -->
+  <div class="product-panel">
+
+    <!-- Búsqueda -->
+    <div class="search-bar">
+      <span style="color:#9CA3AF;font-size:16px">🔍</span>
+      <input type="text" id="search-input" placeholder="Buscar producto..." oninput="filtrarProductos()">
+    </div>
+
+    <!-- Categorías -->
+    <div class="categories" id="cat-bar">
+      <button class="cat-pill active" data-cat="todos" onclick="filtrarCategoria(this)">🍽 Todos</button>
+      {% set categorias_vistas = [] %}
+      {% for p in presentaciones %}
+        {% if p.productoBase.categoria.nombre not in categorias_vistas %}
+          {% set _ = categorias_vistas.append(p.productoBase.categoria.nombre) %}
+          <button class="cat-pill" data-cat="{{ p.productoBase.categoria.nombre }}" onclick="filtrarCategoria(this)">
+            {{ p.productoBase.categoria.nombre }}
+          </button>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Grid de productos -->
+    <div class="product-grid" id="product-grid">
+      {% for p in presentaciones %}
+        {% set stock_disp = (p.productoBase.stockActual / p.equivalencia) | int %}
+        {% set agotado = stock_disp <= 0 %}
+        <button
+          class="card {% if not agotado %}{% if loop.index % 5 == 1 %}bg-mint{% elif loop.index % 5 == 2 %}bg-yellow{% elif loop.index % 5 == 3 %}bg-peach{% elif loop.index % 5 == 4 %}bg-sky{% else %}bg-lav{% endif %}{% endif %}"
+          data-id="{{ p.id }}"
+          data-nombre="{{ p.nombre }}"
+          data-precio="{{ p.precio }}"
+          data-stock="{{ stock_disp }}"
+          data-emoji="{{ p.productoBase.categoria.nombre }}"
+          data-cat="{{ p.productoBase.categoria.nombre }}"
+          {% if agotado %}disabled{% endif %}
+          onclick="agregarAlCarrito(this)"
+        >
+          {% if agotado %}
+            <span class="card-badge badge-out">SIN STOCK</span>
+          {% elif stock_disp <= 5 %}
+            <span class="card-badge badge-art">ÚLTIMOS</span> 
+          {% else %}
+            <span class="card-badge badge-ok">Disponible</span>
+          {% endif %}
+
+          <div class="card-emoji">
+            {% if 'paleta' in p.nombre.lower() %}🍡
+            {% elif 'cono' in p.nombre.lower() %}🍦
+            {% elif 'vaso' in p.nombre.lower() %}🥤
+            {% elif 'rollo' in p.nombre.lower() or 'roll' in p.nombre.lower() %}🌀
+            {% elif 'esquimol' in p.nombre.lower() %}🍦
+            {% else %}🍨{% endif %}
+          </div>
+          <div class="card-name">{{ p.nombre }}</div>
+          <div class="card-sub">{{ stock_disp }} unidades disponibles</div>
+          <div class="card-footer">
+            <span class="card-price">${{ p.precio | int }}</span>
+            {% if not agotado %}
+              <div class="btn-add" onclick="event.stopPropagation(); agregarAlCarrito(this.closest('.card'))">+</div>
+            {% else %}
+              <div class="btn-add disabled">✕</div>
+            {% endif %}
+          </div>
+        </button>
+      {% else %}
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--soft);font-weight:700">
+          No hay productos disponibles en este momento.
+        </div>
+      {% endfor %}
+    </div>
+
+  </div><!-- /product-panel -->
+
+  <!-- PANEL DERECHO: ticket -->
+  <div class="ticket-panel">
+    <div class="ticket-header">
+      <div class="ticket-title">🧾 Mi pedido <span class="ticket-num" id="ticket-folio">#---</span></div>
+      <button class="btn-limpiar" onclick="limpiarCarrito()">✕ Limpiar</button>
+    </div>
+
+    <div class="ticket-limits">
+      <div class="limit-item">
+        Productos: <span class="limit-val" id="lim-prods" style="color:var(--mint)">0</span>/5
+      </div>
+      <div class="limit-item" style="margin-left:auto">
+        <span style="font-size:11px;color:var(--soft)">Máx. 20 uds/producto</span>
+      </div>
+    </div>
+
+    <div class="ticket-items" id="ticket-items">
+      <div class="ticket-empty" id="ticket-empty">
+        <span>🛒</span>
+        Agrega productos para comenzar
+      </div>
+    </div>
+
+    <div class="ticket-footer">
+      <div class="total-row">
+        <span class="total-label">Total estimado</span>
+        <span class="total-val" id="ticket-total">$0</span>
+      </div>
+      <button class="btn-cobrar" id="btn-cobrar" onclick="abrirModalCondiciones()" disabled>
+        Continuar con el pedido →
+      </button>
+    </div>
+  </div><!-- /ticket-panel -->
+
+</div><!-- /layout -->
+
+<!-- FAB MOBILE -->
+<button class="fab-cart" onclick="abrirModalDatos()">
+  🛒 Ver pedido · <span id="fab-count">0</span> items
+</button>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- MODAL: CONDICIONES DEL SERVICIO                  -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-condiciones">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">📋 Condiciones del servicio</div>
+      <button class="modal-close" onclick="cerrarModal('modal-condiciones')">✕</button>
+    </div>
+    <div class="modal-body">
+      <ul class="cond-list">
+        <li class="cond-item"><span class="cond-icon">📦</span> Tu pedido es una <strong>reservación de stock</strong> existente en tienda.</li>
+        <li class="cond-item"><span class="cond-icon">💳</span> El <strong>pago se realiza en línea</strong> antes de confirmar tu pedido.</li>
+        <li class="cond-item"><span class="cond-icon">🏪</span> Debes <strong>recoger en sucursal</strong> en el horario indicado.</li>
+        <li class="cond-item"><span class="cond-icon">🕐</span> Horario de recogida: <strong>1:00 PM a 7:00 PM</strong>.</li>
+        <li class="cond-item"><span class="cond-icon">⚠️</span> Pedidos después de las <strong>6:00 PM</strong> se procesan para el día siguiente.</li>
+      </ul>
+
+      <label class="cond-accept" for="chk-acepto">
+        <input type="checkbox" id="chk-acepto" onchange="toggleAceptar()">
+        <label for="chk-acepto">He leído y acepto las condiciones del servicio</label>
+      </label>
+
+      <button class="modal-btn primary" id="btn-aceptar" onclick="abrirModalDatos()" disabled>
+        Acepto y continúo →
+      </button>
+      <button class="modal-btn secondary" onclick="cerrarModal('modal-condiciones')">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- MODAL 2: DATOS DEL CLIENTE + FECHA                 -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-datos">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">👤 Tus datos</div>
+      <button class="modal-close" onclick="cerrarModal('modal-datos')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-label">Nombre completo *</div>
+      <input type="text" class="form-input" id="inp-nombre" placeholder="Ej. María García López">
+
+      <div class="form-label">Teléfono (10 dígitos) *</div>
+      <input type="tel" class="form-input" id="inp-telefono" placeholder="Ej. 4771234567"
+             maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')">
+
+      <div class="form-label" style="margin-top:4px">¿Cuándo pasas a recoger?</div>
+      <div class="hint-box">
+        🕐 Mínimo 1h de anticipación · Horario: 1:00 PM – 7:00 PM · Máx. 2 días adelante
+      </div>
+      <div class="form-row">
+        <div>
+          <div class="form-label">Fecha</div>
+          <input type="date" class="form-input" id="inp-fecha">
+        </div>
+        <div>
+          <div class="form-label">Hora</div>
+          <input type="time" class="form-input" id="inp-hora" min="13:00" max="19:00">
+        </div>
+      </div>
+
+      <button class="modal-btn primary" id="btn-confirmar-datos" onclick="abrirModalResumen()">
+        Ver resumen del pedido →
+      </button>
+      <button class="modal-btn secondary" onclick="cerrarModal('modal-datos')">Atrás</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- MODAL 3: RESUMEN + CONFIRMACIÓN FINAL              -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-resumen">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">✅ Confirmar pedido</div>
+      <button class="modal-close" onclick="cerrarModal('modal-resumen')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Revisa tu pedido antes de continuar al pago.</p>
+
+      <div class="resumen-items" id="resumen-items"></div>
+
+      <div class="resumen-total">
+        <span>Total</span>
+        <span id="resumen-total-val">$0</span>
+      </div>
+
+      <div style="background:var(--warm);border-radius:10px;padding:12px;margin:12px 0;font-size:13px;font-weight:700;color:var(--mid)">
+        <div>👤 <span id="res-nombre"></span></div>
+        <div style="margin-top:4px">📱 <span id="res-telefono"></span></div>
+        <div style="margin-top:4px">📅 <span id="res-fecha"></span></div>
+      </div>
+
+      <button class="modal-btn primary" id="btn-enviar" onclick="enviarPedido()">
+        Confirmar y pagar →
+      </button>
+      <button class="modal-btn secondary" onclick="cerrarModal('modal-resumen')">Atrás</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- JS                                                  -->
+<!-- ═══════════════════════════════════════════════════ -->
+<script>
+/* ── estado del carrito ── */
+const carrito = {};   // { idPresentacion: {nombre, precio, cantidad, emoji} }
+let condicionesAceptadas = false;
+
+/* ── helpers de UI ── */
+function toast(msg, tipo = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'toast show' + (tipo ? ' ' + tipo : '');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.className = 'toast', 2800);
+}
+
+function cerrarModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+/* ── agregar al carrito ── */
+function agregarAlCarrito(card) {
+  const id     = card.dataset.id;
+  const nombre = card.dataset.nombre;
+  const precio = parseFloat(card.dataset.precio);
+  const stock  = parseInt(card.dataset.stock);
+  const emoji  = card.querySelector('.card-emoji').textContent.trim();
+
+  const productosActuales = Object.keys(carrito).length;
+
+  if (!carrito[id]) {
+    if (productosActuales >= 5) {
+      toast('Máximo 5 productos diferentes por pedido.', 'error'); return;
+    }
+    if (stock < 1) {
+      toast('Sin stock disponible.', 'error'); return;
+    }
+    carrito[id] = { nombre, precio, cantidad: 1, emoji, stock };
+  } else {
+    if (carrito[id].cantidad >= 20) {
+      toast('Máximo 20 unidades por producto.', 'error'); return;
+    }
+    if (carrito[id].cantidad >= stock) {
+      toast(`Solo hay ${stock} unidades disponibles de "${nombre}".`, 'error'); return;
+    }
+    carrito[id].cantidad++;
+  }
+
+  renderCarrito();
+  toast(`"${nombre}" agregado 🎉`, 'success');
+}
+
+/* ── cambiar cantidad desde ticket ── */
+function cambiarCantidad(id, delta) {
+  if (!carrito[id]) return;
+  const nueva = carrito[id].cantidad + delta;
+  if (nueva < 1) {
+    delete carrito[id];
+  } else if (nueva > 20) {
+    toast('Máximo 20 unidades.', 'error'); return;
+  } else if (nueva > carrito[id].stock) {
+    toast(`Solo hay ${carrito[id].stock} unidades disponibles.`, 'error'); return;
+  } else {
+    carrito[id].cantidad = nueva;
+  }
+  renderCarrito();
+}
+
+/* ── limpiar carrito ── */
+function limpiarCarrito() {
+  Object.keys(carrito).forEach(k => delete carrito[k]);
+  renderCarrito();
+}
+
+/* ── render del ticket ── */
+function renderCarrito() {
+  const itemsEl  = document.getElementById('ticket-items');
+  const emptyEl  = document.getElementById('ticket-empty');
+  const totalEl  = document.getElementById('ticket-total');
+  const countEl  = document.getElementById('nav-count');
+  const fabEl    = document.getElementById('fab-count');
+  const cobrarEl = document.getElementById('btn-cobrar');
+  const limEl    = document.getElementById('lim-prods');
+
+  const ids   = Object.keys(carrito);
+  const total = ids.reduce((s, id) => s + carrito[id].precio * carrito[id].cantidad, 0);
+  const units = ids.reduce((s, id) => s + carrito[id].cantidad, 0);
+
+  // contadores
+  countEl.textContent = units;
+  fabEl.textContent   = units;
+  limEl.textContent   = ids.length;
+  limEl.className     = 'limit-val ' + (ids.length >= 5 ? 'warn' : 'ok');
+  totalEl.textContent = '$' + total.toFixed(0);
+  cobrarEl.disabled   = ids.length === 0;
+
+  if (ids.length === 0) {
+    emptyEl.style.display  = 'flex';
+    // borrar items anteriores
+    itemsEl.querySelectorAll('.ticket-item').forEach(el => el.remove());
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  // reconstruir items
+  itemsEl.querySelectorAll('.ticket-item').forEach(el => el.remove());
+  ids.forEach(id => {
+    const it   = carrito[id];
+    const div  = document.createElement('div');
+    div.className = 'ticket-item';
+    div.innerHTML = `
+      <div class="item-icon">${it.emoji}</div>
+      <div class="item-info">
+        <div class="item-name">${it.nombre}</div>
+        <div class="item-price-unit">$${it.precio.toFixed(2)} c/u</div>
+      </div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="cambiarCantidad('${id}', -1)">−</button>
+        <span class="qty-val">${it.cantidad}</span>
+        <button class="qty-btn" onclick="cambiarCantidad('${id}', 1)">+</button>
+      </div>
+      <div class="item-total">$${(it.precio * it.cantidad).toFixed(0)}</div>
+    `;
+    itemsEl.appendChild(div);
+  });
+}
+
+/* ── filtros ── */
+function filtrarCategoria(btn) {
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  filtrarProductos();
+}
+
+function filtrarProductos() {
+  const catActiva = document.querySelector('.cat-pill.active')?.dataset.cat || 'todos';
+  const busq      = document.getElementById('search-input').value.toLowerCase().trim();
+  document.querySelectorAll('.card').forEach(card => {
+    const cat    = card.dataset.cat || '';
+    const nombre = (card.dataset.nombre || '').toLowerCase();
+    const porCat = catActiva === 'todos' || cat === catActiva;
+    const porBusq = !busq || nombre.includes(busq);
+    card.style.display = (porCat && porBusq) ? '' : 'none';
+  });
+}
+
+/* ── modal condiciones ── */
+function abrirModalCondiciones() {
+  if (Object.keys(carrito).length === 0) { toast('Agrega al menos un producto.', 'error'); return; }
+  document.getElementById('chk-acepto').checked = false;
+  document.getElementById('btn-aceptar').disabled = true;
+  document.getElementById('modal-condiciones').classList.add('open');
+}
+
+function toggleAceptar() {
+  const checked = document.getElementById('chk-acepto').checked;
+  document.getElementById('btn-aceptar').disabled = !checked;
+  condicionesAceptadas = checked;
+}
+
+/* ── modal datos ── */
+function abrirModalDatos() {
+  // si viene del navbar sin aceptar condiciones, abrir primero condiciones
+  if (!condicionesAceptadas && Object.keys(carrito).length > 0) {
+    cerrarModal('modal-condiciones');
+    abrirModalCondiciones();
+    return;
+  }
+  if (Object.keys(carrito).length === 0) { toast('Agrega al menos un producto.', 'error'); return; }
+
+  // pre-rellenar fecha/hora mínima
+  const ahora   = new Date();
+  const minHour = ahora.getHours() < 18 ? ahora.getHours() + 1 : 13;
+  const minDate = ahora.getHours() < 18 ? ahora : new Date(ahora.getTime() + 86400000);
+
+  const yyyy = minDate.getFullYear();
+  const mm   = String(minDate.getMonth() + 1).padStart(2, '0');
+  const dd   = String(minDate.getDate()).padStart(2, '0');
+  const hh   = String(Math.min(Math.max(minHour, 13), 18)).padStart(2, '0');
+
+  const maxDate = new Date(ahora.getTime() + 2 * 86400000);
+  const mxYYYY  = maxDate.getFullYear();
+  const mxMM    = String(maxDate.getMonth() + 1).padStart(2, '0');
+  const mxDD    = String(maxDate.getDate()).padStart(2, '0');
+
+  const inpFecha = document.getElementById('inp-fecha');
+  const inpHora  = document.getElementById('inp-hora');
+  inpFecha.value = `${yyyy}-${mm}-${dd}`;
+  inpFecha.min   = `${yyyy}-${mm}-${dd}`;
+  inpFecha.max   = `${mxYYYY}-${mxMM}-${mxDD}`;
+  inpHora.value  = `${hh}:00`;
+
+  cerrarModal('modal-condiciones');
+  document.getElementById('modal-datos').classList.add('open');
+}
+
+/* ── modal resumen ── */
+function abrirModalResumen() {
+  const nombre   = document.getElementById('inp-nombre').value.trim();
+  const telefono = document.getElementById('inp-telefono').value.trim();
+  const fecha    = document.getElementById('inp-fecha').value;
+  const hora     = document.getElementById('inp-hora').value;
+
+  // validaciones
+  document.getElementById('inp-nombre').classList.remove('error');
+  document.getElementById('inp-telefono').classList.remove('error');
+
+  if (!nombre) {
+    document.getElementById('inp-nombre').classList.add('error');
+    toast('El nombre es obligatorio.', 'error'); return;
+  }
+  if (!/^\d{10}$/.test(telefono)) {
+    document.getElementById('inp-telefono').classList.add('error');
+    toast('El teléfono debe tener exactamente 10 dígitos.', 'error'); return;
+  }
+  if (!fecha || !hora) {
+    toast('Selecciona fecha y hora de recogida.', 'error'); return;
+  }
+
+  // validar horario
+  const horaNum = parseInt(hora.split(':')[0]);
+  if (horaNum < 13 || horaNum >= 19) {
+    toast('El horario de recogida es de 1:00 PM a 7:00 PM.', 'error'); return;
+  }
+
+  // llenar resumen
+  const ids = Object.keys(carrito);
+  const total = ids.reduce((s, id) => s + carrito[id].precio * carrito[id].cantidad, 0);
+
+  const resumenEl = document.getElementById('resumen-items');
+  resumenEl.innerHTML = '';
+  ids.forEach(id => {
+    const it  = carrito[id];
+    const div = document.createElement('div');
+    div.className = 'resumen-item';
+    div.innerHTML = `
+      <span>${it.emoji} ${it.nombre} × ${it.cantidad}</span>
+      <span>$${(it.precio * it.cantidad).toFixed(0)}</span>
+    `;
+    resumenEl.appendChild(div);
+  });
+
+  document.getElementById('resumen-total-val').textContent = '$' + total.toFixed(0);
+  document.getElementById('res-nombre').textContent   = nombre;
+  document.getElementById('res-telefono').textContent = telefono;
+
+  // formato fecha legible
+  const [y, m, d] = fecha.split('-');
+  const [hh, min] = hora.split(':');
+  const ampm = parseInt(hh) >= 12 ? 'PM' : 'AM';
+  const h12  = parseInt(hh) > 12 ? parseInt(hh) - 12 : parseInt(hh);
+  document.getElementById('res-fecha').textContent =
+    `${d}/${m}/${y} a las ${h12}:${min} ${ampm}`;
+
+  cerrarModal('modal-datos');
+  document.getElementById('modal-resumen').classList.add('open');
+}
+
+/* ── enviar pedido al backend ── */
+async function enviarPedido() {
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled  = true;
+  btn.innerHTML = '<span class="spinner"></span> Procesando...';
+
+  const nombre   = document.getElementById('inp-nombre').value.trim();
+  const telefono = document.getElementById('inp-telefono').value.trim();
+  const fecha    = document.getElementById('inp-fecha').value;
+  const hora     = document.getElementById('inp-hora').value;
+
+  const fechaRecogida = `${fecha}T${hora}:00`;
+  const items = Object.entries(carrito).map(([idPresentacion, it]) => ({
+    idPresentacion: parseInt(idPresentacion),
+    cantidad: it.cantidad
+  }));
+
+  try {
+    const res = await fetch('/pedido/crear', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombreCliente: nombre, telefono, fechaRecogida, items })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.ok) {
+      toast(data.msg || 'Error al crear el pedido.', 'error');
+      btn.disabled  = false;
+      btn.innerHTML = 'Confirmar y pagar →';
+      return;
+    }
+
+    // redirigir a pantalla de pago
+    window.location.href = `/pedido/pago/${data.folio}`;
+
+  } catch (e) {
+    toast('Error de conexión. Intenta de nuevo.', 'error');
+    btn.disabled  = false;
+    btn.innerHTML = 'Confirmar y pagar →';
+  }
+}
+
+/* ── cerrar modal con Escape ── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    ['modal-condiciones','modal-datos','modal-resumen'].forEach(id => cerrarModal(id));
+  }
+});
+
+/* ── cerrar modal al click en overlay ── */
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) cerrarModal(overlay.id);
+  });
+});
+
+/* ── init ── */
+renderCarrito();
+</script>
+
+</body>
+</html>

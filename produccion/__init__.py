@@ -37,73 +37,27 @@ def iniciar_produccion(sol_id):
     return redirect(url_for('produccion.tablero'))
 
 
-@produccion_bp.route("/produccion/materiales")
-def materiales():
-    materias_db = MateriaPrima.query.all()
+# @produccion_bp.route("/produccion/materiales")
+# def materiales():
+#     materias_db = MateriaPrima.query.all()
 
-    materias_primas = []
-    for mp in materias_db:
-        materias_primas.append({
-            "id": mp.id,
-            "nombre": mp.nombre,
-            "unidadBase": mp.unidadBase,
-            "stockActual": float(mp.stockActual or 0),
-            "stockMinimo": float(mp.stockMinimo or 0),
-            "estatus": mp.estatus,
-            "categoria": {
-                "id": mp.categoria.id if mp.categoria else None,
-                "nombre": mp.categoria.nombre if mp.categoria else "Sin categoría"
-            }
-        })
+#     materias_primas = []
+#     for mp in materias_db:
+#         materias_primas.append({
+#             "id": mp.id,
+#             "nombre": mp.nombre,
+#             "unidadBase": mp.unidadBase,
+#             "stockActual": float(mp.stockActual or 0),
+#             "stockMinimo": float(mp.stockMinimo or 0),
+#             "estatus": mp.estatus,
+#             "categoria": {
+#                 "id": mp.categoria.id if mp.categoria else None,
+#                 "nombre": mp.categoria.nombre if mp.categoria else "Sin categoría"
+#             }
+#         })
 
     return render_template(
         "produccion/materia_prima.html",
         materias_primas=materias_primas
     )
-
-@produccion_bp.route("/produccion/terminar/<int:sol_id>", methods=["POST"])
-def terminar_produccion(sol_id):
-    solicitud = SolicitudProduccion.query.get_or_404(sol_id)
-
-    if solicitud.estatus != 'En Proceso':
-        flash("La solicitud no está en proceso", "warning")
-        return redirect(url_for('produccion.tablero'))
-
-    # Buscamos la receta
-    receta = Receta.query.filter_by(idProducto=solicitud.idProducto).first()
-
-    if not receta:
-        flash(f"No hay receta para {solicitud.producto.nombre}", "danger")
-        return redirect(url_for('produccion.tablero'))
-
-    try:
-        # Iniciamos el ciclo de descuento
-        for detalle in receta.detalles:
-            materia = MateriaPrima.query.get(detalle.idMateriaPrima)
-            
-            if materia:
-                # CÁLCULO DE PROPORCIÓN
-                proporcion = decimal.Decimal(str(detalle.cantidad)) / decimal.Decimal(str(receta.cantidadProducida))
-                cantidad_a_descontar = proporcion * decimal.Decimal(str(solicitud.cantidad_solicitada))
-                
-                # RESTA FÍSICA EN EL OBJETO
-                materia.stockActual = decimal.Decimal(str(materia.stockActual)) - cantidad_a_descontar
-
-        # SUMAR AL STOCK DEL PRODUCTO TERMINADO
-        producto = Producto.query.get(solicitud.idProducto)
-        if producto:
-            producto.stockActual = decimal.Decimal(str(producto.stockActual or 0)) + decimal.Decimal(str(solicitud.cantidad_solicitada))
-
-        # CAMBIAR ESTATUS
-        solicitud.estatus = 'Terminado'
-        
-        # GUARDAR CAMBIOS
-        db.session.commit()
-        
-        flash(f"Producción terminada e inventarios actualizados", "success")
-
-    except Exception as e:
-        db.session.rollback()
-        flash(f"Error en el proceso: {str(e)}", "danger")
-
-    return redirect(url_for('produccion.tablero'))
+    

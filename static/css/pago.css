@@ -1,0 +1,722 @@
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    :root {
+        --cream: #FFF8F0;
+        --warm: #FFF0DC;
+        --orange: #F97316;
+        --orange2: #EA580C;
+        --pink: #FB7185;
+        --mint: #34D399;
+        --dark: #1C1917;
+        --mid: #57534E;
+        --soft: #A8A29E;
+        --border: #E7E2DC;
+        --green: #059669;
+        --red: #DC2626;
+    }
+
+    body {
+        font-family: 'Nunito', sans-serif;
+        background: var(--cream);
+        color: var(--dark);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── navbar ── */
+    nav {
+        background: rgba(255, 248, 240, .95);
+        backdrop-filter: blur(12px);
+        border-bottom: 1.5px solid var(--border);
+        padding: 0 24px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .nav-logo {
+        font-size: 26px;
+    }
+
+    .nav-name {
+        font-family: 'Fredoka One', cursive;
+        font-size: 18px;
+        color: var(--orange);
+    }
+
+    .nav-sub {
+        font-size: 11px;
+        color: var(--soft);
+        font-weight: 600;
+    }
+
+    .nav-folio {
+        background: var(--warm);
+        border: 1.5px solid var(--border);
+        border-radius: 50px;
+        padding: 6px 16px;
+        font-weight: 800;
+        font-size: 13px;
+        color: var(--mid);
+    }
+
+    /* ── main layout ── */
+    main {
+        flex: 1;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 40px 16px;
+    }
+
+    .pago-wrap {
+        width: 100%;
+        max-width: 900px;
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    @media(max-width:760px) {
+        .pago-wrap {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ── card base ── */
+    .card {
+        background: #fff;
+        border: 1.5px solid var(--border);
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, .06);
+    }
+
+    /* ── timer ── */
+    .timer-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #FEF3C7;
+        border: 1.5px solid #FDE68A;
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-bottom: 24px;
+    }
+
+    .timer-icon {
+        font-size: 20px;
+    }
+
+    .timer-text {
+        font-size: 13px;
+        font-weight: 700;
+        color: #92400E;
+        flex: 1;
+    }
+
+    .timer-count {
+        font-family: 'Fredoka One', cursive;
+        font-size: 20px;
+        color: var(--orange);
+        min-width: 52px;
+        text-align: right;
+    }
+
+    .timer-count.urgent {
+        color: var(--red);
+        animation: pulse .8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1
+        }
+
+        50% {
+            opacity: .6
+        }
+    }
+
+    /* ── progress steps ── */
+    .steps {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        margin-bottom: 28px;
+    }
+
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--soft);
+    }
+
+    .step.done {
+        color: var(--mint);
+    }
+
+    .step.active {
+        color: var(--orange);
+    }
+
+    .step-dot {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        background: #fff;
+    }
+
+    .step.done .step-dot {
+        background: var(--mint);
+        border-color: var(--mint);
+        color: #fff;
+    }
+
+    .step.active .step-dot {
+        background: var(--orange);
+        border-color: var(--orange);
+        color: #fff;
+    }
+
+    .step-line {
+        flex: 1;
+        height: 2px;
+        background: var(--border);
+        margin: 0 4px;
+        margin-bottom: 20px;
+    }
+
+    .step-line.done {
+        background: var(--mint);
+    }
+
+    /* ── sección de pago ── */
+    .section-title {
+        font-family: 'Fredoka One', cursive;
+        font-size: 20px;
+        color: var(--dark);
+        margin-bottom: 20px;
+    }
+
+    .card-art {
+        background: linear-gradient(135deg, #1C1917 0%, #292524 100%);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+        min-height: 140px;
+    }
+
+    .card-art::before {
+        content: '';
+        position: absolute;
+        top: -30px;
+        right: -30px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(249, 115, 22, .15);
+    }
+
+    .card-art::after {
+        content: '';
+        position: absolute;
+        bottom: -20px;
+        right: 40px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(249, 115, 22, .08);
+    }
+
+    .card-art-logo {
+        font-family: 'Fredoka One', cursive;
+        font-size: 13px;
+        color: rgba(255, 255, 255, .5);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+
+    .card-art-num {
+        font-family: 'Fredoka One', cursive;
+        font-size: 18px;
+        color: rgba(255, 255, 255, .9);
+        letter-spacing: 4px;
+        margin-bottom: 16px;
+    }
+
+    .card-art-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .card-art-label {
+        font-size: 9px;
+        color: rgba(255, 255, 255, .4);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .card-art-val {
+        font-size: 13px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, .8);
+        margin-top: 2px;
+    }
+
+    .card-art-brand {
+        font-family: 'Fredoka One', cursive;
+        font-size: 22px;
+        color: var(--orange);
+    }
+
+    /* ── form inputs ── */
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    .form-label-sm {
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--soft);
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .form-input {
+        width: 100%;
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        padding: 11px 14px;
+        font-family: 'Nunito', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--dark);
+        outline: none;
+        transition: border-color .15s;
+        background: var(--cream);
+    }
+
+    .form-input:focus {
+        border-color: var(--orange);
+    }
+
+    .form-row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    /* ── seguridad badges ── */
+    .security-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .sec-badge {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: #ECFDF5;
+        border: 1px solid #A7F3D0;
+        border-radius: 50px;
+        padding: 4px 12px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #065F46;
+    }
+
+    /* ── botones ── */
+    .btn-pagar {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 50px;
+        background: var(--orange);
+        color: #fff;
+        font-family: 'Fredoka One', cursive;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all .2s;
+        margin-top: 4px;
+    }
+
+    .btn-pagar:hover:not(:disabled) {
+        background: var(--orange2);
+        transform: scale(1.02);
+        box-shadow: 0 4px 20px rgba(249, 115, 22, .35);
+    }
+
+    .btn-pagar:disabled {
+        background: #D1D5DB;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-cancelar {
+        width: 100%;
+        padding: 11px;
+        border: 1.5px solid var(--border);
+        border-radius: 50px;
+        background: none;
+        color: var(--soft);
+        font-family: 'Fredoka One', cursive;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all .2s;
+        margin-top: 8px;
+    }
+
+    .btn-cancelar:hover {
+        border-color: var(--pink);
+        color: var(--pink);
+    }
+
+    /* ── resumen lateral ── */
+    .resumen-title {
+        font-family: 'Fredoka One', cursive;
+        font-size: 18px;
+        color: var(--dark);
+        margin-bottom: 16px;
+    }
+
+    .resumen-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .resumen-item:last-child {
+        border-bottom: none;
+    }
+
+    .resumen-item-name {
+        color: var(--mid);
+    }
+
+    .resumen-item-price {
+        color: var(--dark);
+    }
+
+    .resumen-divider {
+        border: none;
+        border-top: 2px dashed var(--border);
+        margin: 8px 0;
+    }
+
+    .resumen-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+    }
+
+    .resumen-total-label {
+        font-weight: 800;
+        font-size: 14px;
+    }
+
+    .resumen-total-price {
+        font-family: 'Fredoka One', cursive;
+        font-size: 28px;
+        color: var(--orange);
+    }
+
+    .cliente-info {
+        background: var(--warm);
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-top: 16px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--mid);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .folio-badge {
+        background: #F3F4F6;
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin-top: 12px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--soft);
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .folio-badge span:last-child {
+        font-family: 'Fredoka One', cursive;
+        font-size: 14px;
+        color: var(--dark);
+    }
+
+    /* ── spinner ── */
+    .spinner {
+        width: 22px;
+        height: 22px;
+        border: 3px solid rgba(255, 255, 255, .3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin .7s linear infinite;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 8px;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* ── pantallas de resultado ── */
+    .result-screen {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 20px 0;
+    }
+
+    .result-screen.show {
+        display: flex;
+    }
+
+    .result-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+    }
+
+    .result-title {
+        font-family: 'Fredoka One', cursive;
+        font-size: 26px;
+        margin-bottom: 8px;
+    }
+
+    .result-title.success {
+        color: var(--green);
+    }
+
+    .result-title.error {
+        color: var(--red);
+    }
+
+    .result-sub {
+        font-size: 14px;
+        color: var(--mid);
+        font-weight: 600;
+        line-height: 1.6;
+        max-width: 340px;
+    }
+
+    .folio-grande {
+        font-family: 'Fredoka One', cursive;
+        font-size: 32px;
+        color: var(--orange);
+        background: var(--warm);
+        border: 2px dashed var(--orange);
+        border-radius: 16px;
+        padding: 12px 32px;
+        margin: 16px 0;
+        letter-spacing: 2px;
+    }
+
+    .pickup-card {
+        background: #ECFDF5;
+        border: 1.5px solid #A7F3D0;
+        border-radius: 14px;
+        padding: 16px 20px;
+        margin-top: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #065F46;
+        text-align: left;
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .pickup-card .pick-row {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        margin-bottom: 6px;
+    }
+
+    .pickup-card .pick-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .btn-volver {
+        margin-top: 20px;
+        padding: 12px 32px;
+        border: none;
+        border-radius: 50px;
+        background: var(--orange);
+        color: #fff;
+        font-family: 'Fredoka One', cursive;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all .2s;
+    }
+
+    .btn-volver:hover {
+        background: var(--orange2);
+        transform: scale(1.03);
+    }
+
+    /* ── modal cancelar ── */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(28, 25, 23, .55);
+        backdrop-filter: blur(4px);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .modal-overlay.open {
+        display: flex;
+    }
+
+    .modal {
+        background: #fff;
+        border-radius: 24px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, .18);
+        animation: modalIn .25s cubic-bezier(.34, 1.56, .64, 1);
+        padding: 28px;
+    }
+
+    @keyframes modalIn {
+        from {
+            opacity: 0;
+            transform: scale(.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .modal-title {
+        font-family: 'Fredoka One', cursive;
+        font-size: 20px;
+        color: var(--dark);
+        margin-bottom: 10px;
+    }
+
+    .modal-sub {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--mid);
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .modal-btns {
+        display: flex;
+        gap: 10px;
+    }
+
+    .modal-btns button {
+        flex: 1;
+        padding: 12px;
+        border-radius: 50px;
+        border: none;
+        font-family: 'Fredoka One', cursive;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all .2s;
+    }
+
+    .btn-confirm-cancel {
+        background: var(--red);
+        color: #fff;
+    }
+
+    .btn-confirm-cancel:hover {
+        background: #B91C1C;
+    }
+
+    .btn-keep {
+        background: var(--border);
+        color: var(--mid);
+    }
+
+    .btn-keep:hover {
+        background: #D1D5DB;
+    }
+
+    /* toast */
+    .toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--dark);
+        color: #fff;
+        border-radius: 50px;
+        padding: 10px 22px;
+        font-size: 13px;
+        font-weight: 700;
+        z-index: 999;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity .3s;
+        white-space: nowrap;
+    }
+
+    .toast.show {
+        opacity: 1;
+    }
+
+    .toast.error {
+        background: #EF4444;
+    }

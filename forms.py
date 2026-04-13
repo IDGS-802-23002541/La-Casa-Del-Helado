@@ -104,11 +104,19 @@ class ProductoForm(Form):
         validators.DataRequired(message="El campo es requerido"), 
     ])
 
-    costoUnitario = DecimalField("Costo Unitario", [
-        validators.DataRequired(message="El campo es requerido"), 
-    ])
-
     idCategoria = SelectField("Categoria", coerce=int, validators=[
         validators.DataRequired(message="El campo es requerido"), 
     ])
 
+class PresentacionVentaForm(Form):
+    nombre = StringField("Nombre", [
+        validators.DataRequired(message="El campo es requerido"), 
+    ])
+    
+    precio = DecimalField("Precio", [
+        validators.DataRequired(message="El campo es requerido"), 
+    ])
+
+    equivalencia = DecimalField("Equivalencia", [
+        validators.DataRequired(message="El campo es requerido"), 
+    ])

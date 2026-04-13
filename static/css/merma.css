@@ -1,0 +1,157 @@
+/* SOLO estilos propios del módulo */
+
+/* BADGES */
+.tipo-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.tipo-producto {
+    background: var(--sky);
+    color: var(--blue);
+}
+
+.tipo-materia {
+    background: var(--vanilla);
+    color: var(--caramel);
+}
+
+/* CHIPS */
+.cantidad-chip {
+    background: var(--blush);
+    color: var(--coral-dark);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 11px;
+}
+
+/* TEXTO */
+.justificacion-text {
+    font-size: 12px;
+    color: var(--mid);
+    max-width: 250px;
+}
+
+/* TIPO SELECTOR */
+.tipo-selector {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tipo-btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #f8f5fc;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.tipo-btn:hover {
+    border-color: var(--teal);
+}
+
+/* CAMPOS OCULTOS */
+.hidden-field {
+    display: none;
+}
+
+/* MODAL FIX */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 24, 48, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(3px);
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal-box {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.modal-box h2 {
+    font-size: 16px;
+    margin-bottom: 6px;
+}
+
+.modal-box p {
+    font-size: 12px;
+    color: var(--light-text);
+    margin-bottom: 15px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.tipo-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+}
+
+.tipo-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0.8rem 0.5rem;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: #F8F5FC;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--font-body);
+}
+
+.tipo-btn:hover {
+    border-color: var(--teal);
+    background: var(--mint);
+}
+
+.tipo-btn.active[data-tipo="producto"] {
+    background: var(--sky);
+    border-color: var(--blue);
+    color: var(--blue);
+}
+
+.tipo-btn.active[data-tipo="materia"] {
+    background: var(--vanilla);
+    border-color: var(--caramel);
+    color: var(--caramel);
+}
+
+.tipo-btn-icon {
+    font-size: 1.3rem;
+}
+
+.tipo-btn-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tipo-btn.active {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}

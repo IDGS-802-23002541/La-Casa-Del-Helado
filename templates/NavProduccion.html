@@ -1,49 +1,47 @@
 <nav class="navbar">
   <a href="{{ url_for('auth.login') }}" class="nav-brand">
     <div class="nav-brand-avatar">🍦</div>
-    <div style="display: flex; flex-direction: column; line-height: 1;">
-      <span class="nav-brand-name" style="font-size: 16px;">La Casa del Helado</span>
-      <small style="font-size: 9px; color: #ff7043; font-weight: 800; letter-spacing: 1px;">
+    <div class="nav-brand-text">
+      <span class="nav-brand-name">La Casa del Helado</span>
+      <small class="nav-brand-sub">
         SISTEMA INTEGRAL
       </small>
     </div>
   </a>
 
-  <div class="nav-links" style="display: flex; gap: 15px;">
+  <div class="nav-links">
     <a href="{{ url_for('recetas.index') }}"
       class="nav-link {% if request.endpoint == 'recetas.index' %}active{% endif %}">
-      📖 Recetas
+      Recetas
     </a>
 
     <a href="{{ url_for('produccion.tablero') }}"
       class="nav-link {% if request.endpoint == 'produccion.tablero' %}active{% endif %}">
-      🏭 Producción
+      Producción
     </a>
 
-    <a href="{{ url_for('produccion.materiales') }}"
-      class="nav-link {% if request.endpoint == 'produccion.materiales' %}active{% endif %}">
-      🍎 Materia Prima
+    <a href="{{ url_for('materia.materia') }}"
+       class="nav-link {% if request.endpoint == 'materia.materia' %}active{% endif %}">
+      Materia Prima
     </a>
   </div>
 
-  <div class="nav-right" style="display: flex; align-items: center; gap: 18px;">
-    <div style="text-align: right; line-height: 1.2;">
-      <div id="fecha" style="font-size: 11px; color: #888; font-weight: 700;">
+  <div class="nav-right">
+    <div class="nav-date">
+      <div id="fecha" class="nav-date-fecha">
         Cargando...
       </div>
-      <div id="hora" style="font-weight: 800; color: #2d3436; font-size: 17px;">
+      <div id="hora" class="nav-date-hora">
         00:00:00
       </div>
     </div>
 
     <div class="nav-user-avatar"
-      style="background: #ff7043; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px;"
       title="{{ current_user.nombreUsuario }}">
       {{ current_user.nombreUsuario[0] | upper if current_user.nombreUsuario else '?' }}
     </div>
 
-    <a href="{{ url_for('auth.logout') }}"
-      style="text-decoration: none; font-size: 11px; color: #ff7675; font-weight: 800; padding: 6px 12px; background: rgba(255, 118, 117, 0.1); border-radius: 20px;">
+    <a href="{{ url_for('auth.logout') }}" class="nav-logout">
       SALIR
     </a>
   </div>

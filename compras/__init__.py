@@ -14,7 +14,16 @@ compra_bp = Blueprint(
 
 @compra_bp.route("/compra", methods=["GET", "POST"])
 def compra():
-    compras = Compra.query.filter_by(estatus=True).all()
+    # Filtro por fecha
+    fecha = request.args.get("fecha")
+    query = Compra.query.filter_by(estatus=True)
+    if fecha:
+        dia = datetime.strptime(fecha, "%Y-%m-%d")
+        query = query.filter(
+            Compra.fechaCompra >= dia.replace(hour=0, minute=0, second=0),
+            Compra.fechaCompra <= dia.replace(hour=23, minute=59, second=59)
+        )
+    compras = query.order_by(Compra.fechaCompra.desc()).all()
     compra_form = forms.CompraForm(request.form)
     detalle_form = forms.DetalleCompraForm(request.form)
 
@@ -23,7 +32,7 @@ def compra():
     compra_form.idProveedor.choices = [(p.id, p.razonSocial) for p in proveedores]
 
     materias = MateriaPrima.query.all()
-    detalle_form.idMateriaPrima.choices = [('', '— Seleccionar producto —')] + [(m.id, m.nombre) for m in materias]
+    detalle_form.idMateriaPrima.choices = [(m.id, m.nombre) for m in materias]
 
     # Inicializar sesión para los detalles (el "carrito")
     if "detalles" not in session:
@@ -87,7 +96,6 @@ def compra():
             return redirect(url_for("compra.compra"))
 
         # --- ACCIÓN: GUARDAR COMPRA DEFINITIVA ---
-       # --- ACCIÓN: GUARDAR COMPRA DEFINITIVA ---
         if accion == "guardar_compra":
             # 1. Verificamos que haya productos en la sesión
             lista_detalles = session.get("detalles", [])
@@ -144,6 +152,21 @@ def get_presentaciones(idMateria):
     opciones = PRESENTACIONES_UI.get(materia.unidadBase, [])
     return {"presentaciones": opciones}
 
+@compra_bp.route("/compra/eliminar_detalle", methods=["POST"])
+def eliminar_detalle():
+    data = request.get_json()
+    index = data.get("index")
+
+    detalles = session.get("detalles", [])
+
+    if index is not None and 0 <= index < len(detalles):
+        detalles.pop(index)
+
+    session["detalles"] = detalles
+    session.modified = True
+
+    return {"ok": True}
+
 @compra_bp.route("/compra/cancelar", methods=["POST"])
 def cancelar_compra():
     session.pop("detalles", None)
@@ -175,16 +198,22 @@ CONVERSIONES = {
 }
 
 PRESENTACIONES_UI = {
-    "Litros": [
-        ("ml", "Mililitros"), ("L", "Litro (1L)"),
-        ("galon", "Galón (3.785L)"), ("medio_galon", "Medio galón (1.892L)"),
+    "ml": [
+        ("ml", "Mililitros"),
+        ("L", "Litro (1L)"),
+        ("galon", "Galón (3.785L)"),
+        ("medio_galon", "Medio galón (1.892L)"),
     ],
-    "Kilos": [
-        ("g", "Gramos"), ("kg", "Kilogramo (1kg)"),
-        ("500g", "Bolsa 500g"), ("250g", "Bolsa 250g"),
+    "g": [
+        ("g", "Gramos"),
+        ("kg", "Kilogramo (1kg)"),
+        ("500g", "Bolsa 500g"),
+        ("250g", "Bolsa 250g"),
     ],
-    "Piezas": [
-        ("unidad", "Unidad"), ("docena", "Docena (12)"),
-        ("caja_12", "Caja 12 piezas"), ("caja_24", "Caja 24 piezas"),
+    "pza": [
+        ("unidad", "Unidad"),
+        ("docena", "Docena (12)"),
+        ("caja_12", "Caja 12 piezas"),
+        ("caja_24", "Caja 24 piezas"),
     ]
 }
