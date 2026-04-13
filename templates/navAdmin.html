@@ -28,13 +28,8 @@
     </a>
 
     <a href="{{ url_for('materia.materia') }}"
-<<<<<<< HEAD
-       class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
-        🍎 Materia Prima
-=======
        class="nav-link {% if request.endpoint == 'materia.materia' %}active{% endif %}">
       Materia Prima
->>>>>>> a31179699f9d0f79c865fc3da88aa7df211a58c5
     </a>
 
     <a href="{{ url_for('producto.index') }}"
@@ -52,20 +47,9 @@
       Recetas
     </a>
 
-<<<<<<< HEAD
-   <a href="{{ url_for('merma.merma') }}"
-   class="nav-link {% if request.endpoint == 'mermas.index' %}active{% endif %}">
-    📋 Mermas
-</a>
-
-    <a href="{{ url_for('dash.auth') }}"
-       class="nav-link {% if request.endpoint == 'dash_bp.auth' %}active{% endif %}">
-       📊 Dashboard
-=======
     <a href="{{ url_for('merma.merma') }}"
        class="nav-link {% if request.endpoint == 'merma.merma' %}active{% endif %}">
       Mermas
->>>>>>> a31179699f9d0f79c865fc3da88aa7df211a58c5
     </a>
 
   </div>
