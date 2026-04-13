@@ -2,15 +2,8 @@
    La Casa del Helado — Punto de Venta
    styles.css
 ════════════════════════════════════════ */
-body {
-  height: 100vh !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-  margin: 0 !important;
-}
 
-.main {
+.venta-main {
   display: flex !important;
   flex-direction: row !important;
   /* Lado a lado */
@@ -19,26 +12,24 @@ body {
   width: 100% !important;
 }
 
-.left-panel {
+.venta-left-panel {
   flex: 1 !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
 }
 
-.ticket-panel {
-  width: 320px !important;
-  /* Ancho fijo para el ticket */
-  height: 100% !important;
-  display: flex !important;
-  flex-direction: column !important;
-  background: white !important;
-  border-left: 1px solid #e5e7eb !important;
-  flex-shrink: 0 !important;
-  /* No se encoge */
+.venta-ticket-panel {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-left: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  height: 97vh;
 }
 
-.product-grid {
+.venta-product-grid {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
   gap: 15px !important;
@@ -68,22 +59,6 @@ body {
   --radius: 16px;
 }
 
-/* ── RESET ── */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Nunito', sans-serif;
-  background: var(--cream);
-  color: var(--dark);
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
 
 /* ════════════════════════
    PAGE TABS

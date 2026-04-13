@@ -8,8 +8,8 @@
 
 {% block body %}
 
-<div class="main">
-  <div class="left-panel">
+<div class="venta-main">
+  <div class="venta-left-panel">
     
     <div class="mode-switcher">
       <a href="{{ url_for('venta.punto_venta') }}" 
@@ -43,7 +43,7 @@
           {% endfor %}
         </div>
 
-        <div class="product-grid" id="productGrid">
+        <div class="venta-product-grid" id="productGrid">
         {% for p in presentaciones %}
 
           {% set nombre_cat = p.relacion_categoria.nombre | lower if p.relacion_categoria else 'general' %}
@@ -147,7 +147,7 @@
     {% endif %}
   </div>
 
-  <div class="ticket-panel">
+  <div class="venta-ticket-panel">
     <div class="ticket-header">
       <div class="ticket-title">🧾 Ticket <span class="ticket-num">#001</span></div>
       <form action="{{ url_for('venta.limpiar_ticket') }}" method="GET">

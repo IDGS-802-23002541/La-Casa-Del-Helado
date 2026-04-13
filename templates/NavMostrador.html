@@ -55,16 +55,15 @@
       Punto de Venta
     </a>
 
-    <a href="{{ url_for('compra.compra') }}"
-       class="nav-pos-tab {% if request.endpoint == 'compra.compra' %}active{% endif %}">
-      Compras
-    </a>
-
     <a href="{{ url_for('SolicitudProduccion.solicitud_produccion') }}"
        class="nav-pos-tab {% if request.endpoint == 'SolicitudProduccion.solicitud_produccion' %}active{% endif %}">
       Producción
     </a>
-
+    
+    <a href="{{ url_for('compra.compra') }}"
+       class="nav-pos-tab {% if request.endpoint == 'compra.compra' %}active{% endif %}">
+      Compras
+    </a>
   </div>
 
 </nav>

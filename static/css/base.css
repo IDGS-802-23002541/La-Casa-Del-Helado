@@ -6,6 +6,22 @@
 /* ─────────────────────────────
    NAVBAR PRODUCCIÓN Y ADMIN
    ───────────────────────────── */
+html,
+body {
+    height: 100%;
+}
+
+.app-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
 
 .navbar {
     display: flex;
