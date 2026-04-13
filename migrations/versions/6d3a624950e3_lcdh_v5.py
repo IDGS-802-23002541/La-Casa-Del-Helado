@@ -1,8 +1,8 @@
-"""empty message
+"""LCDH_v5
 
-Revision ID: 0dc86657962c
+Revision ID: 6d3a624950e3
 Revises: 
-Create Date: 2026-04-01 08:53:12.727178
+Create Date: 2026-04-13 00:15:25.199006
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0dc86657962c'
+revision = '6d3a624950e3'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,6 +22,12 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nombre', sa.String(length=100), nullable=False),
     sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('conversiones',
+    sa.Column('unidadBase', sa.String(length=20), nullable=False),
+    sa.Column('presentacion', sa.String(length=20), nullable=False),
+    sa.Column('factor', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.PrimaryKeyConstraint('unidadBase', 'presentacion')
     )
     op.create_table('proveedor',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -42,9 +48,10 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nombre', sa.String(length=100), nullable=False),
     sa.Column('unidadBase', sa.String(length=20), nullable=False),
-    sa.Column('stockActual', sa.Float(), nullable=True),
-    sa.Column('stockMinimo', sa.Float(), nullable=True),
+    sa.Column('stockActual', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('stockMinimo', sa.Numeric(precision=10, scale=2), nullable=True),
     sa.Column('idCategoria', sa.Integer(), nullable=False),
+    sa.Column('estatus', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['idCategoria'], ['categoria.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -94,11 +101,35 @@ def upgrade():
     sa.Column('unidad', sa.String(length=20), nullable=False),
     sa.Column('justificacion', sa.String(length=200), nullable=False),
     sa.Column('fecha', sa.Date(), nullable=False),
+    sa.Column('estatus', sa.Boolean(), nullable=True),
+    sa.Column('fechaEliminacion', sa.DateTime(), nullable=True),
     sa.Column('idUsuario', sa.Integer(), nullable=False),
     sa.CheckConstraint('(idMateriaPrima IS NOT NULL AND idProducto IS NULL) OR (idMateriaPrima IS NULL AND idProducto IS NOT NULL)', name='check_merma_origen'),
     sa.ForeignKeyConstraint(['idMateriaPrima'], ['materia_prima.id'], ),
     sa.ForeignKeyConstraint(['idProducto'], ['producto.id'], ),
     sa.ForeignKeyConstraint(['idUsuario'], ['usuario.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('pedido',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('folio', sa.String(length=20), nullable=False),
+    sa.Column('idCliente', sa.Integer(), nullable=False),
+    sa.Column('fechaPedido', sa.DateTime(), nullable=False),
+    sa.Column('fechaRecogida', sa.DateTime(), nullable=True),
+    sa.Column('estatus', sa.String(length=30), nullable=False),
+    sa.Column('total', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.ForeignKeyConstraint(['idCliente'], ['usuario.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('folio')
+    )
+    op.create_table('presentacion_venta',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('nombre', sa.String(length=100), nullable=False),
+    sa.Column('precio', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('idProductoBase', sa.Integer(), nullable=False),
+    sa.Column('equivalencia', sa.Numeric(precision=10, scale=4), nullable=False),
+    sa.Column('estatus', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['idProductoBase'], ['producto.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('receta',
@@ -116,13 +147,15 @@ def upgrade():
     sa.ForeignKeyConstraint(['rol_id'], ['rol.id'], ),
     sa.ForeignKeyConstraint(['usuario_id'], ['usuario.id'], )
     )
-    op.create_table('solicitudproduccion',
+    op.create_table('solicitud_produccion',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('fecha', sa.Date(), nullable=False),
-    sa.Column('estatus', sa.String(length=20), nullable=False),
     sa.Column('idProducto', sa.Integer(), nullable=False),
-    sa.Column('cantidad', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('idUsuario', sa.Integer(), nullable=False),
+    sa.Column('cantidad_solicitada', sa.Integer(), nullable=False),
+    sa.Column('fecha_solicitud', sa.DateTime(), nullable=True),
+    sa.Column('estatus', sa.String(length=50), nullable=True),
     sa.ForeignKeyConstraint(['idProducto'], ['producto.id'], ),
+    sa.ForeignKeyConstraint(['idUsuario'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('turno',
@@ -133,15 +166,33 @@ def upgrade():
     sa.ForeignKeyConstraint(['idUsuario'], ['usuario.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('venta',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('fecha', sa.DateTime(), nullable=False),
+    sa.Column('total', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('idUsuario', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['idUsuario'], ['usuario.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('detalle_compra',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('idCompra', sa.Integer(), nullable=False),
     sa.Column('idMateriaPrima', sa.Integer(), nullable=False),
-    sa.Column('cantidad', sa.Float(), nullable=False),
+    sa.Column('cantidad', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('contenidoNeto', sa.String(length=20), nullable=True),
-    sa.Column('precio', sa.Float(), nullable=False),
+    sa.Column('precio', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.ForeignKeyConstraint(['idCompra'], ['compra.id'], ),
     sa.ForeignKeyConstraint(['idMateriaPrima'], ['materia_prima.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('detalle_pedido',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('idPedido', sa.Integer(), nullable=False),
+    sa.Column('idPresentacion', sa.Integer(), nullable=False),
+    sa.Column('cantidad', sa.Integer(), nullable=False),
+    sa.Column('precioUnitario', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.ForeignKeyConstraint(['idPedido'], ['pedido.id'], ),
+    sa.ForeignKeyConstraint(['idPresentacion'], ['presentacion_venta.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('detalle_receta',
@@ -154,20 +205,14 @@ def upgrade():
     sa.ForeignKeyConstraint(['idReceta'], ['receta.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('venta',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('fecha', sa.DateTime(), nullable=False),
-    sa.Column('total', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('idTurno', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['idTurno'], ['turno.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('detalleventa',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('idProducto', sa.Integer(), nullable=False),
     sa.Column('idVenta', sa.Integer(), nullable=False),
+    sa.Column('idPresentacion', sa.Integer(), nullable=True),
     sa.Column('cantidad', sa.Numeric(precision=10, scale=2), nullable=False),
     sa.Column('precioUnitario', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.ForeignKeyConstraint(['idPresentacion'], ['presentacion_venta.id'], ),
     sa.ForeignKeyConstraint(['idProducto'], ['producto.id'], ),
     sa.ForeignKeyConstraint(['idVenta'], ['venta.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -178,13 +223,16 @@ def upgrade():
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('detalleventa')
-    op.drop_table('venta')
     op.drop_table('detalle_receta')
+    op.drop_table('detalle_pedido')
     op.drop_table('detalle_compra')
+    op.drop_table('venta')
     op.drop_table('turno')
-    op.drop_table('solicitudproduccion')
+    op.drop_table('solicitud_produccion')
     op.drop_table('roles_usuarios')
     op.drop_table('receta')
+    op.drop_table('presentacion_venta')
+    op.drop_table('pedido')
     op.drop_table('merma')
     op.drop_table('compra')
     op.drop_table('usuario')
@@ -192,5 +240,6 @@ def downgrade():
     op.drop_table('materia_prima')
     op.drop_table('rol')
     op.drop_table('proveedor')
+    op.drop_table('conversiones')
     op.drop_table('categoria')
     # ### end Alembic commands ###
