@@ -1,13 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Inventario Materia Prima{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dist/output.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/materia_prima.css') }}">
+{% endblock %}
+
 {% block body %}
 <div class="app-body has-panel">
 
     <aside class="sidebar">
         <div class="sb-section">Administración</div>
         <a href="#" class="sb-item active">
-            Materia Prima
+            🧪 Materia Prima
             <span class="sb-badge">{{ materias_primas|length }}</span>
         </a>
     </aside>
@@ -23,18 +28,16 @@
         <div class="toolbar">
             <div class="search-inp">
                 🔎
-                <input type="text" id="search" placeholder="Buscar insumo, categoría o proveedor...">
+                <input type="text" id="search" placeholder="Buscar insumo o categoría...">
             </div>
-
             <div class="sep"></div>
-
             <div class="filter-chip fc-all">Todos</div>
             <div class="filter-chip fc-activo inactive-filter">Activos</div>
             <div class="filter-chip fc-inactivo inactive-filter">Inactivos</div>
         </div>
 
         <div class="table-wrap">
-            <table class="table" id="materiasTable">
+            <table id="materiasTable">
                 <thead>
                     <tr>
                         <th>Insumo</th>
@@ -49,16 +52,17 @@
                     <tr data-id="{{ mp.id }}" class="{% if not mp.estatus %}inactive-row{% endif %}">
                         <td><strong>{{ mp.nombre }}</strong><br><span class="text-xs text-muted">{{ mp.unidadBase }}</span></td>
                         <td><span class="cat-badge cat-insumo">{{ mp.categoria.nombre }}</span></td>
-                        <td>{{ mp.proveedor.razonSocial if mp.proveedor else 'Sin proveedor' }}</td>
                         <td><strong>{{ mp.stockActual }} {{ mp.unidadBase }}</strong></td>
-                        <td>{% if mp.estatus %}<span class="status-badge s-activo">Activo</span>{% else %}<span class="status-badge s-inactivo">Inactivo</span>{% endif %}</td>
                         <td>
-                            <button class="action-btn ab-ver btnVer" data-id="{{ mp.id }}">
-                                Ver
-                            </button>
-                            <button class="action-btn ab-editar btnEditar" data-id="{{ mp.id }}">
-                                Editar
-                            </button>
+                            {% if mp.estatus %}
+                                <span class="status-badge s-activo">Activo</span>
+                            {% else %}
+                                <span class="status-badge s-inactivo">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="action-btn ab-ver btnVer" data-id="{{ mp.id }}">Ver</button>
+                            <button class="action-btn ab-editar btnEditar" data-id="{{ mp.id }}">Editar</button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -67,7 +71,6 @@
         </div>
     </main>
 
-    <!-- PANEL DERECHO -->
     <aside class="right-panel">
         <div class="panel-hdr-dark">
             <h3 id="panelTitle">Nuevo insumo</h3>
@@ -115,7 +118,6 @@
             <button type="submit" form="materiaForm" class="btn-save">Guardar</button>
         </div>
     </aside>
-
 </div>
 
 <div id="overlay"></div>
@@ -123,6 +125,169 @@
     <span id="closeCard">✖</span>
     <h3 id="cardNombre"></h3>
     <hr>
+    <p><strong>Categoría:</strong> <span id="cardCategoria"></span></p>
+    <p><strong>Stock:</strong> <span id="cardStock"></span></p>
+    <p><strong>Estatus:</strong> <span id="cardEstatus"></span></p>
+</div>
+
+<script>
+    const materias = JSON.parse('{{ materias_primas | tojson | safe }}');
+</script>
+{% endblock %}
+
+{% extends "base.html" %}
+{% block title %}Inventario Materia Prima{% endblock %}
+
+{% block body %}
+
+<div class="app-body has-panel">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sb-section">Administración</div>
+        <a href="#" class="sb-item active">
+            Materia Prima
+            <span class="sb-badge">{{ materias_primas|length }}</span>
+        </a>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <div class="page-hdr">
+            <div class="page-hdr-left">
+                <h1>Inventario de materia prima</h1>
+                <p>Administra tus insumos y controla el stock</p>
+            </div>
+        </div>
+
+        <!-- BUSCADOR -->
+        <div class="toolbar">
+            <div class="search-inp">
+                🔎
+                <input type="text" id="search" placeholder="Buscar insumo, categoría ...">
+            </div>
+            <button class="btn-primary-teal"
+                  style="padding:8px 16px; border-radius:10px; font-size:12px;">
+            Buscar
+          </button>
+        </div>
+
+        <!-- TABLA -->
+        <div class="table-wrap">
+            <table class="table" id="materiasTable">
+                <thead>
+                    <tr>
+                        <th>Insumo</th>
+                        <th>Categoría</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mp in materias_primas %}
+                    <tr 
+                        data-id="{{ mp.id }}" 
+                        class="{% if not mp.estatus %}inactive-row{% endif %}"
+                    >
+                        <td>
+                            <span class="cell-main">{{ mp.nombre }}</span><br>
+                            <span class="cell-sub">{{ mp.unidadBase }}</span>
+                        </td>
+
+                        <td>
+                            <span class="tag-count">
+                                {{ mp.categoria.nombre }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="cell-muted">
+                                {{ mp.stockActual }} {{ mp.unidadBase }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if mp.estatus %}
+                                <span class="status-badge s-activo">● Activo</span>
+                            {% else %}
+                                <span class="status-badge s-inactivo">● Inactivo</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <button class="action-btn ab-ver btnVer" data-id="{{ mp.id }}">
+                                Ver
+                            </button>
+                            <button class="action-btn ab-editar btnEditar" data-id="{{ mp.id }}">
+                                Editar
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    {% if current_user.rol.nombre == 'Administrador' %}
+    <!-- PANEL DERECHO -->
+    <aside class="right-panel">
+        <div class="panel-hdr-dark">
+            <h3>Nuevo insumo</h3>
+            <p>Agrega o edita materia prima</p>
+        </div>
+        <div class="panel-body">
+            <form method="POST" id="materiaForm">
+                <input type="hidden" name="id" id="formId">
+
+                <div class="fsec">Información general</div>
+                <div class="fg"><label>Nombre</label><input name="nombre" type="text" required></div>
+                <div class="fr2">
+                    <div class="fg"><label>Categoría</label>
+                        <select name="idCategoria" required>
+                            {% for c in categorias %}
+                            <option value="{{ c.id }}">{{ c.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="fg"><label>Unidad</label><input name="unidadBase" type="text" required></div>
+                </div>
+
+                <div class="fsec">Stock</div>
+                <div class="fr2">
+                    <div class="fg"><label>Stock mínimo</label><input name="stockMinimo" type="number" required></div>
+                    <div class="fg"><label>Stock actual</label><input name="stockActual" type="number"></div>
+                </div>
+
+                <div class="fsec">Estatus</div>
+                <div class="status-row">
+                    <label class="status-chip on">
+                        <input type="radio" name="estatus" value="1" checked hidden>Activo
+                    </label>
+                    <label class="status-chip off">
+                        <input type="radio" name="estatus" value="0" hidden>Inactivo
+                    </label>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel-footer">
+            <button type="button" class="btn-cancel">Cancelar</button>
+            <button type="submit" form="materiaForm" class="btn-save">Guardar</button>
+        </div>
+    </aside>
+    {% endif %}
+
+</div>
+
+<!-- TARJETA VER -->
+<div id="overlay"></div>
+<div id="card">
+    <span id="closeCard">✖</span>
+    <h3 id="cardNombre"></h3>
     <p><strong>Categoría:</strong> <span id="cardCategoria"></span></p>
     <p><strong>Stock:</strong> <span id="cardStock"></span></p>
     <p><strong>Estatus:</strong> <span id="cardEstatus"></span></p>
@@ -165,7 +330,6 @@ const card = document.getElementById("card");
 const closeCard = document.getElementById("closeCard");
 const cardNombre = document.getElementById("cardNombre");
 const cardCategoria = document.getElementById("cardCategoria");
-const cardProveedor = document.getElementById("cardProveedor");
 const cardStock = document.getElementById("cardStock");
 const cardEstatus = document.getElementById("cardEstatus");
 
@@ -174,7 +338,6 @@ document.querySelectorAll(".btnVer").forEach(btn=>{
         const mp = materias.find(m=>m.id==btn.dataset.id);
         cardNombre.textContent = mp.nombre;
         cardCategoria.textContent = mp.categoria.nombre;
-        cardProveedor.textContent = mp.proveedor ? mp.proveedor.razonSocial : "Sin proveedor";
         cardStock.textContent = mp.stockActual + " " + mp.unidadBase;
         cardEstatus.textContent = mp.estatus ? "Activo" : "Inactivo";
         overlay.style.display="block"; card.style.display="block";
@@ -193,7 +356,6 @@ document.querySelectorAll(".btnEditar").forEach(btn=>{
         form.stockActual.value = mp.stockActual;
         form.stockMinimo.value = mp.stockMinimo;
         form.idCategoria.value = mp.categoria.id;
-        form.idProveedor.value = mp.proveedor ? mp.proveedor.id : "";
         const chipsStatus = document.querySelectorAll(".status-chip");
         chipsStatus.forEach(c=>{c.classList.remove("on");c.classList.add("off");});
         if(mp.estatus){ chipsStatus[0].classList.add("on"); document.querySelector("input[value='1']").checked=true;}
@@ -210,4 +372,5 @@ document.querySelectorAll(".status-chip").forEach(chip=>{
     };
 });
 </script>
+
 {% endblock %}

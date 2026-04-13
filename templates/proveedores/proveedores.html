@@ -71,50 +71,6 @@
           </tr>
         </thead>
 
-<<<<<<< HEAD
-      <tbody>
-  {% for p in proveedores %}
-    {# Agregamos esta validación #}
-    {% if p.estatus == 'Activo' %}
-    <tr>
-      <td>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="background: {{ p.avatar_color }}; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.8rem;">
-            {{ p.razonSocial[0] | upper }}
-          </div>
-          {{ p.razonSocial }}
-        </div>
-      </td>
-      <td>{{ p.correo }}</td>
-      <td>{{ p.telefono }}</td>
-      <td>{{ p.direccion }}</td>
-      <td>
-        <span class="badge bg-success">
-          {{ p.estatus }}
-        </span>
-      </td>
-      <td>
-        <div style="display: flex; gap: 8px; align-items: center;">
-          <a href="{{ url_for('proveedores.proveedorModificar', id=p.id) }}" 
-             class="btn-edit-pill" 
-             style="background-color: #e3f2fd; color: #1976d2; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 600;">
-            ✏️ Editar
-          </a>
-
-          <form method="POST" action="{{ url_for('proveedores.proveedorToggle') }}" style="display: inline">
-            <input type="hidden" name="id" value="{{ p.id }}">
-            <button type="submit" class="btn-toggle-pill" style="background-color: #f5f5f5; color: #d32f2f; padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">
-              🚫 Eliminar
-            </button>
-          </form>
-        </div>
-      </td>
-    </tr>
-    {% endif %}
-  {% endfor %}
-</tbody>
-    </table>
-=======
         <tbody>
           {% for p in proveedores %}
           <tr>
@@ -182,7 +138,6 @@
         </tbody>
       </table>
     </div>
->>>>>>> a31179699f9d0f79c865fc3da88aa7df211a58c5
   </main>
 
   <aside class="right-panel" style="padding: 0; overflow: hidden;">
