@@ -28,13 +28,8 @@
 
         <div class="toolbar">
             <div class="search-inp">
-<<<<<<< HEAD
-                🔎
-                <input type="text" id="search" placeholder="Buscar insumo o categoría...">
-=======
                 🔍
                 <input type="text" id="search" placeholder="Buscar insumo, categoría o proveedor...">
->>>>>>> a31179699f9d0f79c865fc3da88aa7df211a58c5
             </div>
             <div class="sep"></div>
             <div class="filter-chip fc-all">Todos</div>
@@ -56,14 +51,6 @@
                 <tbody>
                     {% for mp in materias_primas %}
                     <tr data-id="{{ mp.id }}" class="{% if not mp.estatus %}inactive-row{% endif %}">
-<<<<<<< HEAD
-                        <td><strong>{{ mp.nombre }}</strong><br><span class="text-xs text-muted">{{ mp.unidadBase
-                                }}</span></td>
-                        <td>{{ mp.categoria.nombre }}</td>
-                        <td>{{ mp.stockActual }} {{ mp.unidadBase }}</td>
-                        <td>{% if mp.estatus %}Activo{% else %}Inactivo{% endif %}</td>
-                        <td><button class="action-btn btnVer" data-id="{{ mp.id }}">Ver</button></td>
-=======
 
                         <!-- Nombre -->
                         <td class="td-nombre">
@@ -95,7 +82,6 @@
                             </button>
                         </td>
 
->>>>>>> a31179699f9d0f79c865fc3da88aa7df211a58c5
                     </tr>
                     {% endfor %}
                 </tbody>
