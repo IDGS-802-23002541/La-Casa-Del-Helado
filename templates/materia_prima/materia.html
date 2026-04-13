@@ -1,71 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Inventario Materia Prima{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='dist/output.css') }}">
-<style>
-/* Limitar altura de la tabla y permitir scroll */
-.table-wrap {
-    max-height: 540px; /* 9 filas aprox, ajusta según tu CSS */
-    overflow-y: auto;
-}
-
-/* Filas inactivas */
-.inactive-row {
-    opacity: 0.5;
-}
-
-/* Chips de filtro */
-.filter-chip {
-    display: inline-block;
-    padding: 0.3em 0.7em;
-    margin-right: 0.5em;
-    background: #eee;
-    border-radius: 5px;
-    cursor: pointer;
-}
-.filter-chip.inactive-filter {
-    background: #ccc;
-}
-
-/* Status chip */
-.status-chip {
-    display: inline-block;
-    padding: 0.3em 0.7em;
-    border-radius: 5px;
-    cursor: pointer;
-}
-.status-chip.on { background: #4caf50; color: #fff; }
-.status-chip.off { background: #eee; color: #333; }
-
-/* Overlay para tarjeta */
-#overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right:0;
-    bottom:0;
-    background: rgba(0,0,0,0.5);
-    display:none;
-    z-index: 999;
-}
-#card {
-    position: fixed;
-    top:50%;
-    left:50%;
-    transform: translate(-50%, -50%);
-    background:#fff;
-    padding:2em;
-    border-radius:10px;
-    width:300px;
-    display:none;
-    z-index:1000;
-}
-#card h3 { margin-top:0; }
-#closeCard { cursor:pointer; float:right; }
-</style>
-{% endblock %}
-
 {% block body %}
 
 <div class="app-body has-panel">
@@ -74,7 +9,7 @@
     <aside class="sidebar">
         <div class="sb-section">Administración</div>
         <a href="#" class="sb-item active">
-            🧪 Materia Prima
+            Materia Prima
             <span class="sb-badge">{{ materias_primas|length }}</span>
         </a>
     </aside>
@@ -104,7 +39,7 @@
 
         <!-- TABLA -->
         <div class="table-wrap">
-            <table id="materiasTable">
+            <table class="table" id="materiasTable">
                 <thead>
                     <tr>
                         <th>Insumo</th>
@@ -121,8 +56,8 @@
                         class="{% if not mp.estatus %}inactive-row{% endif %}"
                     >
                         <td>
-                            <span class="td-nombre">{{ mp.nombre }}</span><br>
-                            <span class="td-muted">{{ mp.unidadBase }}</span>
+                            <span class="cell-main">{{ mp.nombre }}</span><br>
+                            <span class="cell-sub">{{ mp.unidadBase }}</span>
                         </td>
 
                         <td>
@@ -132,7 +67,7 @@
                         </td>
 
                         <td>
-                            <span class="td-muted">
+                            <span class="cell-muted">
                                 {{ mp.stockActual }} {{ mp.unidadBase }}
                             </span>
                         </td>

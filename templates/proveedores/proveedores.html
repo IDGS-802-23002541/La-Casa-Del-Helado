@@ -22,78 +22,122 @@
   </aside>
 
   <main class="main">
-    <div class="page-hdr">
-      <div>
-        <h1>Proveedor</h1>
+    <div class="page-hdr fade-up">
+      <div class="page-hdr-left">
+        <h1>Proveedores</h1>
         <p>Administración de proveedores</p>
       </div>
     </div>
 
-    <form method="GET" action="{{ url_for('proveedores.proveedoresTabla') }}" style="display: flex; gap: 10px; margin-bottom: 20px;">
-      <input type="text" name="q" value="{{ busqueda or '' }}" placeholder="Buscar por razón social..." style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #ddd;" />
-      <button type="submit" class="btn-primary" style="white-space: nowrap;">
-        Buscar
-      </button>
+    <form method="GET" action="{{ url_for('proveedores.proveedoresTabla') }}">
+      <div class="toolbar fade-up-1">
+
+        <div class="search-inp">
+          <span style="color:var(--light-text); font-size:14px;">🔍</span>
+          <input 
+            type="text" 
+            name="q" 
+            value="{{ busqueda or '' }}" 
+            placeholder="Buscar proveedor…" 
+          />
+        </div>
+
+        <button type="submit" class="btn-primary-teal">
+          Buscar
+        </button>
+
+        {% if busqueda %}
+          <a href="{{ url_for('proveedores.proveedoresTabla') }}" 
+            class="btn-cancel"
+            style="text-decoration:none;">
+            Limpiar
+          </a>
+        {% endif %}
+
+      </div>
     </form>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Razón Social</th>
-          <th>Correo</th>
-          <th>Teléfono</th>
-          <th>Dirección</th>
-          <th>Estatus</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
+    <!-- TABLA -->
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Proveedor</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Dirección</th>
+            <th>Estatus</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
 
-      <tbody>
-        {% for p in proveedores %}
-        <tr>
-          <td>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="background: {{ p.avatar_color }}; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.8rem;">
-                    {{ p.razonSocial[0] | upper }}
+        <tbody>
+          {% for p in proveedores %}
+          <tr>
+
+            <!-- PROVEEDOR -->
+            <td>
+              <div style="display:flex; align-items:center; gap:10px;">
+                
+                <!-- Avatar -->
+                <div class="prov-avatar" style="background: {{ p.avatar_color }}">
+                  {{ p.razonSocial[0] | upper }}
                 </div>
-                {{ p.razonSocial }}
-            </div>
-          </td>
-          <td>{{ p.correo }}</td>
-          <td>{{ p.telefono }}</td>
-          <td>{{ p.direccion }}</td>
-          <td>
-            <span class="badge {{ 'bg-success' if p.estatus == 'Activo' else 'bg-danger' }}">
-                {{ p.estatus }}
-            </span>
-          </td>
 
-          <td>
-            <div style="display: flex; gap: 8px; align-items: center;">
+                <div>
+                  <div class="td-nombre">{{ p.razonSocial }}</div>
+                </div>
+
+              </div>
+            </td>
+
+            <!-- CORREO -->
+            <td class="td-muted">
+              {{ p.correo }}
+            </td>
+
+            <!-- TELÉFONO -->
+            <td class="cell-main">
+              {{ p.telefono }}
+            </td>
+
+            <!-- DIRECCIÓN -->
+            <td class="td-muted">
+              {{ p.direccion }}
+            </td>
+
+            <!-- ESTATUS -->
+            <td>
+              {% if p.estatus == 'Activo' %}
+                <span class="status-badge s-activo">● Activo</span>
+              {% else %}
+                <span class="status-badge s-inactivo">● Inactivo</span>
+              {% endif %}
+            </td>
+
+            <!-- ACCIONES -->
+            <td>
               <a href="{{ url_for('proveedores.proveedorModificar', id=p.id) }}" 
-                 class="btn-edit-pill" 
-                 style="background-color: #e3f2fd; color: #1976d2; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: 0.3s;">
-                ✏️ Editar
+                class="action-btn ab-editar">
+                Editar
               </a>
 
-              <form
-                method="POST"
-                action="{{ url_for('proveedores.proveedorToggle') }}"
-                style="display: inline"
-              >
+              <form method="POST"
+                    action="{{ url_for('proveedores.proveedorToggle') }}"
+                    style="display:inline;">
                 <input type="hidden" name="id" value="{{ p.id }}">
-                <button type="submit" 
-                        class="btn-toggle-pill" 
-                        style="background-color: #f5f5f5; color: #616161; padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: 0.3s;">
-                  {{ '🚫 Desactivar' if p.estatus == 'Activo' else '✅ Activar' }}
+                <button type="submit"
+                        class="action-btn {{ 'ab-desact' if p.estatus == 'Activo' else 'ab-activar' }}">
+                  {{ 'Desactivar' if p.estatus == 'Activo' else 'Activar' }}
                 </button>
               </form>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+            </td>
+
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </main>
 
   <aside class="right-panel" style="padding: 0; overflow: hidden;">

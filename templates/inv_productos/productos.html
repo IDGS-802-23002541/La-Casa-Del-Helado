@@ -61,45 +61,89 @@
       </form>
 
       <!-- TABLA -->
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Categoría</th>
-            <th>Unidad</th>
-            <th>Stock actual</th>
-            <th>Stock mínimo</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for p in productos %}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ p.nombre }}</td>
-            <td>{{ p.categoria.nombre if p.categoria else '-' }}</td>
-            <td>{{ p.unidadBase }}</td>
-            <td>
-              {% if p.stockActual <= p.stockMinimo %}
-                <span class="status-badge s-bajo">{{ p.stockActual }}</span>
-              {% else %}
-                {{ p.stockActual }}
-              {% endif %}
-            </td>
-            <td>{{ p.stockMinimo }}</td>
-            <td>
-              <a href="{{ url_for('producto.index', edit=p.id) }}" class="action-btn ab-editar">Editar</a>
-              <form method="POST"
-                    action="{{ url_for('producto.eliminar', id=p.id) }}"
-                    style="display:inline;">
-                <button type="submit" class="action-btn ab-eliminar">Eliminar</button>
-              </form>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Categoría</th>
+              <th>Unidad</th>
+              <th>Stock actual</th>
+              <th>Stock mínimo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for p in productos %}
+            <tr>
+
+              <!-- ID -->
+              <td class="td-id">
+                {{ loop.index }}
+              </td>
+
+              <!-- NOMBRE -->
+              <td>
+                <span class="td-nombre">{{ p.nombre }}</span>
+              </td>
+
+              <!-- CATEGORÍA -->
+              <td>
+                <span class="tag-count">
+                  {{ p.categoria.nombre if p.categoria else '—' }}
+                </span>
+              </td>
+
+              <!-- UNIDAD -->
+              <td>
+                <span class="td-muted">
+                  {{ p.unidadBase }}
+                </span>
+              </td>
+
+              <!-- STOCK ACTUAL -->
+              <td>
+                {% if p.stockActual <= p.stockMinimo %}
+                  <span class="status-badge s-warning">
+                    ⚠ {{ p.stockActual }}
+                  </span>
+                {% else %}
+                  <span class="td-muted">
+                    {{ p.stockActual }}
+                  </span>
+                {% endif %}
+              </td>
+
+              <!-- STOCK MÍNIMO -->
+              <td>
+                <span class="td-muted">
+                  {{ p.stockMinimo }}
+                </span>
+              </td>
+
+              <!-- ACCIONES -->
+              <td>
+                <a href="{{ url_for('producto.index', edit=p.id) }}" 
+                  class="action-btn ab-editar">
+                  Editar
+                </a>
+
+                <form method="POST"
+                      action="{{ url_for('producto.eliminar', id=p.id) }}"
+                      style="display:inline;">
+                  <button type="submit" class="action-btn ab-eliminar">
+                    Eliminar
+                  </button>
+                </form>
+              </td>
+
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </main>
 
     <!-- PANEL DERECHO -->

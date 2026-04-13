@@ -1,0 +1,147 @@
+/* RESUMEN */
+.resumen {
+    display: flex;
+    gap: 10px;
+}
+
+.pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.pill-warning {
+    background: var(--vanilla);
+    color: var(--caramel);
+}
+
+.pill-info {
+    background: var(--sky);
+    color: var(--blue);
+}
+
+.pill-success {
+    background: var(--lime);
+    color: var(--green);
+}
+
+/* BOARD */
+.board {
+    display: flex;
+    gap: 16px;
+    height: 100%;
+}
+
+.col {
+    flex: 1;
+    border-radius: 16px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+}
+
+/* COLORES COLUMNAS */
+.col-warning {
+    background: rgba(255, 243, 196, 0.6);
+}
+
+.col-info {
+    background: rgba(200, 232, 255, 0.6);
+}
+
+.col-success {
+    background: rgba(212, 245, 192, 0.6);
+}
+
+.col-header {
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* CARDS */
+.card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.card-info {
+    border-left: 4px solid var(--blue);
+}
+
+.card-success {
+    border-left: 4px solid var(--green);
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top small {
+    display: block;
+    color: var(--light-text);
+}
+
+/* CANTIDAD */
+.qty {
+    background: var(--coral);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 11px;
+}
+
+/* BOTONES */
+.btn-action {
+    width: 100%;
+    margin-top: 6px;
+    padding: 8px;
+    border-radius: 10px;
+    border: none;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-warning {
+    background: var(--vanilla);
+    color: var(--caramel);
+}
+
+.btn-warning:hover {
+    background: var(--caramel);
+    color: white;
+}
+
+.btn-info {
+    background: var(--sky);
+    color: var(--blue);
+}
+
+.btn-info:hover {
+    background: var(--blue);
+    color: white;
+}
+
+.btn-success {
+    background: var(--lime);
+    color: var(--green);
+}
+
+.btn-success:hover {
+    background: var(--green);
+    color: white;
+}
