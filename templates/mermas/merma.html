@@ -8,107 +8,93 @@
 {% endblock %}
 
 {% block body %}
-<div class="app-body has-panel">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sb-section">Gestión</div>
-    <a href="{{ url_for('merma.merma') }}" class="sb-item active">
-      Mermas
-      <span class="sb-badge">{{ mermas|length }}</span>
-    </a>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-
-    <!-- HEADER -->
-    <div class="page-hdr">
-      <div class="page-hdr-left">
-        <h1>Mermas</h1>
-        <p>Registro de pérdidas de inventario</p>
-      </div>
+  <!-- HEADER -->
+  <div class="page-hdr">
+    <div class="page-hdr-left">
+      <h1>Mermas</h1>
+      <p>Registro de pérdidas de inventario</p>
     </div>
+  </div>
 
-    <!-- FILTRO -->
-    <form method="GET" action="{{ url_for('merma.merma') }}">
-      <div class="toolbar fade-up-1">
-        <div class="filtro-fecha-group">
-          <label>📅</label>
-          <input type="date" name="fecha" value="{{ request.args.get('fecha', '') }}">
-        </div>
-
-        <button type="submit" class="btn-primary-teal">
-          Filtrar
-        </button>
-
-        {% if request.args.get('fecha') %}
-          <a href="{{ url_for('merma.merma') }}" class="btn-limpiar">
-            Limpiar
-          </a>
-        {% endif %}
-
+  <!-- FILTRO -->
+  <form method="GET" action="{{ url_for('merma.merma') }}">
+    <div class="toolbar fade-up-1">
+      <div class="filtro-fecha-group">
+        <label>📅</label>
+        <input type="date" name="fecha" value="{{ request.args.get('fecha', '') }}">
       </div>
-    </form>
 
-    <!-- TABLA -->
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Tipo</th>
-            <th>Artículo</th>
-            <th>Cantidad</th>
-            <th>Unidad</th>
-            <th>Justificación</th>
-            <th>Fecha</th>
-            <th>Usuario</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
+      <button type="submit" class="btn-primary-teal">
+        Filtrar
+      </button>
 
-        <tbody>
-          {% for m in mermas %}
-          <tr>
-            <td>
-              {% if m.materia_prima %}
-                <span class="tipo-badge tipo-materia">Materia</span>
-              {% else %}
-                <span class="tipo-badge tipo-producto">Producto</span>
-              {% endif %}
-            </td>
-
-            <td>{{ m.materia_prima.nombre if m.materia_prima else m.producto.nombre }}</td>
-
-            <td><span class="cantidad-chip">{{ m.cantidad }}</span></td>
-            <td>{{ m.unidad }}</td>
-            <td class="justificacion-text">{{ m.justificacion }}</td>
-            <td>{{ m.fecha.strftime('%Y-%m-%d') }}</td>
-            <td><span class="cell-main">{{ m.usuario.nombreUsuario }}</span></td>
-
-            <td>
-              <button
-                onclick="abrirModalEliminar('{{ url_for('merma.eliminar_merma', id=m.id) }}')"
-                type="button"
-                class="action-btn ab-eliminar"
-              >
-                Eliminar
-              </button>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      {% if not mermas %}
-      <div class="empty-state">
-        <p>No hay mermas registradas aún.</p>
-      </div>
+      {% if request.args.get('fecha') %}
+        <a href="{{ url_for('merma.merma') }}" class="btn-limpiar">
+          Limpiar
+        </a>
       {% endif %}
+
     </div>
+  </form>
 
-  </main>
+  <!-- TABLA -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Artículo</th>
+          <th>Cantidad</th>
+          <th>Unidad</th>
+          <th>Justificación</th>
+          <th>Fecha</th>
+          <th>Usuario</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
 
+      <tbody>
+        {% for m in mermas %}
+        <tr>
+          <td>
+            {% if m.materia_prima %}
+              <span class="tipo-badge tipo-materia">Materia</span>
+            {% else %}
+              <span class="tipo-badge tipo-producto">Producto</span>
+            {% endif %}
+          </td>
+
+          <td>{{ m.materia_prima.nombre if m.materia_prima else m.producto.nombre }}</td>
+
+          <td><span class="cantidad-chip">{{ m.cantidad }}</span></td>
+          <td>{{ m.unidad }}</td>
+          <td class="justificacion-text">{{ m.justificacion }}</td>
+          <td>{{ m.fecha.strftime('%Y-%m-%d') }}</td>
+          <td><span class="cell-main">{{ m.usuario.nombreUsuario }}</span></td>
+
+          <td>
+            <button
+              onclick="abrirModalEliminar('{{ url_for('merma.eliminar_merma', id=m.id) }}')"
+              type="button"
+              class="action-btn ab-eliminar"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if not mermas %}
+    <div class="empty-state">
+      <p>No hay mermas registradas aún.</p>
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block right_panel %}
   <!-- PANEL DERECHO -->
   <aside class="right-panel">
 
@@ -202,7 +188,7 @@
     </div>
 
   </aside>
-</div>
+{% endblock %}
 
 <!-- MODAL -->
 <div id="modalEliminar" class="modal-overlay">
@@ -217,6 +203,7 @@
   </div>
 </div>
 
+{% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -272,5 +259,4 @@ function cancelarMerma() {
     .then(() => location.reload());
 }
 </script>
-
 {% endblock %}

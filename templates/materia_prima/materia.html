@@ -2,101 +2,85 @@
 {% block title %}Inventario Materia Prima{% endblock %}
 
 {% block body %}
-
-<div class="app-body has-panel">
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <div class="sb-section">Administración</div>
-        <a href="#" class="sb-item active">
-            Materia Prima
-            <span class="sb-badge">{{ materias_primas|length }}</span>
-        </a>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="main">
-
-        <!-- HEADER -->
-        <div class="page-hdr">
-            <div class="page-hdr-left">
-                <h1>Inventario de materia prima</h1>
-                <p>Administra tus insumos y controla el stock</p>
-            </div>
+    <div class="page-hdr fade-up">
+        <div class="page-hdr-left">
+            <h1>Inventario de materia prima</h1>
+            <p>Administra tus insumos y controla el stock</p>
         </div>
+    </div>
 
-        <!-- BUSCADOR -->
-        <div class="toolbar">
-            <div class="search-inp">
-                🔎
-                <input type="text" id="search" placeholder="Buscar insumo, categoría ...">
-            </div>
-            <button class="btn-primary-teal"
-                  style="padding:8px 16px; border-radius:10px; font-size:12px;">
-            Buscar
-          </button>
+    <!-- BUSCADOR -->
+    <div class="toolbar">
+        <div class="search-inp">
+            🔎
+            <input type="text" id="search" placeholder="Buscar insumo, categoría ...">
         </div>
+        <button class="btn-primary-teal"
+                style="padding:8px 16px; border-radius:10px; font-size:12px;">
+        Buscar
+        </button>
+    </div>
 
-        <!-- TABLA -->
-        <div class="table-wrap">
-            <table class="table" id="materiasTable">
-                <thead>
-                    <tr>
-                        <th>Insumo</th>
-                        <th>Categoría</th>
-                        <th>Stock</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for mp in materias_primas %}
-                    <tr 
-                        data-id="{{ mp.id }}" 
-                        class="{% if not mp.estatus %}inactive-row{% endif %}"
-                    >
-                        <td>
-                            <span class="cell-main">{{ mp.nombre }}</span><br>
-                            <span class="cell-sub">{{ mp.unidadBase }}</span>
-                        </td>
+    <!-- TABLA -->
+    <div class="table-wrap">
+        <table class="table" id="materiasTable">
+            <thead>
+                <tr>
+                    <th>Insumo</th>
+                    <th>Categoría</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mp in materias_primas %}
+                <tr 
+                    data-id="{{ mp.id }}" 
+                    class="{% if not mp.estatus %}inactive-row{% endif %}"
+                >
+                    <td>
+                        <span class="cell-main">{{ mp.nombre }}</span><br>
+                        <span class="cell-sub">{{ mp.unidadBase }}</span>
+                    </td>
 
-                        <td>
-                            <span class="tag-count">
-                                {{ mp.categoria.nombre }}
-                            </span>
-                        </td>
+                    <td>
+                        <span class="tag-count">
+                            {{ mp.categoria.nombre }}
+                        </span>
+                    </td>
 
-                        <td>
-                            <span class="cell-muted">
-                                {{ mp.stockActual }} {{ mp.unidadBase }}
-                            </span>
-                        </td>
+                    <td>
+                        <span class="cell-muted">
+                            {{ mp.stockActual }} {{ mp.unidadBase }}
+                        </span>
+                    </td>
 
-                        <td>
-                            {% if mp.estatus %}
-                                <span class="status-badge s-activo">● Activo</span>
-                            {% else %}
-                                <span class="status-badge s-inactivo">● Inactivo</span>
-                            {% endif %}
-                        </td>
+                    <td>
+                        {% if mp.estatus %}
+                            <span class="status-badge s-activo">● Activo</span>
+                        {% else %}
+                            <span class="status-badge s-inactivo">● Inactivo</span>
+                        {% endif %}
+                    </td>
 
-                        <td>
-                            <button class="action-btn ab-ver btnVer" data-id="{{ mp.id }}">
-                                Ver
-                            </button>
-                            <button class="action-btn ab-editar btnEditar" data-id="{{ mp.id }}">
-                                Editar
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </main>
+                    <td>
+                        <button class="action-btn ab-ver btnVer" data-id="{{ mp.id }}">
+                            Ver
+                        </button>
+                        <button class="action-btn ab-editar btnEditar" data-id="{{ mp.id }}">
+                            Editar
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
 
-    {% if current_user.rol.nombre == 'Administrador' %}
-    <!-- PANEL DERECHO -->
+{% block right_panel %}
+  {% if current_user.rol.nombre == 'Administrador' %}
     <aside class="right-panel">
         <div class="panel-hdr-dark">
             <h3>Nuevo insumo</h3>
@@ -142,9 +126,10 @@
             <button type="submit" form="materiaForm" class="btn-save">Guardar</button>
         </div>
     </aside>
-    {% endif %}
-
-</div>
+  {% elif current_user.rol.nombre == 'Produccion' %}
+    {% block layout_class %}no-panel{% endblock %}
+  {% endif %}
+{% endblock %}
 
 <!-- TARJETA VER -->
 <div id="overlay"></div>
@@ -155,7 +140,7 @@
     <p><strong>Stock:</strong> <span id="cardStock"></span></p>
     <p><strong>Estatus:</strong> <span id="cardEstatus"></span></p>
 </div>
-
+{% block extra_js %}
 <script>
 const materias = JSON.parse('{{ materias_primas | tojson | safe }}');
 let estadoFiltro = "todos";
@@ -235,5 +220,4 @@ document.querySelectorAll(".status-chip").forEach(chip=>{
     };
 });
 </script>
-
 {% endblock %}

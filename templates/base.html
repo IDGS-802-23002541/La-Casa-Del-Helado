@@ -14,21 +14,40 @@
   {% block extra_css %}{% endblock %}
 </head>
 <body>
-
+{% if not hide_layout %}
   <!-- NAVBAR por rol  -->
   {% if current_user.is_authenticated %}
     {% set rol = current_user.rol.nombre if current_user.rol else '' %}
-    {% if rol == 'Administrador' %}
-      {% include 'navAdmin.html' %}
-    {% elif rol == 'Produccion' %}
-      {% include 'navProduccion.html' %}
-    {% elif rol == 'Mostrador' %}
-      {% include 'navMostrador.html' %}
-    {% endif %}
+    {% include 'navbar.html' %}
   {% endif %}
 
   <!-- CUERPO -->
-  {% block body %}{% endblock %}
+  <div class="app-body 
+    {% if rol in ['Mostrador'] %}
+      no-sidebar
+    {% endif %}
+    {% block layout_class %}{% endblock %}">
+    
+    <!-- SIDEBAR (izquierdo) -->
+    {% if current_user.is_authenticated %}
+      {% if rol == 'Administrador' %}
+        {% include 'asideAdmin.html' %}
+      {% elif rol == 'Produccion' %}
+        {% include 'asideProduccion.html' %}
+      {% endif %}
+    {% endif %}
+
+    <main class="main">
+      {% block body %}{% endblock %}
+    </main>
+
+    {% block right_panel %}{% endblock %}
+  </div>
+{% else %}
+  <!-- PARA EL LOGIN -->
+  {% block content  %}{% endblock %}
+{% endif %}
+
   <div class="toast" id="toast"></div>
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}

@@ -8,124 +8,110 @@
 {% endblock %}
 
 {% block body %}
-<div class="app-body has-panel">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sb-section">Gestión</div>
-    <a href="{{ url_for('compra.compra') }}" class="sb-item active">
-      Compra
-      <span class="sb-badge">{{ compras|length }}</span>
-    </a>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
-
-    <!-- HEADER -->
-    <div class="page-hdr fade-up">
-      <div class="page-hdr-left">
-        <h1>Compras</h1>
-        <p>Registro de entradas de materia prima</p>
-      </div>
+  <!-- HEADER -->
+  <div class="page-hdr fade-up">
+    <div class="page-hdr-left">
+      <h1>Compras</h1>
+      <p>Registro de entradas de materia prima</p>
     </div>
+  </div>
 
-    <!-- TOOLBAR (FILTRO FECHA) -->
-    <form method="GET" action="{{ url_for('compra.compra') }}">
-      <div class="toolbar fade-up-1">
-        <div class="filtro-fecha-group">
-          <label>📅</label>
-          <input type="date" name="fecha" value="{{ request.args.get('fecha', '') }}">
-        </div>
-
-        <button type="submit" class="btn-primary-teal">
-          Filtrar
-        </button>
-
-        {% if request.args.get('fecha') %}
-          <a href="{{ url_for('compra.compra') }}" class="btn-cancel">
-            Limpiar
-          </a>
-        {% endif %}
-
+  <!-- TOOLBAR (FILTRO FECHA) -->
+  <form method="GET" action="{{ url_for('compra.compra') }}">
+    <div class="toolbar fade-up-1">
+      <div class="filtro-fecha-group">
+        <label>📅</label>
+        <input type="date" name="fecha" value="{{ request.args.get('fecha', '') }}">
       </div>
-    </form>
 
-    <!-- TABLA -->
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Factura</th>
-            <th>Proveedor</th>
-            <th>Detalles</th>
-            <th>Fecha</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
+      <button type="submit" class="btn-primary-teal">
+        Filtrar
+      </button>
 
-        <tbody>
-          {% for c in compras %}
-          <tr>
-
-            <!-- FACTURA -->
-            <td>
-              <span class="factura-badge">
-                {{ c.factura }}
-              </span>
-            </td>
-
-            <!-- PROVEEDOR -->
-            <td>
-              <div class="cell-main">
-                {{ c.proveedor.razonSocial }}
-              </div>
-            </td>
-
-            <!-- DETALLES -->
-            <td>
-              <ul class="detalle-list">
-                {% for d in c.detalles_compra %}
-                  <li>
-                    <span class="qty">{{ d.cantidad }} ( {{d.contenidoNeto }} )</span>
-                    {{ d.materiaPrima.nombre }}
-                  </li>
-                {% endfor %}
-              </ul>
-            </td>
-
-            <!-- FECHA -->
-            <td>
-              <span class="cell-muted">
-                {{ c.fechaCompra.strftime('%Y-%m-%d') }}
-              </span>
-            </td>
-
-            <!-- ACCIONES -->
-            <td>
-              <button
-                onclick="abrirModalEliminar('{{ url_for('compra.eliminar_compra', id=c.id) }}')"
-                type="button"
-                class="action-btn ab-eliminar"
-              >
-                Eliminar
-              </button>
-            </td>
-
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      {% if not compras %}
-      <div class="empty-state">
-        <p>No hay compras registradas aún.</p>
-      </div>
+      {% if request.args.get('fecha') %}
+        <a href="{{ url_for('compra.compra') }}" class="btn-cancel">
+          Limpiar
+        </a>
       {% endif %}
+
     </div>
+  </form>
 
-  </main>
+  <!-- TABLA -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Factura</th>
+          <th>Proveedor</th>
+          <th>Detalles</th>
+          <th>Fecha</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
 
+      <tbody>
+        {% for c in compras %}
+        <tr>
+
+          <!-- FACTURA -->
+          <td>
+            <span class="factura-badge">
+              {{ c.factura }}
+            </span>
+          </td>
+
+          <!-- PROVEEDOR -->
+          <td>
+            <div class="cell-main">
+              {{ c.proveedor.razonSocial }}
+            </div>
+          </td>
+
+          <!-- DETALLES -->
+          <td>
+            <ul class="detalle-list">
+              {% for d in c.detalles_compra %}
+                <li>
+                  <span class="qty">{{ d.cantidad }} ( {{d.contenidoNeto }} )</span>
+                  {{ d.materiaPrima.nombre }}
+                </li>
+              {% endfor %}
+            </ul>
+          </td>
+
+          <!-- FECHA -->
+          <td>
+            <span class="cell-muted">
+              {{ c.fechaCompra.strftime('%Y-%m-%d') }}
+            </span>
+          </td>
+
+          <!-- ACCIONES -->
+          <td>
+            <button
+              onclick="abrirModalEliminar('{{ url_for('compra.eliminar_compra', id=c.id) }}')"
+              type="button"
+              class="action-btn ab-eliminar"
+            >
+              Eliminar
+            </button>
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if not compras %}
+    <div class="empty-state">
+      <p>No hay compras registradas aún.</p>
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block right_panel %}
   <!-- PANEL DERECHO (FORMULARIO) -->
   <aside class="right-panel">
 
@@ -249,8 +235,7 @@
 
     </div>
   </aside>
-
-</div>
+{% endblock %}
 
 <!-- MODAL -->
 <div id="modalEliminar" class="modal-overlay">
@@ -268,8 +253,8 @@
     <form id="formEliminar" method="POST"></form>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
 
+{% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 

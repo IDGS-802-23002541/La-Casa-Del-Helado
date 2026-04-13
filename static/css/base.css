@@ -104,14 +104,42 @@ body {
     font-size: 13px;
 }
 
-.nav-logout {
+.btn-logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    width: 100%;
+    padding: 10px 14px;
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.12);
+
+    border: 1px solid rgba(255, 107, 107, 0.25);
+    border-radius: 12px;
+
     text-decoration: none;
-    font-size: 11px;
-    color: #ff7675;
-    font-weight: 800;
-    padding: 6px 12px;
-    background: rgba(255, 118, 117, 0.1);
-    border-radius: 20px;
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+    background: linear-gradient(135deg, #ff8a8a, #ff6b6b);
+    color: #fff;
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(255, 107, 107, 0.35);
+}
+
+/* CLICK */
+.btn-logout:active {
+    transform: scale(0.97);
 }
 
 .nav-date {

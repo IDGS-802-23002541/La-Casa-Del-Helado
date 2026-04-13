@@ -11,135 +11,128 @@
 
 
 {% block body %}
-
-<div class="app-body has-panel">
-  <aside class="sidebar">
-    <div class="sb-section">Gestión</div>
-    <a href="{{ url_for('proveedores.proveedoresTabla') }}" class="sb-item active">
-      🏭 Proveedor
-      <span class="sb-badge">{{ proveedores|length }}</span>
-    </a>
-  </aside>
-
-  <main class="main">
-    <div class="page-hdr fade-up">
-      <div class="page-hdr-left">
-        <h1>Proveedores</h1>
-        <p>Administración de proveedores</p>
-      </div>
+  <!-- HEADER -->
+  <div class="page-hdr fade-up">
+    <div class="page-hdr-left">
+      <h1>Proveedores</h1>
+      <p>Administración de proveedores</p>
     </div>
+  </div>
+  <!-- BUSCADOR -->
+  <form method="GET" action="{{ url_for('proveedores.proveedoresTabla') }}">
+    <div class="toolbar fade-up-1">
 
-    <form method="GET" action="{{ url_for('proveedores.proveedoresTabla') }}">
-      <div class="toolbar fade-up-1">
-
-        <div class="search-inp">
-          <span style="color:var(--light-text); font-size:14px;">🔍</span>
-          <input 
-            type="text" 
-            name="q" 
-            value="{{ busqueda or '' }}" 
-            placeholder="Buscar proveedor…" 
-          />
-        </div>
-
-        <button type="submit" class="btn-primary-teal">
-          Buscar
-        </button>
-
-        {% if busqueda %}
-          <a href="{{ url_for('proveedores.proveedoresTabla') }}" 
-            class="btn-cancel"
-            style="text-decoration:none;">
-            Limpiar
-          </a>
-        {% endif %}
-
+      <div class="search-inp">
+        <span style="color:var(--light-text); font-size:14px;">🔍</span>
+        <input 
+          type="text" 
+          name="q" 
+          value="{{ busqueda or '' }}" 
+          placeholder="Buscar proveedor…" 
+        />
       </div>
-    </form>
 
-    <!-- TABLA -->
-    <div class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Proveedor</th>
-            <th>Correo</th>
-            <th>Teléfono</th>
-            <th>Dirección</th>
-            <th>Estatus</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
+      <button type="submit" class="btn-primary-teal">
+        Buscar
+      </button>
 
-        <tbody>
-          {% for p in proveedores %}
-          <tr>
+      {% if busqueda %}
+        <a href="{{ url_for('proveedores.proveedoresTabla') }}" 
+          class="btn-cancel"
+          style="text-decoration:none;">
+          Limpiar
+        </a>
+      {% endif %}
 
-            <!-- PROVEEDOR -->
-            <td>
-              <div style="display:flex; align-items:center; gap:10px;">
-                
-                <!-- Avatar -->
-                <div class="prov-avatar" style="background: {{ p.avatar_color }}">
-                  {{ p.razonSocial[0] | upper }}
-                </div>
+    </div>
+  </form>
 
-                <div>
-                  <div class="td-nombre">{{ p.razonSocial }}</div>
-                </div>
+  <!-- TABLA -->
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Proveedor</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th>Dirección</th>
+          <th>Estatus</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
 
+      <tbody>
+        {% for p in proveedores %}
+        <tr>
+
+          <!-- PROVEEDOR -->
+          <td>
+            <div style="display:flex; align-items:center; gap:10px;">
+              
+              <!-- Avatar -->
+              <div class="prov-avatar" style="background: {{ p.avatar_color }}">
+                {{ p.razonSocial[0] | upper }}
               </div>
-            </td>
 
-            <!-- CORREO -->
-            <td class="td-muted">
-              {{ p.correo }}
-            </td>
+              <div>
+                <div class="td-nombre">{{ p.razonSocial }}</div>
+              </div>
 
-            <!-- TELÉFONO -->
-            <td class="cell-main">
-              {{ p.telefono }}
-            </td>
+            </div>
+          </td>
 
-            <!-- DIRECCIÓN -->
-            <td class="td-muted">
-              {{ p.direccion }}
-            </td>
+          <!-- CORREO -->
+          <td class="td-muted">
+            {{ p.correo }}
+          </td>
 
-            <!-- ESTATUS -->
-            <td>
-              {% if p.estatus == 'Activo' %}
-                <span class="status-badge s-activo">● Activo</span>
-              {% else %}
-                <span class="status-badge s-inactivo">● Inactivo</span>
-              {% endif %}
-            </td>
+          <!-- TELÉFONO -->
+          <td class="cell-main">
+            {{ p.telefono }}
+          </td>
 
-            <!-- ACCIONES -->
-            <td>
-              <a href="{{ url_for('proveedores.proveedorModificar', id=p.id) }}" 
-                class="action-btn ab-editar">
-                Editar
-              </a>
+          <!-- DIRECCIÓN -->
+          <td class="td-muted">
+            {{ p.direccion }}
+          </td>
 
-              <form method="POST"
-                    action="{{ url_for('proveedores.proveedorToggle') }}"
-                    style="display:inline;">
-                <input type="hidden" name="id" value="{{ p.id }}">
-                <button type="submit"
-                        class="action-btn {{ 'ab-desact' if p.estatus == 'Activo' else 'ab-activar' }}">
-                  {{ 'Desactivar' if p.estatus == 'Activo' else 'Activar' }}
-                </button>
-              </form>
-            </td>
+          <!-- ESTATUS -->
+          <td>
+            {% if p.estatus == 'Activo' %}
+              <span class="status-badge s-activo">● Activo</span>
+            {% else %}
+              <span class="status-badge s-inactivo">● Inactivo</span>
+            {% endif %}
+          </td>
 
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </main>
+          <!-- ACCIONES -->
+          <td>
+            <a href="{{ url_for('proveedores.proveedorModificar', id=p.id) }}" 
+              class="action-btn ab-editar">
+              Editar
+            </a>
 
+            <form method="POST"
+                  action="{{ url_for('proveedores.proveedorToggle') }}"
+                  style="display:inline;">
+              <input type="hidden" name="id" value="{{ p.id }}">
+              <button type="submit"
+                      class="action-btn {{ 'ab-desact' if p.estatus == 'Activo' else 'ab-activar' }}">
+                {{ 'Desactivar' if p.estatus == 'Activo' else 'Activar' }}
+              </button>
+            </form>
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}
+
+{% block right_panel %}
+  <!-- PANEL DERECHO -->
   <aside class="right-panel" style="padding: 0; overflow: hidden;">
     
     <div class="panel-hdr-dark">
@@ -197,5 +190,4 @@
         </form>
     </div>
   </aside>
-</div>
 {% endblock %}
