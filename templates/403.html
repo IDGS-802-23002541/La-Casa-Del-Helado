@@ -4,57 +4,152 @@
     <meta charset="UTF-8">
     <title>Acceso denegado</title>
     <style>
-        body {
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
             font-family: 'Segoe UI', sans-serif;
-            background: #f8f9fa;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
             text-align: center;
+            overflow: hidden;
+            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a6c1ee);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .container {
-            max-width: 500px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            max-width: 450px;
+            color: white;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .icon {
+            font-size: 60px;
+            margin-bottom: 10px;
         }
 
         h1 {
-            font-size: 100px;
+            font-size: 90px;
             margin: 0;
-            color: #ffa502;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         h2 {
             margin: 10px 0;
-            color: #333;
+            font-size: 26px;
+            color: #fff;
         }
 
         p {
-            color: #666;
+            color: rgba(255,255,255,0.85);
+            margin-top: 10px;
         }
 
         a {
             display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #ffa502;
-            color: white;
+            margin-top: 25px;
+            padding: 12px 28px;
+            background: white;
+            color: #ff6b6b;
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         }
 
         a:hover {
-            background: #e59400;
+            transform: scale(1.05);
+            background: #ff6b6b;
+            color: white;
+        }
+
+        /* partículas suaves */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.2;
+            background: white;
+            animation: rise 12s infinite linear;
+        }
+
+        .bubble:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            left: 10%;
+            bottom: -100px;
+            animation-delay: 0s;
+        }
+
+        .bubble:nth-child(2) {
+            width: 40px;
+            height: 40px;
+            left: 70%;
+            bottom: -120px;
+            animation-delay: 3s;
+        }
+
+        .bubble:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            left: 40%;
+            bottom: -150px;
+            animation-delay: 6s;
+        }
+
+        @keyframes rise {
+            0% {
+                transform: translateY(0);
+                opacity: 0.2;
+            }
+            100% {
+                transform: translateY(-120vh);
+                opacity: 0;
+            }
         }
     </style>
 </head>
+
 <body>
+
+    <!-- burbujas -->
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+
     <div class="container">
+        <div class="icon">🔒</div>
         <h1>403</h1>
         <h2>Acceso prohibido</h2>
         <p>No tienes permisos para acceder a esta página.</p>
-        <a href="/">Volver al inicio</a>
+        <a href="/login">Volver al inicio</a>
     </div>
+
 </body>
 </html>
