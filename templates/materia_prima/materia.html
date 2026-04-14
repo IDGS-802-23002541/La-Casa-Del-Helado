@@ -3,10 +3,66 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='dist/output.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/materia_prima.css') }}">
+<style>
+.table-wrap {
+    max-height: 540px;
+    overflow-y: auto;
+}
+
+.inactive-row {
+    opacity: 0.5;
+}
+
+.filter-chip {
+    display: inline-block;
+    padding: 0.3em 0.7em;
+    margin-right: 0.5em;
+    background: #eee;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.filter-chip.inactive-filter {
+    background: #ccc;
+}
+
+.status-chip {
+    display: inline-block;
+    padding: 0.3em 0.7em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.status-chip.on { background: #4caf50; color: #fff; }
+.status-chip.off { background: #eee; color: #333; }
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right:0;
+    bottom:0;
+    background: rgba(0,0,0,0.5);
+    display:none;
+    z-index: 999;
+}
+#card {
+    position: fixed;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
+    background:#fff;
+    padding:2em;
+    border-radius:10px;
+    width:300px;
+    display:none;
+    z-index:1000;
+}
+#card h3 { margin-top:0; }
+#closeCard { cursor:pointer; float:right; }
+</style>
 {% endblock %}
 
 {% block body %}
+
 <div class="app-body has-panel">
 
     <aside class="sidebar">
@@ -18,6 +74,7 @@
     </aside>
 
     <main class="main">
+
         <div class="page-hdr">
             <div class="page-hdr-left">
                 <h1>Inventario de materia prima</h1>
@@ -28,9 +85,11 @@
         <div class="toolbar">
             <div class="search-inp">
                 🔎
-                <input type="text" id="search" placeholder="Buscar insumo o categoría...">
+                <input type="text" id="search" placeholder="Buscar insumo, categoría o proveedor...">
             </div>
+
             <div class="sep"></div>
+
             <div class="filter-chip fc-all">Todos</div>
             <div class="filter-chip fc-activo inactive-filter">Activos</div>
             <div class="filter-chip fc-inactivo inactive-filter">Inactivos</div>
@@ -42,6 +101,7 @@
                     <tr>
                         <th>Insumo</th>
                         <th>Categoría</th>
+                        <th>Proveedor</th>
                         <th>Stock</th>
                         <th>Estado</th>
                         <th>Acciones</th>
@@ -52,14 +112,9 @@
                     <tr data-id="{{ mp.id }}" class="{% if not mp.estatus %}inactive-row{% endif %}">
                         <td><strong>{{ mp.nombre }}</strong><br><span class="text-xs text-muted">{{ mp.unidadBase }}</span></td>
                         <td><span class="cat-badge cat-insumo">{{ mp.categoria.nombre }}</span></td>
+                        <td>{{ mp.proveedor.razonSocial if mp.proveedor else 'Sin proveedor' }}</td>
                         <td><strong>{{ mp.stockActual }} {{ mp.unidadBase }}</strong></td>
-                        <td>
-                            {% if mp.estatus %}
-                                <span class="status-badge s-activo">Activo</span>
-                            {% else %}
-                                <span class="status-badge s-inactivo">Inactivo</span>
-                            {% endif %}
-                        </td>
+                        <td>{% if mp.estatus %}<span class="status-badge s-activo">Activo</span>{% else %}<span class="status-badge s-inactivo">Inactivo</span>{% endif %}</td>
                         <td>
                             <button class="action-btn ab-ver btnVer" data-id="{{ mp.id }}">Ver</button>
                             <button class="action-btn ab-editar btnEditar" data-id="{{ mp.id }}">Editar</button>
@@ -69,171 +124,9 @@
                 </tbody>
             </table>
         </div>
+
     </main>
 
-    <aside class="right-panel">
-        <div class="panel-hdr-dark">
-            <h3 id="panelTitle">Nuevo insumo</h3>
-            <p>Agrega o edita materia prima</p>
-        </div>
-        <div class="panel-body">
-            <form action="{{ url_for('materia.materia') }}" method="POST" id="materiaForm">
-                <input type="hidden" name="id" id="formId">
-
-                <div class="fsec">Información general</div>
-                <div class="fg"><label>Nombre</label><input name="nombre" type="text" required></div>
-                
-                <div class="fr2">
-                    <div class="fg">
-                        <label>Categoría</label>
-                        <select name="idCategoria" required>
-                            {% for c in categorias %}
-                            <option value="{{ c.id }}">{{ c.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="fg"><label>Unidad</label><input name="unidadBase" type="text" required></div>
-                </div>
-
-                <div class="fsec">Stock</div>
-                <div class="fr2">
-                    <div class="fg"><label>Stock mínimo</label><input name="stockMinimo" type="number" step="0.01" required></div>
-                    <div class="fg"><label>Stock actual</label><input name="stockActual" type="number" step="0.01"></div>
-                </div>
-
-                <div class="fsec">Estatus</div>
-                <div class="status-row">
-                    <label class="status-chip on" id="chipActivo">
-                        <input type="radio" name="estatus" value="1" checked hidden>Activo
-                    </label>
-                    <label class="status-chip off" id="chipInactivo">
-                        <input type="radio" name="estatus" value="0" hidden>Inactivo
-                    </label>
-                </div>
-            </form>
-        </div>
-
-        <div class="panel-footer">
-            <button type="button" class="btn-cancel" onclick="window.location.reload()">Cancelar</button>
-            <button type="submit" form="materiaForm" class="btn-save">Guardar</button>
-        </div>
-    </aside>
-</div>
-
-<div id="overlay"></div>
-<div id="card">
-    <span id="closeCard">✖</span>
-    <h3 id="cardNombre"></h3>
-    <hr>
-    <p><strong>Categoría:</strong> <span id="cardCategoria"></span></p>
-    <p><strong>Stock:</strong> <span id="cardStock"></span></p>
-    <p><strong>Estatus:</strong> <span id="cardEstatus"></span></p>
-</div>
-
-<script>
-    const materias = JSON.parse('{{ materias_primas | tojson | safe }}');
-</script>
-{% endblock %}
-
-{% extends "base.html" %}
-{% block title %}Inventario Materia Prima{% endblock %}
-
-{% block body %}
-
-<div class="app-body has-panel">
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <div class="sb-section">Administración</div>
-        <a href="#" class="sb-item active">
-            Materia Prima
-            <span class="sb-badge">{{ materias_primas|length }}</span>
-        </a>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="main">
-
-        <!-- HEADER -->
-        <div class="page-hdr">
-            <div class="page-hdr-left">
-                <h1>Inventario de materia prima</h1>
-                <p>Administra tus insumos y controla el stock</p>
-            </div>
-        </div>
-
-        <!-- BUSCADOR -->
-        <div class="toolbar">
-            <div class="search-inp">
-                🔎
-                <input type="text" id="search" placeholder="Buscar insumo, categoría ...">
-            </div>
-            <button class="btn-primary-teal"
-                  style="padding:8px 16px; border-radius:10px; font-size:12px;">
-            Buscar
-          </button>
-        </div>
-
-        <!-- TABLA -->
-        <div class="table-wrap">
-            <table class="table" id="materiasTable">
-                <thead>
-                    <tr>
-                        <th>Insumo</th>
-                        <th>Categoría</th>
-                        <th>Stock</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for mp in materias_primas %}
-                    <tr 
-                        data-id="{{ mp.id }}" 
-                        class="{% if not mp.estatus %}inactive-row{% endif %}"
-                    >
-                        <td>
-                            <span class="cell-main">{{ mp.nombre }}</span><br>
-                            <span class="cell-sub">{{ mp.unidadBase }}</span>
-                        </td>
-
-                        <td>
-                            <span class="tag-count">
-                                {{ mp.categoria.nombre }}
-                            </span>
-                        </td>
-
-                        <td>
-                            <span class="cell-muted">
-                                {{ mp.stockActual }} {{ mp.unidadBase }}
-                            </span>
-                        </td>
-
-                        <td>
-                            {% if mp.estatus %}
-                                <span class="status-badge s-activo">● Activo</span>
-                            {% else %}
-                                <span class="status-badge s-inactivo">● Inactivo</span>
-                            {% endif %}
-                        </td>
-
-                        <td>
-                            <button class="action-btn ab-ver btnVer" data-id="{{ mp.id }}">
-                                Ver
-                            </button>
-                            <button class="action-btn ab-editar btnEditar" data-id="{{ mp.id }}">
-                                Editar
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </main>
-
-    {% if current_user.rol.nombre == 'Administrador' %}
-    <!-- PANEL DERECHO -->
     <aside class="right-panel">
         <div class="panel-hdr-dark">
             <h3>Nuevo insumo</h3>
@@ -254,6 +147,14 @@
                         </select>
                     </div>
                     <div class="fg"><label>Unidad</label><input name="unidadBase" type="text" required></div>
+                </div>
+                <div class="fg"><label>Proveedor</label>
+                    <select name="idProveedor">
+                        <option value="">Sin proveedor</option>
+                        {% for p in proveedores %}
+                        <option value="{{ p.id }}">{{ p.razonSocial }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <div class="fsec">Stock</div>
@@ -279,16 +180,15 @@
             <button type="submit" form="materiaForm" class="btn-save">Guardar</button>
         </div>
     </aside>
-    {% endif %}
 
 </div>
 
-<!-- TARJETA VER -->
 <div id="overlay"></div>
 <div id="card">
     <span id="closeCard">✖</span>
     <h3 id="cardNombre"></h3>
     <p><strong>Categoría:</strong> <span id="cardCategoria"></span></p>
+    <p><strong>Proveedor:</strong> <span id="cardProveedor"></span></p>
     <p><strong>Stock:</strong> <span id="cardStock"></span></p>
     <p><strong>Estatus:</strong> <span id="cardEstatus"></span></p>
 </div>
@@ -297,7 +197,6 @@
 const materias = JSON.parse('{{ materias_primas | tojson | safe }}');
 let estadoFiltro = "todos";
 
-// FILTRAR
 function filtrarTabla() {
     const texto = document.getElementById("search").value.toLowerCase();
     document.querySelectorAll("#materiasTable tbody tr").forEach(row => {
@@ -313,10 +212,8 @@ function filtrarTabla() {
     });
 }
 
-// BUSCADOR
 document.getElementById("search").addEventListener("keyup", filtrarTabla);
 
-// CHIPS
 const chips = document.querySelectorAll(".filter-chip");
 chips[0].onclick = () => { estadoFiltro="todos"; activarChip(0); filtrarTabla(); };
 chips[1].onclick = () => { estadoFiltro="activos"; activarChip(1); filtrarTabla(); };
@@ -324,12 +221,12 @@ chips[2].onclick = () => { estadoFiltro="inactivos"; activarChip(2); filtrarTabl
 function activarChip(index){ chips.forEach(c=>c.classList.add("inactive-filter")); chips[index].classList.remove("inactive-filter"); }
 activarChip(0);
 
-// TARJETA VER
 const overlay = document.getElementById("overlay");
 const card = document.getElementById("card");
 const closeCard = document.getElementById("closeCard");
 const cardNombre = document.getElementById("cardNombre");
 const cardCategoria = document.getElementById("cardCategoria");
+const cardProveedor = document.getElementById("cardProveedor");
 const cardStock = document.getElementById("cardStock");
 const cardEstatus = document.getElementById("cardEstatus");
 
@@ -338,6 +235,7 @@ document.querySelectorAll(".btnVer").forEach(btn=>{
         const mp = materias.find(m=>m.id==btn.dataset.id);
         cardNombre.textContent = mp.nombre;
         cardCategoria.textContent = mp.categoria.nombre;
+        cardProveedor.textContent = mp.proveedor ? mp.proveedor.razonSocial : "Sin proveedor";
         cardStock.textContent = mp.stockActual + " " + mp.unidadBase;
         cardEstatus.textContent = mp.estatus ? "Activo" : "Inactivo";
         overlay.style.display="block"; card.style.display="block";
@@ -345,7 +243,6 @@ document.querySelectorAll(".btnVer").forEach(btn=>{
 });
 closeCard.onclick = () => { overlay.style.display="none"; card.style.display="none"; };
 
-// EDITAR
 document.querySelectorAll(".btnEditar").forEach(btn=>{
     btn.addEventListener("click", ()=>{
         const mp = materias.find(m=>m.id==btn.dataset.id);
@@ -356,6 +253,7 @@ document.querySelectorAll(".btnEditar").forEach(btn=>{
         form.stockActual.value = mp.stockActual;
         form.stockMinimo.value = mp.stockMinimo;
         form.idCategoria.value = mp.categoria.id;
+        form.idProveedor.value = mp.proveedor ? mp.proveedor.id : "";
         const chipsStatus = document.querySelectorAll(".status-chip");
         chipsStatus.forEach(c=>{c.classList.remove("on");c.classList.add("off");});
         if(mp.estatus){ chipsStatus[0].classList.add("on"); document.querySelector("input[value='1']").checked=true;}
@@ -363,7 +261,6 @@ document.querySelectorAll(".btnEditar").forEach(btn=>{
     });
 });
 
-// STATUS CHIP
 document.querySelectorAll(".status-chip").forEach(chip=>{
     chip.onclick=()=>{
         document.querySelectorAll(".status-chip").forEach(c=>{c.classList.remove("on"); c.classList.add("off");});

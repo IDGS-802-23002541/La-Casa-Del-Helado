@@ -14,16 +14,12 @@ def error_403(e):
 def error_404(e):
     return render_template("errors/404.html"), 404
 
-# --- VISTA PRINCIPAL (PUNTO DE VENTA) ---
 @venta_bp.route("/venta", methods=["GET"])
 def punto_venta():
     vista = 'vd'
     categorias = Categoria.query.all()
     
-    # Obtenemos solo las presentaciones activas
     presentaciones = presentacionVenta.query.filter_by(estatus=True).all()
-
-    # Lógica del carrito (Ticket)
     carrito = session.get('carrito_pos', [])
     total_v = sum(float(item['subtotal']) for item in carrito)
 
@@ -36,20 +32,17 @@ def punto_venta():
         vista=vista
     )
 
-# --- FILTRADO DE PRODUCTOS  ---
+
 @venta_bp.route("/venta/filtrar", methods=["GET"])
 def filtrar_productos():
     categoria_id = request.args.get('cat_id', type=int)
     busqueda = request.args.get('q', '').strip()
 
     query = presentacionVenta.query.filter_by(estatus=True)
-
     if busqueda:
         query = query.filter(presentacionVenta.nombre.ilike(f"%{busqueda}%"))
-
     if categoria_id:
         query = query.join(Producto).filter(Producto.idCategoria == categoria_id)
-
     presentaciones = query.all()
     categorias = Categoria.query.all()
 
@@ -67,18 +60,16 @@ def filtrar_productos():
         query_actual=busqueda
     )
 
-# --- CARRITO Y VENTAS ---
+
 @venta_bp.route("/vender_agregar", methods=["POST"])
 def vender_agregar():
     id_pres = request.form.get('id')
     if not id_pres:
         return redirect(url_for('venta.punto_venta'))
-
     pres = presentacionVenta.query.get_or_404(id_pres)
     precio = float(pres.precio)
 
     carrito = session.get('carrito_pos', [])
-
     for item in carrito:
         if item['id'] == int(id_pres):
             item['cantidad'] += 1
@@ -106,16 +97,13 @@ def finalizar_venta():
     if not carrito:
         flash("El carrito está vacío", "warning")
         return redirect(url_for('venta.punto_venta'))
-
     try:
         total = sum(float(i['subtotal']) for i in carrito)
         db.session.execute(
             db.text("CALL finalizar_venta(:idUsuario, :total, @idVenta)"),
             {"idUsuario": current_user.id, "total": total}
         )
-
         id_venta = db.session.execute(db.text("SELECT @idVenta")).scalar()
-
         for i in carrito:
             db.session.execute(
                 db.text("CALL agregar_detalle_venta(:idVenta, :idProductoBase, :idPresentacion, :cantidad, :precio, :equivalencia)"),

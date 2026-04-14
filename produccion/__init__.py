@@ -36,28 +36,63 @@ def iniciar_produccion(sol_id):
     flash(f"Producción de {solicitud.producto.nombre} iniciada", "success")
     return redirect(url_for('produccion.tablero'))
 
+@produccion_bp.route("/produccion/terminar/<int:sol_id>", methods=["POST"])
+def terminar_produccion(sol_id):
+    solicitud = SolicitudProduccion.query.get_or_404(sol_id)
 
-# @produccion_bp.route("/produccion/materiales")
-# def materiales():
-#     materias_db = MateriaPrima.query.all()
+    if solicitud.estatus != 'En Proceso':
+        flash("La solicitud no se puede terminar", "warning")
+        return redirect(url_for('produccion.tablero'))
 
-#     materias_primas = []
-#     for mp in materias_db:
-#         materias_primas.append({
-#             "id": mp.id,
-#             "nombre": mp.nombre,
-#             "unidadBase": mp.unidadBase,
-#             "stockActual": float(mp.stockActual or 0),
-#             "stockMinimo": float(mp.stockMinimo or 0),
-#             "estatus": mp.estatus,
-#             "categoria": {
-#                 "id": mp.categoria.id if mp.categoria else None,
-#                 "nombre": mp.categoria.nombre if mp.categoria else "Sin categoría"
-#             }
-#         })
+    receta = Receta.query.filter_by(idProducto=solicitud.idProducto).first()
+
+    if receta:
+        for detalle in receta.detalles:
+            materia = MateriaPrima.query.get(detalle.idMateriaPrima)
+
+            if materia:
+                cantidad_requerida = decimal.Decimal(str(detalle.cantidad)) * decimal.Decimal(str(solicitud.cantidad_solicitada))
+
+                if materia.stockActual < cantidad_requerida:
+                    flash(f"No hay suficiente {materia.nombre}", "danger")
+                    return redirect(url_for('produccion.tablero'))
+
+                materia.stockActual -= cantidad_requerida
+
+    producto = Producto.query.get(solicitud.idProducto)
+    producto.stockActual += decimal.Decimal(str(solicitud.cantidad_solicitada))
+
+    solicitud.estatus = 'Terminado'
+    db.session.commit()
+
+    flash(f"Producción de {producto.nombre} terminada y stock actualizado", "success")
+    return redirect(url_for('produccion.tablero'))
+
+
+@produccion_bp.route("/produccion/materiales")
+def materiales():
+    materias_db = MateriaPrima.query.all()
+
+    materias_primas = []
+    for mp in materias_db:
+        materias_primas.append({
+            "id": mp.id,
+            "nombre": mp.nombre,
+            "unidadBase": mp.unidadBase,
+            "stockActual": float(mp.stockActual or 0),
+            "stockMinimo": float(mp.stockMinimo or 0),
+            "estatus": mp.estatus,
+            "categoria": {
+                "id": mp.categoria.id if mp.categoria else None,
+                "nombre": mp.categoria.nombre if mp.categoria else "Sin categoría"
+            },
+            "proveedor": {
+                "id": mp.proveedor.id if mp.proveedor else None,
+                "razonSocial": mp.proveedor.razonSocial if mp.proveedor else "Sin proveedor"
+            }
+        })
 
     return render_template(
         "produccion/materia_prima.html",
         materias_primas=materias_primas
     )
-    
