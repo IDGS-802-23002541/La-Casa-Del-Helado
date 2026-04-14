@@ -58,13 +58,18 @@ def page_not_found(e):
 def access_denied(e):
 	return render_template("403.html"), 403
 
+#Logs
+LOG_FILENAME = 'errores.log'
+
+logging.basicConfig(
+    filename=LOG_FILENAME,
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)s %(message)s'
+)
+
 if __name__ == '__main__':
 	with app.app_context():
 		db.create_all()
 	app.run(debug=True)
 	LOG_FILENAME = 'errores.log' 
-    logging.basicConfig(
-        filename=LOG_FILENAME,
-        level=logging.DEBUG,
-        format='%(asctime)s %(levelname)s %(message)s'
-    )
+
