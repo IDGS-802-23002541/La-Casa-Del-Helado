@@ -8,9 +8,11 @@
       <h1>Recetas</h1>
       <p>Gestión de recetas y sus ingredientes</p>
     </div>
+    {% if current_user.rol.nombre == 'Administrador' %}
     <a href="{{ url_for('recetas.crear') }}" class="btn-primary">
       <span>＋</span> Nueva receta
     </a>
+    {% endif %}
   </div>
 
   <!-- Buscador -->
@@ -52,7 +54,9 @@
           <th>Cant. Producida</th>
           <th>Ingredientes</th>
           <th>Estatus</th>
-          <th>Acciones</th>
+          {% if current_user.rol.nombre == 'Administrador' %}
+            <th>Acciones</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -96,6 +100,7 @@
               <span class="status-badge s-inactivo">● Inactiva</span>
             {% endif %}
           </td>
+          {% if current_user.rol.nombre == 'Administrador' %}
           <td>
             <a href="{{ url_for('recetas.editar', id=receta.id) }}"
               class="action-btn ab-editar"
@@ -104,6 +109,7 @@
               class="action-btn ab-desact"
               onclick="event.stopPropagation()">Desact.</a>
           </td>
+          {% endif %}
         </tr>
         {% endfor %}
       {% else %}
@@ -174,10 +180,11 @@
                         max-height:220px; overflow-y:auto;">
             </div>
           </div>
-
-          <div class="fsec" style="margin-top:6px;">Acciones</div>
-
-          <div style="display:flex; flex-direction:column; gap:8px;">
+          
+          <div class="fsec" style="margin-top:6px;
+          {% if current_user.rol.nombre != 'Administrador' %}display:none;{% endif %}">Acciones</div>
+          <div style="display:flex; flex-direction:column; gap:8px;
+            {% if current_user.rol.nombre != 'Administrador' %}display:none;{% endif %}">
             <a id="btn-editar" href="#" class="action-btn ab-editar"
               style="text-align:center; display:block; padding:9px;">
               ✎ Editar receta

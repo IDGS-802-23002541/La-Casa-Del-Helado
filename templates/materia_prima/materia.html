@@ -30,7 +30,9 @@
                     <th>Categoría</th>
                     <th>Stock</th>
                     <th>Estado</th>
-                    <th>Acciones</th>
+                    {% if current_user.rol.nombre == 'Admin' %}
+                        <th>Acciones</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -63,7 +65,7 @@
                             <span class="status-badge s-inactivo">● Inactivo</span>
                         {% endif %}
                     </td>
-
+                    {% if current_user.rol.nombre == 'Admin' %}
                     <td>
                         <button class="action-btn ab-ver btnVer" data-id="{{ mp.id }}">
                             Ver
@@ -72,6 +74,7 @@
                             Editar
                         </button>
                     </td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
