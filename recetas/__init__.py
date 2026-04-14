@@ -1,7 +1,6 @@
-from flask import Blueprint, render_template, request, redirect,url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models import db, Receta, Producto, DetalleReceta, MateriaPrima
 from flask_security.decorators import roles_accepted, login_required
-
 import forms
 
 receta_bp = Blueprint(
@@ -12,7 +11,7 @@ receta_bp = Blueprint(
 
 @receta_bp.route("/recetas", methods=["GET", "POST"])
 @login_required
-@roles_accepted('Produccion','Administrador')
+@roles_accepted('Produccion', 'Administrador')
 def index():
     busqueda = request.args.get('busqueda', '')
     estatus = request.args.get('estatus', '')
@@ -24,11 +23,9 @@ def index():
         query = query.filter(Receta.estatus == False)
     elif estatus == 'activo':
         query = query.filter(Receta.estatus == True)
-    # o todas
 
-    # por nombre
     if busqueda:
-        query = query.filter(Receta.nombre.ilike(f'%{busqueda}'))
+        query = query.filter(Receta.nombre.ilike(f'%{busqueda}%'))
     
     recetas = query.order_by(Receta.id).all()
     total = query.count()
@@ -37,19 +34,18 @@ def index():
     if id_sel:
         receta_sel = Receta.query.get(id_sel)
 
-    return render_template("recetas/recetas.html", recetas=recetas, total=total, busqueda=busqueda, estatus=estatus, receta_sel=receta_sel,)
+    return render_template("recetas/recetas.html", recetas=recetas, total=total, busqueda=busqueda, estatus=estatus, receta_sel=receta_sel)
 
 @receta_bp.route("/recetas/crear", methods=["GET", "POST"])
 @login_required
 @roles_accepted('Administrador')
 def crear():
     form = forms.RecetaForm(request.form)
-    form.idProducto.choices = [ (p.id, p.nombre) for p in Producto.query.order_by(Producto.nombre).all()]
-
+    form.idProducto.choices = [(p.id, p.nombre) for p in Producto.query.order_by(Producto.nombre).all()]
     materias = MateriaPrima.query.order_by(MateriaPrima.nombre).all()
 
     if request.method == 'POST':
-        
+        # 1. Creamos la cabecera usando el procedimiento almacenado
         db.session.execute(
             db.text("CALL crear_receta(:nombre, :idProducto, :cantidad, @id_receta)"),
             {
@@ -58,25 +54,31 @@ def crear():
                 'cantidad': form.cantidadProducida.data
             }
         )
-        id_receta = db.session.execute(db.text("Select @id_receta")).scalar()
-        # inserta detalles
+        
+        # 2. Obtenemos el ID generado (de forma segura)
+        id_receta = db.session.execute(db.text("SELECT @id_receta")).scalar()
+
+        # 3. Obtenemos las listas de ingredientes del formulario
         cantidades = request.form.getlist('mp_cantidad')
         ids_mp = request.form.getlist('mp_id')
         unidades = request.form.getlist('mp_unidad')
 
-        for i in range(len(cantidades)):
-            if cantidades[i] and ids_mp[i]:
+        # 4. Insertamos todos los detalles en un ciclo
+        for i in range(len(ids_mp)):
+            # Validamos que la fila no esté vacía y tenga cantidad válida
+            if cantidades[i] and float(cantidades[i]) > 0:
                 db.session.execute(
-                    db.text("call agregar_detalle(:idReceta,:idMp, :cantidad, :unidad)"),
+                    db.text("CALL agregar_detalle(:idReceta, :idMp, :cantidad, :unidad)"),
                     {
-                        'idReceta':id_receta,
-                        'idMp':ids_mp[i],
-                        'cantidad':cantidades[i],
-                        'unidad':unidades[i],
+                        'idReceta': id_receta,
+                        'idMp': ids_mp[i],
+                        'cantidad': cantidades[i],
+                        'unidad': unidades[i],
                     }
                 )
+        
         db.session.commit()
-        flash('Receta creada correctamente', 'success')
+        flash('Receta y todos sus ingredientes creados correctamente', 'success')
         return redirect(url_for('recetas.index'))
 
     return render_template("recetas/crear.html", form=form, materias=materias)
@@ -90,7 +92,6 @@ def editar():
 
     create_from = forms.RecetaForm(request.form)
     create_from.idProducto.choices = [(p.id, p.nombre) for p in Producto.query.order_by(Producto.nombre).all()]
-
     materias = MateriaPrima.query.order_by(MateriaPrima.nombre).all()
 
     if request.method == "GET":
@@ -100,6 +101,7 @@ def editar():
         create_from.estatus.data = receta.estatus
 
     if request.method == "POST":
+        # Actualizamos la cabecera
         receta.nombre = create_from.nombre.data
         receta.idProducto = create_from.idProducto.data
         receta.cantidadProducida = create_from.cantidadProducida.data
@@ -111,20 +113,19 @@ def editar():
         unidades = request.form.getlist('mp_unidad')
         ids_mp = request.form.getlist('mp_id')
 
-        for i in range(len(cantidades)):
-            if cantidades[i] and ids_mp[i]:
-                detalle = DetalleReceta(
-                    idReceta = receta.id,
-                    idMateriaPrima = int(ids_mp[i]),
-                    cantidad = cantidades[i],
-                    unidad = unidades[i],
-                )
-                db.session.add(detalle)
+    for i in range(len(cantidades)):
+        if cantidades[i] and ids_mp[i]:
+            detalle = DetalleReceta(
+                idReceta = receta.id,
+                idMateriaPrima = int(ids_mp[i]),
+                cantidad = cantidades[i],
+                unidad = unidades[i],
+            )
+            db.session.add(detalle)
 
         db.session.commit()
         flash('Receta actualizada correctamente', 'success')
         return redirect(url_for('recetas.index'))
-    
     return render_template("recetas/editar.html", form=create_from, receta=receta, materias=materias)
 
 @receta_bp.route("/recetas/eliminar", methods=["POST"])
@@ -138,4 +139,3 @@ def eliminar():
     db.session.commit()
     flash("Receta desactivada correctamente", 'warning')
     return redirect(url_for('recetas.index'))
-

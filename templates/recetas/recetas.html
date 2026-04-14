@@ -15,33 +15,33 @@
     {% endif %}
   </div>
 
-  <!-- Buscador -->
-  <form method="GET" action="{{ url_for('recetas.index') }}">
-    <div class="toolbar fade-up-1">
-      <div class="search-inp">
-        <span style="color:var(--light-text); font-size:14px;">🔍</span>
-        <input
-          type="text"
-          name="busqueda"
-          placeholder="Buscar receta…"
-          value="{{ busqueda }}"
-        />
-      </div>
-      {% if request.args.get('estatus') %}
-        <input type="hidden" name="estatus" value="{{ request.args.get('estatus') }}" />
-      {% endif %}
-      <button type="submit" class="btn-primary-teal"
-              style="padding:8px 16px; border-radius:10px; font-size:12px;">
-        Buscar
-      </button>
-      {% if busqueda %}
-        <a href="{{ url_for('recetas.index') }}" class="btn-cancel"
-            style="padding:8px 14px; border-radius:10px; font-size:12px; text-decoration:none;">
-          Limpiar
-        </a>
-      {% endif %}
-    </div>
-  </form>
+      <!-- Buscador -->
+      <form method="GET" action="{{ url_for('recetas.index') }}">
+        <div class="toolbar fade-up-1">
+          <div class="search-inp">
+            <span style="color:var(--light-text); font-size:14px;">🔍</span>
+            <input
+              type="text"
+              name="busqueda"
+              placeholder="Buscar receta…"
+              value="{{ busqueda }}"
+            />
+          </div>
+          {% if request.args.get('estatus') %}
+            <input type="hidden" name="estatus" value="{{ request.args.get('estatus') }}" />
+          {% endif %}
+          <button type="submit" class="btn-primary-teal"
+                  style="padding:8px 16px; border-radius:10px; font-size:12px;">
+            Buscar
+          </button>
+          {% if busqueda %}
+            <a href="{{ url_for('recetas.index') }}" class="btn-cancel"
+               style="padding:8px 14px; border-radius:10px; font-size:12px; text-decoration:none;">
+              Limpiar
+            </a>
+          {% endif %}
+        </div>
+      </form>
 
   <!-- Tabla -->
   <div class="table-wrap fade-up-2">
@@ -130,8 +130,7 @@
   </div>
 {% endblock %}
 
-{% block right_panel %}
-  <!-- PANEL DERECHO -->
+    <!-- ── PANEL DERECHO (solo lectura) ── -->
     <aside class="right-panel">
 
       <div class="panel-hdr-dark">
@@ -201,6 +200,7 @@
 
     </aside>
 
+  </div>
 {% endblock %}
 
 {% block extra_js %}

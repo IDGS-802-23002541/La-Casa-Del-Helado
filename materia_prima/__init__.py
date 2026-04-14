@@ -14,11 +14,10 @@ materia_bp = Blueprint(
 def materia():
     if request.method == "POST":
         materia_id = request.form.get("id")
-
         nombre = request.form.get("nombre")
         unidadBase = request.form.get("unidadBase")
         stockActual = request.form.get("stockActual") or 0
-        stockMinimo = request.form.get("stockMinimo")
+        stockMinimo = request.form.get("stockMinimo") or 0
         idCategoria = request.form.get("idCategoria")
         estatus = request.form.get("estatus")
 
@@ -29,7 +28,6 @@ def materia():
         if materia_id:
             # EDITAR
             materia_existente = MateriaPrima.query.get(materia_id)
-
             if materia_existente:
                 materia_existente.nombre = nombre
                 materia_existente.unidadBase = unidadBase
@@ -37,7 +35,6 @@ def materia():
                 materia_existente.stockMinimo = stockMinimo
                 materia_existente.idCategoria = idCategoria
                 materia_existente.estatus = True if estatus == "1" else False
-
         else:
             # CREAR
             nueva = MateriaPrima(
@@ -53,9 +50,11 @@ def materia():
         db.session.commit()
         return redirect(url_for("materia.materia"))
 
+    # CONSULTAS
     materias_db = MateriaPrima.query.all()
     categorias = Categoria.query.all()
 
+    # Formateo de datos para el template (Sin Proveedor)
     materias_primas = []
     for mp in materias_db:
         materias_primas.append({
@@ -65,7 +64,6 @@ def materia():
             "stockActual": float(mp.stockActual or 0),
             "stockMinimo": float(mp.stockMinimo or 0),
             "estatus": mp.estatus,
-
             "categoria": {
                 "id": mp.categoria.id if mp.categoria else None,
                 "nombre": mp.categoria.nombre if mp.categoria else "Sin categoría"

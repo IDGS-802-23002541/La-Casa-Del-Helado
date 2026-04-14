@@ -4,10 +4,12 @@
 ════════════════════════════════════════ */
 
 .venta-main {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-  width: 100%;
+  display: flex !important;
+  flex-direction: row !important;
+  /* Lado a lado */
+  flex: 1 !important;
+  overflow: hidden !important;
+  width: 100% !important;
 }
 
 .venta-left-panel {
@@ -15,7 +17,6 @@
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
-  min-width: 0;
 }
 
 .venta-ticket-panel {
@@ -25,7 +26,7 @@
   background: white;
   border-left: 1px solid #e5e7eb;
   flex-shrink: 0;
-  height: 100%;
+  height: 97vh;
 }
 
 .venta-product-grid {
@@ -100,6 +101,11 @@
 /* ════════════════════════
    LAYOUT
 ════════════════════════ */
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
 
 .left-panel {
   flex: 1;
@@ -961,10 +967,4 @@
 
 .btn-cobrar:active {
   transform: translateY(0);
-}
-
-#panel-ol {
-  flex: 1;
-  overflow-y: auto;
-  min-width: 0;
 }

@@ -2,240 +2,262 @@
 {% block title %}Productos — La Casa del Helado{% endblock %}
 
 {% block body %}
-  <!-- HEADER -->
-  <div class="page-hdr fade-up">
-    <div class="page-hdr-left">
-      <h1>Productos</h1>
-      <p>Inventario de productos terminados</p>
-    </div>
-  </div>
 
-  <!-- Buscador -->
-  <form method="GET" action="{{ url_for('producto.index') }}">
-    <div class="toolbar fade-up-1">
-      <div class="search-inp">
-        <span style="color:var(--light-text); font-size:14px;">🔍</span>
-        <input
-          type="text"
-          name="busqueda"
-          placeholder="Buscar receta…"
-          value="{{ busqueda }}"
-        />
-      </div>
-      {% if request.args.get('estatus') %}
-        <input type="hidden" name="estatus" value="{{ request.args.get('estatus') }}" />
-      {% endif %}
-      <button type="submit" class="btn-primary-teal"
-              style="padding:8px 16px; border-radius:10px; font-size:12px;">
-        Buscar
-      </button>
-      {% if busqueda %}
-        <a href="{{ url_for('producto.index') }}" class="btn-cancel"
-            style="padding:8px 14px; border-radius:10px; font-size:12px; text-decoration:none;">
-          Limpiar
-        </a>
-      {% endif %}
-    </div>
-  </form>
+  <div class="app-body has-panel">
 
-  <!-- TABLA -->
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Nombre</th>
-          <th>Categoría</th>
-          <th>Unidad</th>
-          <th>Stock actual</th>
-          <th>Stock mínimo</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        {% for p in productos %}
-        <tr>
-
-          <!-- ID -->
-          <td class="td-id">
-            {{ loop.index }}
-          </td>
-
-          <!-- NOMBRE -->
-          <td>
-            <span class="td-nombre">{{ p.nombre }}</span>
-          </td>
-
-          <!-- CATEGORÍA -->
-          <td>
-            <span class="tag-count">
-              {{ p.categoria.nombre if p.categoria else '—' }}
-            </span>
-          </td>
-
-          <!-- UNIDAD -->
-          <td>
-            <span class="td-muted">
-              {{ p.unidadBase }}
-            </span>
-          </td>
-
-          <!-- STOCK ACTUAL -->
-          <td>
-            {% if p.stockActual <= p.stockMinimo %}
-              <span class="status-badge s-warning">
-                ⚠ {{ p.stockActual }}
-              </span>
-            {% else %}
-              <span class="td-muted">
-                {{ p.stockActual }}
-              </span>
-            {% endif %}
-          </td>
-
-          <!-- STOCK MÍNIMO -->
-          <td>
-            <span class="td-muted">
-              {{ p.stockMinimo }}
-            </span>
-          </td>
-
-          <!-- ACCIONES -->
-          <td>
-            <a href="{{ url_for('producto.index', edit=p.id) }}" 
-              class="action-btn ab-editar">
-              Editar
-            </a>
-
-            <form method="POST"
-                  action="{{ url_for('producto.eliminar', id=p.id) }}"
-                  style="display:inline;">
-              <button type="submit" class="action-btn ab-eliminar">
-                Eliminar
-              </button>
-            </form>
-          </td>
-
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-{% endblock %}
-
-{% block right_panel %}
-  <!-- PANEL DERECHO -->
-  <aside class="right-panel">
-    <div class="panel-hdr-dark">
-      <h3>{{ 'Editar Producto' if prod_editar else 'Nuevo Producto' }}</h3>
-      <p>Completa los campos para {{ 'actualizar el' if prod_editar else 'registrar un nuevo' }} producto</p>
-    </div>
-
-    <div class="panel-body">
-      <form id="form-producto" method="POST"
-            action="{{ url_for('producto.editar', id=prod_editar.id) if prod_editar else url_for('producto.crear') }}">
-
-        <div class="fg">
-          <label>Nombre</label>
-          <input type="text" name="nombre"
-                value="{{ prod_editar.nombre if prod_editar else '' }}" />
-        </div>
-
-        <div class="fg">
-          <label>Unidad base</label>
-          <input type="text" name="unidadBase"
-                value="{{ prod_editar.unidadBase if prod_editar else '' }}" />
-        </div>
-
-        <div class="fr2">
-          <div class="fg">
-            <label>Stock actual</label>
-            <input type="number" step="0.01" name="stockActual"
-                  value="{{ prod_editar.stockActual if prod_editar else '' }}" />
-          </div>
-          <div class="fg">
-            <label>Stock mínimo</label>
-            <input type="number" step="0.01" name="stockMinimo"
-                  value="{{ prod_editar.stockMinimo if prod_editar else '' }}" />
-          </div>
-        </div>
-
-        <div class="fg">
-          <label>Categoría</label>
-          <select name="idCategoria">
-            <option value="">— Selecciona categoría —</option>
-            {% for c in categorias %}
-              <option value="{{ c.id }}"
-                {{ 'selected' if prod_editar and prod_editar.idCategoria == c.id }}>
-                {{ c.nombre }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
-
-      </form>
-
-      <!-- SECCIÓN PRESENTACIONES — solo visible al editar -->
-      {% if prod_editar %}
-      <div class="fsec" style="margin-top:18px;">Presentaciones de venta</div>
-
-      {% if presentaciones %}
-        {% for pres in presentaciones %}
-        <div style="display:flex; align-items:center; justify-content:space-between;
-                    background:#F8F5FC; border-radius:9px; padding:8px 10px; margin-bottom:6px;">
-          <div>
-            <div style="font-size:12px; font-weight:600; color:var(--dark);">{{ pres.nombre }}</div>
-            <div style="font-size:10px; color:var(--light-text);">
-              {{ pres.equivalencia }} {{ prod_editar.unidadBase }} · ${{ pres.precio }}
-            </div>
-          </div>
-          <form method="POST"
-                action="{{ url_for('producto.eliminar_presentacion') }}?id={{ pres.id }}">
-            <button type="submit" class="action-btn ab-eliminar" style="margin:0;">✕</button>
-          </form>
-        </div>
-        {% endfor %}
-      {% else %}
-        <p style="font-size:11px; color:var(--light-text); margin-bottom:10px;">
-          Sin presentaciones registradas.
-        </p>
-      {% endif %}
-
-      <!-- Form nueva presentación -->
-      <form method="POST"
-            action="{{ url_for('producto.crear_presentacion', id=prod_editar.id) }}">
-        <div class="fg">
-          <label>Nombre presentación</label>
-          <input type="text" name="nombre" placeholder="Ej. Cono doble de Mango" />
-        </div>
-        <div class="fr2">
-          <div class="fg">
-            <label>Equivalencia ({{ prod_editar.unidadBase }})</label>
-            <input type="number" step="0.0001" name="equivalencia" placeholder="0.1500" />
-          </div>
-          <div class="fg">
-            <label>Precio ($)</label>
-            <input type="number" step="0.01" name="precio" placeholder="25.00" />
-          </div>
-        </div>
-        <button type="submit" class="btn-primary-teal"
-                style="width:100%; border-radius:10px; padding:9px; font-size:12px; justify-content:center;">
-          + Agregar presentación
-        </button>
-      </form>
-      {% endif %}
-
-    </div>
-
-    <div class="panel-footer">
-      <a href="{{ url_for('producto.index') }}" class="btn-cancel">
-        Cancelar
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sb-section">Inventario</div>
+      <a href="{{ url_for('producto.index') }}" class="sb-item active">
+        🍦 Productos
+        <span class="sb-badge">{{ total }}</span>
       </a>
-      <button type="submit" form="form-producto" class="btn-save">
-        {{ 'Actualizar' if prod_editar else 'Guardar' }}
-      </button>
-    </div>
 
-  </aside>
+      <div class="sb-divider"></div>
+      <div class="sb-section">Filtrar por categoría</div>
+
+      <a href="{{ url_for('producto.index', busqueda=busqueda) }}"
+         class="sb-item {{ 'active-teal' if not idCategoria }}">
+        📋 Todas
+      </a>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <div class="page-hdr fade-up">
+        <div class="page-hdr-left">
+          <h1>Productos</h1>
+          <p>Inventario de productos terminados</p>
+        </div>
+      </div>
+
+      <!-- Buscador -->
+      <form method="GET" action="{{ url_for('producto.index') }}">
+        <div class="toolbar fade-up-1">
+          <div class="search-inp">
+            <span style="color:var(--light-text); font-size:14px;">🔍</span>
+            <input
+              type="text"
+              name="busqueda"
+              placeholder="Buscar receta…"
+              value="{{ busqueda }}"
+            />
+          </div>
+          {% if request.args.get('estatus') %}
+            <input type="hidden" name="estatus" value="{{ request.args.get('estatus') }}" />
+          {% endif %}
+          <button type="submit" class="btn-primary-teal"
+                  style="padding:8px 16px; border-radius:10px; font-size:12px;">
+            Buscar
+          </button>
+          {% if busqueda %}
+            <a href="{{ url_for('producto.index') }}" class="btn-cancel"
+               style="padding:8px 14px; border-radius:10px; font-size:12px; text-decoration:none;">
+              Limpiar
+            </a>
+          {% endif %}
+        </div>
+      </form>
+
+      <!-- TABLA -->
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Categoría</th>
+              <th>Unidad</th>
+              <th>Stock actual</th>
+              <th>Stock mínimo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for p in productos %}
+            <tr>
+
+              <!-- ID -->
+              <td class="td-id">
+                {{ loop.index }}
+              </td>
+
+              <!-- NOMBRE -->
+              <td>
+                <span class="td-nombre">{{ p.nombre }}</span>
+              </td>
+
+              <!-- CATEGORÍA -->
+              <td>
+                <span class="tag-count">
+                  {{ p.categoria.nombre if p.categoria else '—' }}
+                </span>
+              </td>
+
+              <!-- UNIDAD -->
+              <td>
+                <span class="td-muted">
+                  {{ p.unidadBase }}
+                </span>
+              </td>
+
+              <!-- STOCK ACTUAL -->
+              <td>
+                {% if p.stockActual <= p.stockMinimo %}
+                  <span class="status-badge s-warning">
+                    ⚠ {{ p.stockActual }}
+                  </span>
+                {% else %}
+                  <span class="td-muted">
+                    {{ p.stockActual }}
+                  </span>
+                {% endif %}
+              </td>
+
+              <!-- STOCK MÍNIMO -->
+              <td>
+                <span class="td-muted">
+                  {{ p.stockMinimo }}
+                </span>
+              </td>
+
+              <!-- ACCIONES -->
+              <td>
+                <a href="{{ url_for('producto.index', edit=p.id) }}" 
+                  class="action-btn ab-editar">
+                  Editar
+                </a>
+
+                <form method="POST"
+                      action="{{ url_for('producto.eliminar', id=p.id) }}"
+                      style="display:inline;">
+                  <button type="submit" class="action-btn ab-eliminar">
+                    Eliminar
+                  </button>
+                </form>
+              </td>
+
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- PANEL DERECHO -->
+<aside class="right-panel">
+  <div class="panel-hdr-dark">
+    <h3>{{ 'Editar Producto' if prod_editar else 'Nuevo Producto' }}</h3>
+    <p>Completa los campos para {{ 'actualizar el' if prod_editar else 'registrar un nuevo' }} producto</p>
+  </div>
+
+  <div class="panel-body">
+    <form id="form-producto" method="POST"
+          action="{{ url_for('producto.editar', id=prod_editar.id) if prod_editar else url_for('producto.crear') }}">
+
+      <div class="fg">
+        <label>Nombre</label>
+        <input type="text" name="nombre"
+              value="{{ prod_editar.nombre if prod_editar else '' }}" />
+      </div>
+
+      <div class="fg">
+        <label>Unidad base</label>
+        <input type="text" name="unidadBase"
+              value="{{ prod_editar.unidadBase if prod_editar else '' }}" />
+      </div>
+
+      <div class="fr2">
+        <div class="fg">
+          <label>Stock actual</label>
+          <input type="number" step="0.01" name="stockActual"
+                value="{{ prod_editar.stockActual if prod_editar else '' }}" />
+        </div>
+        <div class="fg">
+          <label>Stock mínimo</label>
+          <input type="number" step="0.01" name="stockMinimo"
+                value="{{ prod_editar.stockMinimo if prod_editar else '' }}" />
+        </div>
+      </div>
+
+      <div class="fg">
+        <label>Categoría</label>
+        <select name="idCategoria">
+          <option value="">— Selecciona categoría —</option>
+          {% for c in categorias %}
+            <option value="{{ c.id }}"
+              {{ 'selected' if prod_editar and prod_editar.idCategoria == c.id }}>
+              {{ c.nombre }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+    </form>
+
+    <!-- SECCIÓN PRESENTACIONES — solo visible al editar -->
+    {% if prod_editar %}
+    <div class="fsec" style="margin-top:18px;">Presentaciones de venta</div>
+
+    {% if presentaciones %}
+      {% for pres in presentaciones %}
+      <div style="display:flex; align-items:center; justify-content:space-between;
+                  background:#F8F5FC; border-radius:9px; padding:8px 10px; margin-bottom:6px;">
+        <div>
+          <div style="font-size:12px; font-weight:600; color:var(--dark);">{{ pres.nombre }}</div>
+          <div style="font-size:10px; color:var(--light-text);">
+            {{ pres.equivalencia }} {{ prod_editar.unidadBase }} · ${{ pres.precio }}
+          </div>
+        </div>
+        <form method="POST"
+              action="{{ url_for('producto.eliminar_presentacion') }}?id={{ pres.id }}">
+          <button type="submit" class="action-btn ab-eliminar" style="margin:0;">✕</button>
+        </form>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p style="font-size:11px; color:var(--light-text); margin-bottom:10px;">
+        Sin presentaciones registradas.
+      </p>
+    {% endif %}
+
+    <!-- Form nueva presentación -->
+    <form method="POST"
+          action="{{ url_for('producto.crear_presentacion', id=prod_editar.id) }}">
+      <div class="fg">
+        <label>Nombre presentación</label>
+        <input type="text" name="nombre" placeholder="Ej. Cono doble de Mango" />
+      </div>
+      <div class="fr2">
+        <div class="fg">
+          <label>Equivalencia ({{ prod_editar.unidadBase }})</label>
+          <input type="number" step="0.0001" name="equivalencia" placeholder="0.1500" />
+        </div>
+        <div class="fg">
+          <label>Precio ($)</label>
+          <input type="number" step="0.01" name="precio" placeholder="25.00" />
+        </div>
+      </div>
+      <button type="submit" class="btn-primary-teal"
+              style="width:100%; border-radius:10px; padding:9px; font-size:12px; justify-content:center;">
+        + Agregar presentación
+      </button>
+    </form>
+    {% endif %}
+
+  </div>
+
+  <div class="panel-footer">
+    <a href="{{ url_for('producto.index') }}" class="btn-cancel">
+      Cancelar
+    </a>
+    <button type="submit" form="form-producto" class="btn-save">
+      {{ 'Actualizar' if prod_editar else 'Guardar' }}
+    </button>
+  </div>
+
+</aside>
+  </div>
 {% endblock %}

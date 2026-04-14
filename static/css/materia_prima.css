@@ -1,0 +1,105 @@
+/* --- Estructura y Tabla --- */
+.table-wrap {
+    max-height: 540px;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+#materiasTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.inactive-row {
+    opacity: 0.5;
+    background-color: #f9f9f9;
+}
+
+/* --- Filtros y Chips --- */
+.filter-chip {
+    display: inline-block;
+    padding: 0.4em 1em;
+    margin-right: 0.5em;
+    background: #e3f2fd;
+    color: #1976d2;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.filter-chip.inactive-filter {
+    background: #eee;
+    color: #757575;
+}
+
+.filter-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* --- Selectores de Estatus (Formulario) --- */
+.status-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.status-chip {
+    flex: 1;
+    text-align: center;
+    padding: 0.6em;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+    border: 2px solid transparent;
+}
+
+.status-chip.on { 
+    background: #e8f5e9; 
+    color: #2e7d32; 
+    border-color: #4caf50;
+}
+
+.status-chip.off { 
+    background: #ffebee; 
+    color: #c62828; 
+    border-color: #ef5350;
+}
+
+/* --- Modal / Card Detalle --- */
+#overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    z-index: 999;
+    backdrop-filter: blur(2px);
+}
+
+#card {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 2.5em;
+    border-radius: 15px;
+    width: 350px;
+    display: none;
+    z-index: 1000;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+#closeCard {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #999;
+}
+
+#closeCard:hover { color: #333; }

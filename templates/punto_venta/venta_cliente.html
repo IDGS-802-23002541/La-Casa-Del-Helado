@@ -19,6 +19,14 @@
       <div class="nav-sub">Pedidos en línea · Desde 1995</div>
     </div>
   </div>
+
+  <div style="display: flex; align-items: center; gap: 15px;">
+    <a href="{{ url_for('clientesOn.logout_cliente') }}" 
+       style="text-decoration: none; color: #ff6f91; font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 5px; padding: 8px 12px; border: 2px solid #ffecf1; border-radius: 10px; transition: 0.3s;"
+       onmouseover="this.style.backgroundColor='#ffecf1'" onmouseout="this.style.backgroundColor='transparent'">
+        Salir
+    </a>
+
   <button class="nav-cart-btn" onclick="abrirModalDatos()">
     🛒 Mi pedido <span class="nav-badge" id="nav-count">0</span>
   </button>

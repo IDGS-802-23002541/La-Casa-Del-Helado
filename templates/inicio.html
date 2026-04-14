@@ -1,18 +1,202 @@
-{% extends "layout.html"%} {% block container %}
+{% block body %}
+<style>
+/* FUENTES */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-<p class="text-2xl">HTML de inicio</p>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-<a
-  href="#"
-  class="bg-neutral-primary-soft block max-w-sm p-6 border border-default rounded-base shadow-xs hover:bg-neutral-secondary-medium"
->
-  <h5 class="mb-3 text-2xl font-semibold tracking-tight text-heading leading-8">
-    Noteworthy technology acquisitions 2021
-  </h5>
-  <p class="text-body">
-    Here are the biggest technology acquisitions of 2025 so far, in reverse
-    chronological order.
-  </p>
-</a>
+.main-container {
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fbc2eb 50%, #a18cd1 100%);
+  overflow: hidden;
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+}
 
+.bg-visual {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.5;
+  animation: move-blobs 10s infinite alternate;
+}
+
+.blob1 { width: 400px; height: 400px; background: #ff6f91; top: -100px; left: -100px; }
+.blob2 { width: 500px; height: 500px; background: #ffc2d1; bottom: -150px; right: -100px; }
+.blob3 { width: 300px; height: 300px; background: #a18cd1; top: 30%; left: 40%; }
+
+@keyframes move-blobs {
+  from { transform: translate(0, 0); }
+  to { transform: translate(40px, -40px); }
+}
+
+.navbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 25px 50px;
+  position: relative;
+  z-index: 20;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none; 
+  padding: 0;
+  margin: 0;
+}
+
+.nav-links li {
+  list-style: none; 
+}
+
+.btn-soft {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.4s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.btn-soft:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  color: #fff;
+}
+
+
+.hero {
+  position: relative;
+  height: calc(100vh - 100px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+  padding: 20px;
+}
+
+.img-back-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 450px;
+  opacity: 0.12; /* Muy tenue */
+  z-index: 1;
+  filter: blur(2px);
+  animation: float-back 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes float-back {
+  0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+  50% { transform: translate(-50%, -55%) rotate(4deg); }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 75px;
+  line-height: 1;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 14px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  opacity: 0.8;
+}
+
+.img-float {
+  position: absolute;
+  width: 170px;
+  animation: floating-side 5s ease-in-out infinite;
+  z-index: 5;
+  opacity: 0.85;
+}
+
+.top-left { top: 5%; left: 5%; }
+.top-right { top: 5%; right: 5%; }
+.bottom-left { bottom: 5%; left: 8%; }
+.bottom-right { bottom: 5%; right: 8%; }
+.middle-left { left: 12%; top: 45%; width: 140px; }
+.middle-right { right: 12%; top: 35%; width: 140px; }
+
+@keyframes floating-side {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+/* RESPONSIVE */
+@media(max-width: 768px) {
+  .hero h1 { font-size: 45px; }
+  .img-float { display: none; }
+  .img-back-center { width: 280px; }
+  .navbar { padding: 20px; }
+}
+</style>
+<div class="main-container">
+  <div class="bg-visual">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+  </div>
+
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li>
+        <a href="/login" class="btn-soft">Iniciar sesión</a>
+      </li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <img class="img-float top-left" src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG20998.png">
+    <img class="img-float middle-left" src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG21000.png">
+    <img class="img-float bottom-left" src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG20994.png">
+
+    <img class="img-float top-right" src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG20998.png">
+    <img class="img-float middle-right" src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG21000.png">
+    <img class="img-float bottom-right" src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG20994.png">
+
+    <img src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG20984.png" class="img-back-center">
+
+    <div class="hero-content">
+      <p>Sabores que Enamoran</p>
+      <h1>
+        Descubre la Magia del <br>
+        Helado Artesanal
+      </h1>
+      <br><br>
+      <a href="/registro_cliente" class="btn-soft">Ver catálogo</a>
+    </div>
+  </section>
+</div>
 {% endblock %}

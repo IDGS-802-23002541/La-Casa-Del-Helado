@@ -26,3 +26,5 @@ class DevelopmentConfig(Config):
     SECURITY_LOGIN_URL = '/fs-login'
     SECURITY_LOGOUT_URL = '/fs-logout'
     SECURITY_REGISTERABLE = False
+
+ 

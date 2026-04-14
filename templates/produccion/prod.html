@@ -3,9 +3,24 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/produccion.css') }}">
 {% endblock %}
-{% block layout_class %}no-panel{% endblock %}
 
 {% block body %}
+
+<div class="app-body">
+
+  <!-- SIDEBAR (usa base.css) -->
+  <aside class="sidebar">
+    <div class="sb-section">Gestión</div>
+
+    <a href="{{ url_for('produccion.tablero') }}" class="sb-item active-teal">
+      Producción
+      <span class="sb-badge">{{ pendientes|length }}</span>
+    </a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
     <!-- HEADER -->
     <div class="page-hdr">
       <div class="page-hdr-left">
@@ -141,5 +156,8 @@
       </div>
 
     </div>
+
+  </main>
+</div>
 
 {% endblock %}

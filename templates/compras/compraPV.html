@@ -14,34 +14,48 @@
 {% endblock %}
 
 {% block body %}
-  <!-- HEADER -->
-  <div class="page-hdr fade-up">
-    <div class="page-hdr-left">
-      <h1>Compras</h1>
-      <p>Registro de entradas de materia prima</p>
-    </div>
-  </div>
+<div class="app-body has-panel">
 
-  <!-- TOOLBAR (FILTRO FECHA) -->
-  <form method="GET" action="{{ url_for('compra.compra') }}">
-    <div class="toolbar fade-up-1">
-      <div class="filtro-fecha-group">
-        <label>📅</label>
-        <input type="date" name="fecha" value="{{ request.args.get('fecha', '') }}">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-section">Gestión</div>
+    <a href="{{ url_for('compra.compra') }}" class="sb-item active">
+      Compra
+      <span class="sb-badge">{{ compras|length }}</span>
+    </a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- HEADER -->
+    <div class="page-hdr fade-up">
+      <div class="page-hdr-left">
+        <h1>Compras</h1>
+        <p>Registro de entradas de materia prima</p>
       </div>
-
-      <button type="submit" class="btn-primary-teal">
-        Filtrar
-      </button>
-
-      {% if request.args.get('fecha') %}
-        <a href="{{ url_for('compra.compra') }}" class="btn-cancel">
-          Limpiar
-        </a>
-      {% endif %}
-
     </div>
-  </form>
+
+    <!-- TOOLBAR (FILTRO FECHA) -->
+    <form method="GET" action="{{ url_for('compra.compra') }}">
+      <div class="toolbar fade-up-1">
+        <div class="filtro-fecha-group">
+          <label>📅</label>
+          <input type="date" name="fecha" value="{{ request.args.get('fecha', '') }}">
+        </div>
+
+        <button type="submit" class="btn-primary-teal">
+          Filtrar
+        </button>
+
+        {% if request.args.get('fecha') %}
+          <a href="{{ url_for('compra.compra') }}" class="btn-cancel">
+            Limpiar
+          </a>
+        {% endif %}
+
+      </div>
+    </form>
 
   <!-- TABLA -->
   <div class="table-wrap">
@@ -59,42 +73,42 @@
         </tr>
       </thead>
 
-      <tbody>
-        {% for c in compras %}
-        <tr>
+        <tbody>
+          {% for c in compras %}
+          <tr>
 
-          <!-- FACTURA -->
-          <td>
-            <span class="factura-badge">
-              {{ c.factura }}
-            </span>
-          </td>
+            <!-- FACTURA -->
+            <td>
+              <span class="factura-badge">
+                {{ c.factura }}
+              </span>
+            </td>
 
-          <!-- PROVEEDOR -->
-          <td>
-            <div class="cell-main">
-              {{ c.proveedor.razonSocial }}
-            </div>
-          </td>
+            <!-- PROVEEDOR -->
+            <td>
+              <div class="cell-main">
+                {{ c.proveedor.razonSocial }}
+              </div>
+            </td>
 
-          <!-- DETALLES -->
-          <td>
-            <ul class="detalle-list">
-              {% for d in c.detalles_compra %}
-                <li>
-                  <span class="qty">{{ d.cantidad }} ( {{d.contenidoNeto }} )</span>
-                  {{ d.materiaPrima.nombre }}
-                </li>
-              {% endfor %}
-            </ul>
-          </td>
+            <!-- DETALLES -->
+            <td>
+              <ul class="detalle-list">
+                {% for d in c.detalles_compra %}
+                  <li>
+                    <span class="qty">{{ d.cantidad }} ( {{d.contenidoNeto }} )</span>
+                    {{ d.materiaPrima.nombre }}
+                  </li>
+                {% endfor %}
+              </ul>
+            </td>
 
-          <!-- FECHA -->
-          <td>
-            <span class="cell-muted">
-              {{ c.fechaCompra.strftime('%Y-%m-%d') }}
-            </span>
-          </td>
+            <!-- FECHA -->
+            <td>
+              <span class="cell-muted">
+                {{ c.fechaCompra.strftime('%Y-%m-%d') }}
+              </span>
+            </td>
 
           {% if current_user.rol.nombre == 'Admin' %}
           <!-- ACCIONES -->
@@ -109,20 +123,20 @@
           </td>
           {% endif %}
 
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
 
-    {% if not compras %}
-    <div class="empty-state">
-      <p>No hay compras registradas aún.</p>
+      {% if not compras %}
+      <div class="empty-state">
+        <p>No hay compras registradas aún.</p>
+      </div>
+      {% endif %}
     </div>
-    {% endif %}
-  </div>
-{% endblock %}
 
-{% block right_panel %}
+  </main>
+
   <!-- PANEL DERECHO (FORMULARIO) -->
   <aside class="right-panel">
 
@@ -246,7 +260,8 @@
 
     </div>
   </aside>
-{% endblock %}
+
+</div>
 
 <!-- MODAL -->
 <div id="modalEliminar" class="modal-overlay">
@@ -264,8 +279,8 @@
     <form id="formEliminar" method="POST"></form>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
 
-{% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 

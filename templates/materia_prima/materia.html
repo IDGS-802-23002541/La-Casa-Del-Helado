@@ -1,25 +1,99 @@
 {% extends "base.html" %}
 {% block title %}Inventario Materia Prima{% endblock %}
 
-{% block body %}
-    <div class="page-hdr fade-up">
-        <div class="page-hdr-left">
-            <h1>Inventario de materia prima</h1>
-            <p>Administra tus insumos y controla el stock</p>
-        </div>
-    </div>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='dist/output.css') }}">
+<style>
+.table-wrap {
+    max-height: 540px;
+    overflow-y: auto;
+}
 
-    <!-- BUSCADOR -->
-    <div class="toolbar">
-        <div class="search-inp">
-            🔎
-            <input type="text" id="search" placeholder="Buscar insumo, categoría ...">
+.inactive-row {
+    opacity: 0.5;
+}
+
+.filter-chip {
+    display: inline-block;
+    padding: 0.3em 0.7em;
+    margin-right: 0.5em;
+    background: #eee;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.filter-chip.inactive-filter {
+    background: #ccc;
+}
+
+.status-chip {
+    display: inline-block;
+    padding: 0.3em 0.7em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.status-chip.on { background: #4caf50; color: #fff; }
+.status-chip.off { background: #eee; color: #333; }
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right:0;
+    bottom:0;
+    background: rgba(0,0,0,0.5);
+    display:none;
+    z-index: 999;
+}
+#card {
+    position: fixed;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
+    background:#fff;
+    padding:2em;
+    border-radius:10px;
+    width:300px;
+    display:none;
+    z-index:1000;
+}
+#card h3 { margin-top:0; }
+#closeCard { cursor:pointer; float:right; }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="app-body has-panel">
+
+    <aside class="sidebar">
+        <div class="sb-section">Administración</div>
+        <a href="#" class="sb-item active">
+            🧪 Materia Prima
+            <span class="sb-badge">{{ materias_primas|length }}</span>
+        </a>
+    </aside>
+
+    <main class="main">
+
+        <div class="page-hdr">
+            <div class="page-hdr-left">
+                <h1>Inventario de materia prima</h1>
+                <p>Administra tus insumos y controla el stock</p>
+            </div>
         </div>
-        <button class="btn-primary-teal"
-                style="padding:8px 16px; border-radius:10px; font-size:12px;">
-        Buscar
-        </button>
-    </div>
+
+        <div class="toolbar">
+            <div class="search-inp">
+                🔎
+                <input type="text" id="search" placeholder="Buscar insumo, categoría o proveedor...">
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="filter-chip fc-all">Todos</div>
+            <div class="filter-chip fc-activo inactive-filter">Activos</div>
+            <div class="filter-chip fc-inactivo inactive-filter">Inactivos</div>
+        </div>
 
     <!-- TABLA -->
     <div class="table-wrap">
@@ -82,8 +156,6 @@
     </div>
 {% endblock %}
 
-{% block right_panel %}
-  {% if current_user.rol.nombre == 'Administrador' %}
     <aside class="right-panel">
         <div class="panel-hdr-dark">
             <h3>Nuevo insumo</h3>
@@ -104,6 +176,14 @@
                         </select>
                     </div>
                     <div class="fg"><label>Unidad</label><input name="unidadBase" type="text" required></div>
+                </div>
+                <div class="fg"><label>Proveedor</label>
+                    <select name="idProveedor">
+                        <option value="">Sin proveedor</option>
+                        {% for p in proveedores %}
+                        <option value="{{ p.id }}">{{ p.razonSocial }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <div class="fsec">Stock</div>
@@ -129,26 +209,23 @@
             <button type="submit" form="materiaForm" class="btn-save">Guardar</button>
         </div>
     </aside>
-  {% elif current_user.rol.nombre == 'Produccion' %}
-    {% block layout_class %}no-panel{% endblock %}
-  {% endif %}
-{% endblock %}
 
-<!-- TARJETA VER -->
+</div>
+
 <div id="overlay"></div>
 <div id="card">
     <span id="closeCard">✖</span>
     <h3 id="cardNombre"></h3>
     <p><strong>Categoría:</strong> <span id="cardCategoria"></span></p>
+    <p><strong>Proveedor:</strong> <span id="cardProveedor"></span></p>
     <p><strong>Stock:</strong> <span id="cardStock"></span></p>
     <p><strong>Estatus:</strong> <span id="cardEstatus"></span></p>
 </div>
-{% block extra_js %}
+
 <script>
 const materias = JSON.parse('{{ materias_primas | tojson | safe }}');
 let estadoFiltro = "todos";
 
-// FILTRAR
 function filtrarTabla() {
     const texto = document.getElementById("search").value.toLowerCase();
     document.querySelectorAll("#materiasTable tbody tr").forEach(row => {
@@ -164,10 +241,8 @@ function filtrarTabla() {
     });
 }
 
-// BUSCADOR
 document.getElementById("search").addEventListener("keyup", filtrarTabla);
 
-// CHIPS
 const chips = document.querySelectorAll(".filter-chip");
 chips[0].onclick = () => { estadoFiltro="todos"; activarChip(0); filtrarTabla(); };
 chips[1].onclick = () => { estadoFiltro="activos"; activarChip(1); filtrarTabla(); };
@@ -175,12 +250,12 @@ chips[2].onclick = () => { estadoFiltro="inactivos"; activarChip(2); filtrarTabl
 function activarChip(index){ chips.forEach(c=>c.classList.add("inactive-filter")); chips[index].classList.remove("inactive-filter"); }
 activarChip(0);
 
-// TARJETA VER
 const overlay = document.getElementById("overlay");
 const card = document.getElementById("card");
 const closeCard = document.getElementById("closeCard");
 const cardNombre = document.getElementById("cardNombre");
 const cardCategoria = document.getElementById("cardCategoria");
+const cardProveedor = document.getElementById("cardProveedor");
 const cardStock = document.getElementById("cardStock");
 const cardEstatus = document.getElementById("cardEstatus");
 
@@ -189,6 +264,7 @@ document.querySelectorAll(".btnVer").forEach(btn=>{
         const mp = materias.find(m=>m.id==btn.dataset.id);
         cardNombre.textContent = mp.nombre;
         cardCategoria.textContent = mp.categoria.nombre;
+        cardProveedor.textContent = mp.proveedor ? mp.proveedor.razonSocial : "Sin proveedor";
         cardStock.textContent = mp.stockActual + " " + mp.unidadBase;
         cardEstatus.textContent = mp.estatus ? "Activo" : "Inactivo";
         overlay.style.display="block"; card.style.display="block";
@@ -196,7 +272,6 @@ document.querySelectorAll(".btnVer").forEach(btn=>{
 });
 closeCard.onclick = () => { overlay.style.display="none"; card.style.display="none"; };
 
-// EDITAR
 document.querySelectorAll(".btnEditar").forEach(btn=>{
     btn.addEventListener("click", ()=>{
         const mp = materias.find(m=>m.id==btn.dataset.id);
@@ -207,6 +282,7 @@ document.querySelectorAll(".btnEditar").forEach(btn=>{
         form.stockActual.value = mp.stockActual;
         form.stockMinimo.value = mp.stockMinimo;
         form.idCategoria.value = mp.categoria.id;
+        form.idProveedor.value = mp.proveedor ? mp.proveedor.id : "";
         const chipsStatus = document.querySelectorAll(".status-chip");
         chipsStatus.forEach(c=>{c.classList.remove("on");c.classList.add("off");});
         if(mp.estatus){ chipsStatus[0].classList.add("on"); document.querySelector("input[value='1']").checked=true;}
@@ -214,7 +290,6 @@ document.querySelectorAll(".btnEditar").forEach(btn=>{
     });
 });
 
-// STATUS CHIP
 document.querySelectorAll(".status-chip").forEach(chip=>{
     chip.onclick=()=>{
         document.querySelectorAll(".status-chip").forEach(c=>{c.classList.remove("on"); c.classList.add("off");});
@@ -223,4 +298,5 @@ document.querySelectorAll(".status-chip").forEach(chip=>{
     };
 });
 </script>
+
 {% endblock %}

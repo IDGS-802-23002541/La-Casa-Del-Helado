@@ -9,11 +9,49 @@
       </small>
     </div>
   </a>
-  
-  <!-- STATUS -->
-  <div class="nav-pos-status">
-    <span class="nav-pos-dot"></span>
-    Turno activo — {{ current_user.nombreUsuario if current_user.is_authenticated else 'Invitado' }}
+
+  <div class="nav-links">
+
+    <a href="{{ url_for('dash.auth') }}"
+       class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">
+      Dashboard
+    </a>
+
+    <a href="{{ url_for('proveedores.proveedoresTabla') }}"
+       class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
+      Proveedores
+    </a>
+
+    <a href="{{ url_for('compra.compra') }}"
+       class="nav-link {% if request.endpoint == 'proveedores.compra' %}active{% endif %}">
+      Compra
+    </a>
+
+    <a href="{{ url_for('materia.materia') }}"
+       class="nav-link {% if request.endpoint == 'materia.materia' %}active{% endif %}">
+      Materia Prima
+    </a>
+
+    <a href="{{ url_for('producto.index') }}"
+       class="nav-link {% if request.endpoint == 'producto.index' %}active{% endif %}">
+      Productos
+    </a>
+
+    <a href="{{ url_for('usuarios.index') }}"
+       class="nav-link {% if active_page == 'usuarios' %}active{% endif %}">
+      Usuarios
+    </a>
+
+    <a href="{{ url_for('recetas.index') }}"
+       class="nav-link {% if active_page == 'recetas' %}active{% endif %}">
+      Recetas
+    </a>
+
+    <a href="{{ url_for('merma.merma') }}"
+       class="nav-link {% if request.endpoint == 'merma.merma' %}active{% endif %}">
+      Mermas
+    </a>
+
   </div>
 
   <div class="nav-right">
@@ -31,34 +69,14 @@
         ?
       {% endif %}
     </div>
-     {% if rol == 'Mostrador' %}
-      <a href="{{ url_for('auth.logout') }}" class="btn-logout">
-        Cerrar Sesión
-      </a>
-      {% endif %}
+
+    <a href="{{ url_for('auth.logout') }}" class="nav-logout">
+      SALIR
+    </a>
+
   </div>
+
 </nav>
-
-  {% if rol == 'Mostrador' %}
-      <!-- BOTTOM -->
-  <div class="nav-pos-bottom">
-
-    <a href="{{ url_for('venta.punto_venta') }}"
-       class="nav-pos-tab {% if request.endpoint == 'venta.punto_venta' %}active{% endif %}">
-      Punto de Venta
-    </a>
-
-    <a href="{{ url_for('SolicitudProduccion.solicitud_produccion') }}"
-       class="nav-pos-tab {% if request.endpoint == 'SolicitudProduccion.solicitud_produccion' %}active{% endif %}">
-      Producción
-    </a>
-    
-    <a href="{{ url_for('compra.compra') }}"
-       class="nav-pos-tab {% if request.endpoint == 'compra.compra' %}active{% endif %}">
-      Compras
-    </a>
-  </div>
-  {% endif %}
 <script>
   function actualizarHora() {
     const now = new Date();
