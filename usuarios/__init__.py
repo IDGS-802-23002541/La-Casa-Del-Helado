@@ -12,8 +12,8 @@ usuarios_bp = Blueprint(
 )
 
 @usuarios_bp.route("/usuarios", methods=["GET", "POST"])
-# @login_required
-# @roles_accepted('Administrador')
+@login_required
+@roles_accepted('Administrador')
 def index():
     edit_id = request.args.get('edit', type=int)
     busqueda = request.args.get('busqueda','')
@@ -56,8 +56,8 @@ def index():
     )
 
 @usuarios_bp.route("/usuarios/crear", methods=["POST"])
-# @login_required
-# @roles_accepted('Administrador','Produccion')
+@login_required
+@roles_accepted('Administrador','Produccion')
 def crear():
     create_from = forms.UserForm(request.form)
     create_from.idRol.choices = [
@@ -88,8 +88,8 @@ def crear():
     return redirect(url_for('usuarios.index'))
 
 @usuarios_bp.route("/usuarios/editar", methods=["POST"])
-# @login_required
-# @roles_accepted('Administrador')
+@login_required
+@roles_accepted('Administrador')
 def editar():
     id = request.args.get('id')
     usr = db.session.query(Usuario).filter(Usuario.id==id).first()
@@ -109,8 +109,8 @@ def editar():
     return redirect(url_for('usuarios.index'))
 
 @usuarios_bp.route("/usuarios/eliminar", methods=["POST"])
-# @login_required
-# @roles_accepted('Administrador')
+@login_required
+@roles_accepted('Administrador')
 def eliminar():
     id = request.args.get('id')
     usr = Usuario.query.get_or_404(id)

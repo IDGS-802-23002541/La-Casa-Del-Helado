@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from models import db, SolicitudProduccion, Producto, Receta, DetalleReceta, MateriaPrima, Usuario
+from models import db, SolicitudProduccion, Producto, Receta, MateriaPrima
+from flask_security.decorators import roles_accepted, login_required
 import datetime
 import decimal
 
@@ -10,6 +11,8 @@ produccion_bp = Blueprint(
 )
 
 @produccion_bp.route("/produccion")
+@login_required
+@roles_accepted('Produccion')
 def tablero():
     pendientes = SolicitudProduccion.query.filter_by(estatus='Pendiente').all()
     en_proceso = SolicitudProduccion.query.filter_by(estatus='En Proceso').all()
@@ -23,6 +26,8 @@ def tablero():
     )
 
 @produccion_bp.route("/produccion/iniciar/<int:sol_id>", methods=["POST"])
+@login_required
+@roles_accepted('Produccion')
 def iniciar_produccion(sol_id):
     solicitud = SolicitudProduccion.query.get_or_404(sol_id)
 
@@ -37,6 +42,8 @@ def iniciar_produccion(sol_id):
     return redirect(url_for('produccion.tablero'))
 
 @produccion_bp.route("/produccion/terminar/<int:sol_id>", methods=["POST"])
+@login_required
+@roles_accepted('Produccion')
 def terminar_produccion(sol_id):
     solicitud = SolicitudProduccion.query.get_or_404(sol_id)
 

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from models import db, MateriaPrima, Categoria
+from flask_security.decorators import roles_accepted, login_required
 
 materia_bp = Blueprint(
     'materia',
@@ -8,6 +9,8 @@ materia_bp = Blueprint(
 )
 
 @materia_bp.route("/materia", methods=["GET", "POST"])
+@login_required
+@roles_accepted('Administrador', 'Produccion')
 def materia():
     if request.method == "POST":
         materia_id = request.form.get("id")
@@ -19,13 +22,12 @@ def materia():
         idCategoria = request.form.get("idCategoria")
         estatus = request.form.get("estatus")
 
-        # 🔥 CONVERSIÓN IMPORTANTE
         idCategoria = int(idCategoria) if idCategoria else None
         stockActual = float(stockActual)
         stockMinimo = float(stockMinimo)
 
         if materia_id:
-            # 🔹 EDITAR
+            # EDITAR
             materia_existente = MateriaPrima.query.get(materia_id)
 
             if materia_existente:
@@ -37,7 +39,7 @@ def materia():
                 materia_existente.estatus = True if estatus == "1" else False
 
         else:
-            # 🔹 CREAR
+            # CREAR
             nueva = MateriaPrima(
                 nombre=nombre,
                 unidadBase=unidadBase,
@@ -51,11 +53,9 @@ def materia():
         db.session.commit()
         return redirect(url_for("materia.materia"))
 
-    # 🔹 CONSULTAS
     materias_db = MateriaPrima.query.all()
     categorias = Categoria.query.all()
 
-    # 🔥 FORMATO CORRECTO (OBJETOS)
     materias_primas = []
     for mp in materias_db:
         materias_primas.append({

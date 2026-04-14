@@ -6,7 +6,8 @@ from flask_security import login_required, roles_accepted
 proveedores = Blueprint('proveedores', __name__)
 
 @proveedores.route('/proveedores')
-# @login_required # Solo usuarios logueados apueden ver la tabla
+@login_required
+@roles_accepted('Administrador')
 def proveedoresTabla():
     busqueda = request.args.get('q', '')
     estatus_filtro = request.args.get('estatus', '')
@@ -34,8 +35,8 @@ def proveedorDetalles():
     return render_template("proveedores/proveedores.html", proveedor=proveedor, modo="detalles")
 
 @proveedores.route("/proveedorNuevo", methods=["GET", "POST"])
-# @login_required
-# @roles_accepted('Administrador') # Solo el jefe puede crear
+@login_required
+@roles_accepted('Administrador')
 def proveedorNuevo():
     if request.method == "POST":
         razon     = request.form.get('razonSocial')
@@ -66,8 +67,8 @@ def proveedorNuevo():
     return redirect(url_for('proveedores.proveedoresTabla'))
 
 @proveedores.route("/proveedorModificar", methods=["GET", "POST"])
-# @login_required
-# @roles_accepted('Administrador') # Solo el jefe puede editar
+@login_required
+@roles_accepted('Administrador')
 def proveedorModificar():
     id_proveedor = request.args.get('id', type=int)
     proveedor = Proveedor.query.get_or_404(id_proveedor)
@@ -91,8 +92,8 @@ def proveedorModificar():
     return render_template("proveedores/proveedores.html", proveedores=lista, proveedor=proveedor, modo="editar")
 
 @proveedores.route("/proveedorEliminar", methods=["GET", "POST"])
-# @login_required
-# @roles_accepted('Administrador') # Seguridad máxima para borrar
+@login_required
+@roles_accepted('Administrador')
 def proveedorEliminar():
     id_proveedor = request.args.get('id', type=int)
     proveedor = Proveedor.query.get_or_404(id_proveedor)
@@ -106,8 +107,8 @@ def proveedorEliminar():
     return render_template("proveedores/proveedores.html", proveedor=proveedor, modo="eliminar")
 
 @proveedores.route("/proveedorToggle", methods=["POST"])
-# @login_required
-# @roles_accepted('Administrador')
+@login_required
+@roles_accepted('Administrador')
 def proveedorToggle():
     id_proveedor = request.form.get('id', type=int)
     proveedor = Proveedor.query.get_or_404(id_proveedor)

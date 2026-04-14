@@ -4,6 +4,7 @@ from flask_security import current_user
 from flask import flash
 from sqlalchemy import text
 from datetime import datetime
+from flask_security.decorators import roles_accepted, login_required
 
 import forms
 
@@ -14,6 +15,8 @@ merma_bp = Blueprint(
 )
 
 @merma_bp.route('/merma', methods=["GET", "POST"])
+@login_required
+@roles_accepted('Administrador', 'Produccion')
 def merma():
     # Filtro por fecha
     fecha = request.args.get("fecha")
@@ -77,6 +80,8 @@ def merma():
     )
 
 @merma_bp.route("/merma/eliminar/<int:id>", methods=["POST"])
+@login_required
+@roles_accepted('Administrador')
 def eliminar_merma(id):
     merma = Merma.query.get_or_404(id)
 

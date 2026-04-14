@@ -4,8 +4,11 @@ from datetime import datetime, timedelta
 from . import dash_bp
 from sqlalchemy import func
 from models import Producto, Categoria, Venta, DetalleVenta
+from flask_security.decorators import roles_accepted, login_required
 
 @dash_bp.route("/dash", methods=["GET", "POST"])
+@login_required
+@roles_accepted('Administrador')
 def auth():
     fecha_hoy = datetime.now().strftime('%d de %B %Y')
     

@@ -50,6 +50,10 @@ app.register_blueprint(clientes)
 def index():
     return render_template("inicio.html")
 
+@app.errorhandler(500)
+def servidor_error(e):
+    return render_template("500.html"), 500
+
 @app.errorhandler(404)
 def page_not_found(e):
 	return render_template("404.html"), 404

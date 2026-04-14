@@ -3,6 +3,7 @@ from models import db, Proveedor, Compra, Usuario, MateriaPrima, DetalleCompra
 from flask_security import current_user
 from sqlalchemy import text
 from datetime import datetime
+from flask_security.decorators import roles_accepted, login_required
 import json
 import forms
 
@@ -13,6 +14,8 @@ compra_bp = Blueprint(
 )
 
 @compra_bp.route("/compra", methods=["GET", "POST"])
+@login_required
+@roles_accepted('Administrador', 'Mostrador')
 def compra():
     # Filtro por fecha
     fecha = request.args.get("fecha")
@@ -145,6 +148,8 @@ def compra():
     )
 
 @compra_bp.route("/get_presentaciones/<int:idMateria>")
+@login_required
+@roles_accepted('Administrador', 'Mostrador')
 def get_presentaciones(idMateria):
     materia = MateriaPrima.query.get(idMateria)
     if not materia:
@@ -153,6 +158,7 @@ def get_presentaciones(idMateria):
     return {"presentaciones": opciones}
 
 @compra_bp.route("/compra/eliminar_detalle", methods=["POST"])
+@login_required
 def eliminar_detalle():
     data = request.get_json()
     index = data.get("index")
@@ -168,12 +174,15 @@ def eliminar_detalle():
     return {"ok": True}
 
 @compra_bp.route("/compra/cancelar", methods=["POST"])
+@login_required
 def cancelar_compra():
     session.pop("detalles", None)
     session.pop("compra_data", None)
     return redirect(url_for("compra.compra"))
 
 @compra_bp.route("/compra/eliminar/<int:id>", methods=["POST"])
+@login_required
+@roles_accepted('Administrador')
 def eliminar_compra(id):
     compra = Compra.query.get_or_404(id)
     compra.estatus = False

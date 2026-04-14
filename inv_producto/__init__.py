@@ -10,8 +10,8 @@ prod_bp = Blueprint(
 )
 
 @prod_bp.route("/invproducto", methods=["GET"])
-# @login_required
-# @roles_accepted('Administrador')
+@login_required
+@roles_accepted('Administrador')
 def index():
     
     edit_id = request.args.get('edit', type=int)
@@ -46,8 +46,8 @@ def index():
     return render_template("inv_productos/productos.html", productos=productos, categorias=categorias, total=total,prod_editar=prod_editar,form=create_from,busqueda=busqueda,idCategoria=idCategoria,presentaciones=presentaciones)
 
 @prod_bp.route("/invproducto/crear", methods=["POST"])
-# @login_required
-# @roles_accepted('Administrador')
+@login_required
+@roles_accepted('Administrador')
 def crear():
     create_from = forms.ProductoForm(request.form)
     create_from.idCategoria.choices = [ (c.id, c.nombre) for c in Categoria.query.all()]
@@ -65,8 +65,8 @@ def crear():
     return redirect(url_for('producto.index'))
 
 @prod_bp.route("/invproducto/editar", methods=["GET", "POST"])
-# @login_required
-# @roles_accepted('Administrador')
+@login_required
+@roles_accepted('Administrador')
 def editar():
     id = request.args.get('id')
     producto = Producto.query.filter_by(id=id).first()
@@ -85,8 +85,8 @@ def editar():
     return redirect(url_for('producto.index'))
     
 @prod_bp.route("/invproducto/eliminar", methods=["GET", "POST"])
-# @login_required
-# @roles_accepted('Administrador')
+@login_required
+@roles_accepted('Administrador')
 def eliminar():
     id = request.args.get('id')
     producto = Producto.query.filter_by(id=id).first()
@@ -97,8 +97,8 @@ def eliminar():
     return redirect(url_for('producto.index'))
     
 @prod_bp.route("/invproducto/<int:id>/presentaciones/crear", methods=["POST"])
-# @login_required
-# @roles_accepted('Administrador')
+@login_required
+@roles_accepted('Administrador')
 def crear_presentacion(id):
     form = forms.PresentacionVentaForm(request.form)
     
@@ -115,8 +115,8 @@ def crear_presentacion(id):
     return redirect(url_for('producto.index', edit=id))
 
 @prod_bp.route("/invproducto/presentaciones/eliminar", methods=["POST"])
-# @login_required
-# @roles_accepted('Administrador')
+@login_required
+@roles_accepted('Administrador')
 def eliminar_presentacion():
     id = request.args.get('id')
     p = presentacionVenta.query.filter_by(id=id).first()
@@ -127,6 +127,8 @@ def eliminar_presentacion():
     return redirect(url_for('producto.index', edit=id_producto))
 
 @prod_bp.route("/invproducto/presentaciones/editar", methods=["POST"])
+@login_required
+@roles_accepted('Administrador')
 def editar_presentacion():
     id = request.args.get('id')
     p = presentacionVenta.query.filter_by(id=id).first()
