@@ -71,13 +71,14 @@ class MermaForm(Form):
     justificacion = StringField("Justificación", [
         validators.DataRequired(message="El campo es requerido"), 
     ])
+
 class RecetaForm(Form):
     
     nombre = StringField("Nombre", [
         validators.DataRequired(message="El campo es requerido"), 
     ])
     
-    idProducto = SelectField("Producto", coerce=int, validators=[
+    idProducto = SelectField("Producto", coerce=lambda x: int(x) if x else None, validators=[
         validators.DataRequired(message="El campo es requerido"), 
     ])
     

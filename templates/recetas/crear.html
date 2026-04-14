@@ -47,7 +47,12 @@
             </div>
             <div class="fg">
               {{ form.idProducto.label }}
-              {{ form.idProducto() }}
+              <select name="idProducto" id="idProducto">
+                <option value="" disabled selected>— Selecciona un producto —</option>
+                {% for id, nombre in form.idProducto.choices %}
+                  <option value="{{ id }}">{{ nombre }}</option>
+                {% endfor %}
+            </select>
             </div>
           </div>
 
@@ -55,6 +60,9 @@
             <div class="fg">
               {{ form.cantidadProducida.label }}
               {{ form.cantidadProducida(placeholder="0.00", type="number", step="0.01") }}
+              <span style="font-size:10px; color:var(--light-text);">
+                Ingresa la cantidad en mililitros (ml)
+              </span>
             </div>
           </div>
 
@@ -80,10 +88,10 @@
                 <!-- Fila inicial vacía -->
                 <tr class="fila-ingrediente">
                   <td>
-                    <select name="mp_id" style="width:100%;">
+                    <select name="mp_id" style="width:100%;" onchange="actualizarUnidad(this)">
                       <option value="">— Selecciona —</option>
                       {% for mp in materias %}
-                        <option value="{{ mp.id }}">{{ mp.nombre }}</option>
+                        <option value="{{ mp.id }}" data-unidad="{{ mp.unidadBase }}">{{ mp.nombre }}</option>
                       {% endfor %}
                     </select>
                   </td>
@@ -137,10 +145,10 @@
   <template id="tpl-fila">
     <tr class="fila-ingrediente">
       <td>
-        <select name="mp_id" style="width:100%;">
+        <select name="mp_id" style="width:100%;" onchange="actualizarUnidad(this)">
           <option value="">— Selecciona —</option>
           {% for mp in materias %}
-            <option value="{{ mp.id }}">{{ mp.nombre }}</option>
+            <option value="{{ mp.id }}" data-unidad="{{ mp.unidadBase }}" >{{ mp.nombre }}</option>
           {% endfor %}
         </select>
       </td>
@@ -163,6 +171,12 @@
 
 {% block extra_js %}
 <script>
+  function actualizarUnidad(select) {
+    const opt = select.options[select.selectedIndex];
+    const unidad = opt.dataset.unidad || '';
+    const fila = select.closest('tr');
+    fila.querySelector('input[name="mp_unidad"]').value = unidad;
+  }
   function agregarFila() {
     const tpl  = document.getElementById('tpl-fila');
     const tbody = document.getElementById('tbody-ingredientes');

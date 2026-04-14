@@ -80,6 +80,7 @@ class Receta(db.Model):
     idProducto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=True)
     cantidadProducida = db.Column(db.Numeric(10,2), nullable=False)
     estatus = db.Column(db.Boolean, default=True, nullable=False)
+    costoProduccion = db.Column(db.Numeric(10,2), default=0)
 
     producto = db.relationship('Producto', backref='recetas', passive_deletes=True)
     detalles = db.relationship('DetalleReceta', backref='receta', cascade='all, delete-orphan')
