@@ -1,31 +1,57 @@
-<aside class="sidebar w-64 shrink-0">
-    <div class="sb-section">Gestión</div>
-    <a href="{{ url_for('proveedores.index') }}" class="sb-item active">
-      🏭 Proveedor
-      <span class="sb-badge">{{ total }}</span>
-    </a>
+<aside class="sidebar">
+  <!-- DASHBOARD -->
+  <div class="sb-section">General</div>
+  <a href="{{ url_for('dash.auth') }}"
+     class="nav-link {% if request.endpoint == 'dash.auth'  %}active{% endif %}">
+    Dashboard
+  </a>
 
-    <div class="sb-divider"></div>
-    <div class="sb-section">Filtrar por estatus</div>
+  <!-- ADMINISTRACIÓN -->
+  <div class="sb-divider"></div>
+  <div class="sb-section">Administración</div>
 
-    <a
-      href="{{ url_for('proveedores.index', q=busqueda) }}"
-      class="sb-item {{ 'active-teal' if not estatus_activo }}"
-    >
-      📋 Todos
-    </a>
+  <a href="{{ url_for('usuarios.index') }}"
+     class="nav-link {% if request.endpoint == 'usuarios.index' %}active{% endif %}">
+    Usuarios
+  </a>
 
-    <a
-      href="{{ url_for('proveedores.index', estatus='Activo', q=busqueda) }}"
-      class="sb-item {{ 'active-teal' if estatus_activo == 'Activo' }}"
-    >
-      ✅ Activos
-    </a>
+  <a href="{{ url_for('proveedores.proveedoresTabla') }}"
+     class="nav-link {% if request.endpoint == 'proveedores.proveedoresTabla' %}active{% endif %}">
+    Proveedores
+  </a>
 
-    <a
-      href="{{ url_for('proveedores.index', estatus='Inactivo', q=busqueda) }}"
-      class="sb-item {{ 'active-teal' if estatus_activo == 'Inactivo' }}"
-    >
-      ⏸ Inactivos
-    </a>
-  </aside>
+  <!-- OPERACIONES -->
+  <div class="sb-divider"></div>
+  <div class="sb-section">Operaciones</div>
+
+  <a href="{{ url_for('compra.compra') }}"
+     class="nav-link {% if request.endpoint == 'compra.compra' %}active{% endif %}">
+    Compras
+  </a>
+
+  <a href="{{ url_for('materia.materia') }}"
+     class="nav-link {% if request.endpoint == 'materia.materia' %}active{% endif %}">
+    Materia Prima
+  </a>
+
+  <a href="{{ url_for('producto.index') }}"
+     class="nav-link {% if request.endpoint == 'producto.index' %}active{% endif %}">
+    Productos
+  </a>
+
+  <a href="{{ url_for('recetas.index') }}"
+     class="nav-link {% if request.endpoint == 'recetas.index' %}active{% endif %}">
+    Recetas
+  </a>
+
+  <a href="{{ url_for('merma.merma') }}"
+     class="nav-link {% if request.endpoint == 'merma.merma' %}active{% endif %}">
+    Mermas
+  </a>
+
+  <!-- FOOTER / USER -->
+  <div class="sb-divider"></div>
+  <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+    Cerrar Sesión
+  </a>
+</aside>

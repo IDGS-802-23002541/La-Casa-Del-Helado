@@ -1,0 +1,470 @@
+/* ============================================================
+   base.css | Estilos compartidos/repetidos
+   ============================================================ */
+
+
+/* ─────────────────────────────
+   NAVBAR PRODUCCIÓN Y ADMIN
+   ───────────────────────────── */
+html,
+body {
+    height: 100%;
+}
+
+.app-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.nav-brand-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #ff7043;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+}
+
+.nav-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+    gap: 2px;
+}
+
+.nav-brand-name {
+    font-weight: 700;
+    color: #2d3436;
+    font-size: 16px;
+}
+
+.nav-brand-sub {
+    font-size: 9px;
+    color: #ff7043;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 15px;
+}
+
+.nav-link {
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+}
+
+.nav-link.active {
+    color: #ff7043;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.nav-user-avatar {
+    background: #ff7043;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.btn-logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    width: 100%;
+    padding: 10px 14px;
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.12);
+
+    border: 1px solid rgba(255, 107, 107, 0.25);
+    border-radius: 12px;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+    background: linear-gradient(135deg, #ff8a8a, #ff6b6b);
+    color: #fff;
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(255, 107, 107, 0.35);
+}
+
+/* CLICK */
+.btn-logout:active {
+    transform: scale(0.97);
+}
+
+.nav-date {
+    text-align: right;
+    line-height: 1.2;
+}
+
+.nav-date-fecha {
+    font-size: 11px;
+    color: #888;
+    font-weight: 700;
+}
+
+.nav-date-hora {
+    font-weight: 800;
+    color: #2d3436;
+    font-size: 17px;
+}
+
+
+/* ─────────────────────────────
+   NAVBAR MOSTRADOR
+   ───────────────────────────── */
+/* ============================================================
+   NAV MOSTRADOR (POS) - GLOBAL LIMPIO
+   ============================================================ */
+
+.nav-pos {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Nunito', sans-serif;
+    flex-shrink: 0;
+}
+
+/* ───────── TOP ───────── */
+.nav-pos-top {
+    background: linear-gradient(90deg, #c4f1d5 0%, #f7f3ad 50%, #ffde8a 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px;
+    height: 60px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* BRAND */
+.nav-pos-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-pos-logo {
+    background: var(--coral);
+    padding: 6px;
+    border-radius: 8px;
+    font-size: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav-pos-title {
+    font-weight: 800;
+    font-size: 16px;
+    color: #2d3436;
+    line-height: 1;
+}
+
+.nav-pos-subtitle {
+    font-size: 10px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* STATUS */
+.nav-pos-status {
+    background: rgba(255, 255, 255, 0.6);
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-pos-dot {
+    width: 8px;
+    height: 8px;
+    background: #00a86b;
+    border-radius: 50%;
+    box-shadow: 0 0 5px #00a86b;
+}
+
+/* USER AREA */
+.nav-pos-user {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-pos-time {
+    font-weight: 800;
+    font-size: 16px;
+    color: #2d3436;
+}
+
+.btn-cerrar-turno {
+    background: white;
+    border: 1.5px solid #ff7043;
+    color: #ff7043;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.btn-cerrar-turno:hover {
+    background: #ff7043;
+    color: white;
+}
+
+.user-avatar-circle {
+    background: #6c5ce7;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+}
+
+/* ───────── BOTTOM ───────── */
+.nav-pos-bottom {
+    background: #fff;
+    display: flex;
+    padding: 0 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.nav-pos-tab {
+    padding: 14px 20px;
+    text-decoration: none;
+    color: #777;
+    font-size: 13px;
+    font-weight: 800;
+    position: relative;
+    transition: 0.2s;
+}
+
+.nav-pos-tab:hover {
+    color: #ff7043;
+}
+
+.nav-pos-tab.active {
+    color: #ff7043;
+}
+
+.nav-pos-tab.active::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #ff7043;
+    border-radius: 3px 3px 0 0;
+}
+
+/* ─────────────────────────────
+   TABLAS (GLOBAL)
+   ───────────────────────────── */
+
+.table-wrap {
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #eee;
+    overflow: hidden;
+    max-height: 540px;
+    overflow-y: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+thead {
+    background: #faf7f4;
+}
+
+thead th {
+    text-align: left;
+    font-size: 11px;
+    color: var(--light-text);
+    font-weight: 700;
+    padding: 10px;
+}
+
+tbody td {
+    padding: 10px;
+    border-top: 1px solid #f1f1f1;
+}
+
+.table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background: #f9f7ff;
+    cursor: pointer;
+}
+
+
+tr.selected {
+    background: #f5f3ff;
+}
+
+
+/* ─────────────────────────────
+   CELDAS (REUTILIZABLES)
+   ───────────────────────────── */
+
+.cell-main {
+    font-weight: 600;
+    color: #2d3436;
+}
+
+.cell-sub {
+    font-size: 10px;
+    color: #aaa;
+}
+
+.cell-muted {
+    color: #666;
+}
+
+
+/* ─────────────────────────────
+   BADGES / TAGS
+   ───────────────────────────── */
+
+.tag-count {
+    background: var(--lavender);
+    color: var(--purple);
+    border-radius: 8px;
+    padding: 3px 9px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* ─────────────────────────────
+   STATUS
+   ───────────────────────────── */
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.s-activo {
+    background: #e6f7ee;
+    color: #00a86b;
+}
+
+.s-inactivo {
+    background: #fdeaea;
+    color: #d63031;
+}
+
+.s-warning {
+    background: #fff4e5;
+    color: #f39c12;
+}
+
+
+/* ─────────────────────────────
+   BOTONES
+   ───────────────────────────── */
+
+.action-btn {
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+/* ─────────────────────────────
+   INPUT DATE
+   ───────────────────────────── */
+
+.input-date {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 12px;
+}
+
+
+
+/* ─────────────────────────────
+   FILTRO DE FECHA (TOOLBAR)
+   ───────────────────────────── */
+.filtro-fecha-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filtro-fecha-group label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--light-text);
+}
+
+.filtro-fecha-group input {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 12px;
+}

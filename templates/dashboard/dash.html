@@ -1,104 +1,110 @@
 {% extends "base.html" %}
 
+{% block title %}Dashboard — La Casa del Helado{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dash.css') }}">
+{% endblock %}
+
+{% block layout_class %}no-panel scrollable{% endblock %}
+
 {% block body %}
+
+<div class="dash-header">
+  <div class="dash-header-left">
+    <h1 class="dash-title">Dashboard</h1>
+    <p class="dash-subtitle">
+      Bienvenida, <span>{{ usuario_nombre }}</span> 👋
+    </p>
+  </div>
+
+  <div class="dash-actions">
+    <button id="exportPDF" class="btn-export">
+      📄 Exportar PDF
+    </button>
+  </div>
+</div>
+
+<!-- GRÁFICAS PRINCIPALES -->
+<div class="dash-grid-top">
+  <div class="card">
+    <h3>Ventas Semanales ($)</h3>
+    <div class="chart-box">
+      <canvas id="ventasSemana"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Distribución</h3>
+    <div class="chart-box">
+      <canvas id="ventasTipo"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- TOPS -->
+<div class="dash-grid">
+  <div class="card">
+    <h3>Top Semana (Unidades)</h3>
+    <div class="chart-box">
+      <canvas id="topSemana"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Top Semana ($)</h3>
+    <div class="chart-box">
+      <canvas id="topSemanaMonto"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Top Mes (Unidades)</h3>
+    <div class="chart-box">
+      <canvas id="topMes"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Top Mes ($)</h3>
+    <div class="chart-box">
+      <canvas id="topMesMonto"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- TABLA -->
+<div class="card">
+  <h2>Utilidad por Producto</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Venta</th>
+        <th>Utilidad</th>
+        <th>Rendimiento</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in utilidad_productos %}
+      <tr>
+        <td>{{ p.producto }}</td>
+        <td>${{ "%.2f"|format(p.venta) }}</td>
+        <td class="text-success">${{ "%.2f"|format(p.utilidad) }}</td>
+        <td>{{ "%.2f"|format((p.utilidad/p.venta*100) if p.venta else 0) }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
-<div id="dashboard-content" style="display: flex; flex-direction: column; height: 100vh; width: 100vw; overflow: hidden; font-family: 'Nunito', sans-serif;">
-<div style="width: 100%;"></div>
-<div style="display: flex; flex: 1; width: 100%; overflow: hidden; background-color: #F9FAFB;">
-<aside class="sidebar">
-<div class="sb-section">Administración</div>
-<a href="#" class="sb-item active">📊 Reportes de ventas</a>
-</aside>
-
-<main style="flex: 1; padding: 40px; overflow-y: auto;">
-<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 35px;">
-<div>
-<h1 style="font-weight: 800; color: #111827; font-size: 28px; margin: 0;">Análisis de Ventas</h1>
-<p style="color: #6B7280; font-size: 16px; margin-top: 5px;">Bienvenida, {{ usuario_nombre }}!</p>
-</div>
-<div style="display: flex; gap: 12px;">
-<button id="exportPDF" style="background: #FF8A8A; color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer;">PDF</button>
-</div>
-</div>
-
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-bottom: 40px;">
-<div style="background: white; padding: 25px; border-radius: 24px;">
-<h3>Ventas Semanales ($)</h3>
-<div style="height:220px">
-<canvas id="ventasSemana"></canvas>
-</div>
-</div>
-
-<div style="background: white; padding: 25px; border-radius: 24px;">
-<h3>Distribución</h3>
-<div style="height:220px">
-<canvas id="ventasTipo"></canvas>
-</div>
-</div>
-</div>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-bottom:40px;">
-<div style="background:white;padding:25px;border-radius:24px;">
-<h3>Top Semana (Unidades)</h3>
-<div style="height:220px">
-<canvas id="topSemana"></canvas>
-</div>
-</div>
-
-<div style="background:white;padding:25px;border-radius:24px;">
-<h3>Top Semana ($)</h3>
-<div style="height:220px">
-<canvas id="topSemanaMonto"></canvas>
-</div>
-</div>
-
-<div style="background:white;padding:25px;border-radius:24px;">
-<h3>Top Mes (Unidades)</h3>
-<div style="height:220px">
-<canvas id="topMes"></canvas>
-</div>
-</div>
-
-<div style="background:white;padding:25px;border-radius:24px;">
-<h3>Top Mes ($)</h3>
-<div style="height:220px">
-<canvas id="topMesMonto"></canvas>
-</div>
-</div>
-</div>
-
-<div style="background: white; padding: 30px; border-radius: 24px;">
-<h2>Utilidad por Producto</h2>
-<table style="width:100%;">
-<thead>
-<tr>
-<th>PRODUCTO</th>
-<th>VENTA</th>
-<th>UTILIDAD</th>
-<th>RENDIMIENTO</th>
-</tr>
-</thead>
-<tbody>
-{% for p in utilidad_productos %}
-<tr>
-<td>{{ p.producto }}</td>
-<td>${{ "%.2f"|format(p.venta) }}</td>
-<td style="color:#10B981">${{ "%.2f"|format(p.utilidad) }}</td>
-<td>{{ "%.2f"|format((p.utilidad/p.venta*100) if p.venta else 0) }}%</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-
-</main>
-</div>
-</div>
-
 <script>
 
 window.DASHBOARD_DATA = {

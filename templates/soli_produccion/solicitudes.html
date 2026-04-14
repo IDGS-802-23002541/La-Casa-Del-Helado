@@ -6,72 +6,81 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/soli_produccion.css') }}">
 {% endblock %}
 
+{% block layout_class %}no-panel no-aside{% endblock %}
+
 {% block body %}
 <div class="dashboard-container">
-    
-    <header class="page-header">
-        <div class="header-title">
-            <h1>Gestión de Producción</h1>
-            <p>Control de reabastecimiento</p>
-        </div>
-    </header>
 
     <div class="glass-card">
         <form action="{{ url_for('SolicitudProduccion.solicitud_produccion') }}" method="POST" class="form-grid">
+            
             <div class="input-group">
                 <label>Selecciona el sabor o insumo</label>
                 <select name="idProducto" class="custom-input" required>
                     <option value="">Buscar producto...</option>
                     {% for p in productos %}
-                        <option value="{{ p.id }}">{{ p.nombre }} — (Actual: {{ p.stockActual }})</option>
+                        <option value="{{ p.id }}">
+                            {{ p.nombre }} — (Actual: {{ p.stockActual }})
+                        </option>
                     {% endfor %}
                 </select>
             </div>
+
             <div class="input-group">
                 <label>Cantidad requerida</label>
                 <input type="number" name="cantidad" class="custom-input" value="1" min="1" required>
             </div>
-            <button type="submit" class="btn-primary-custom">CREAR SOLICITUD</button>
+
+            <button type="submit" class="btn-primary-custom">
+                CREAR SOLICITUD
+            </button>
+
         </form>
     </div>
 
     <div class="status-grid">
+
         {% if historial %}
             {% for h in historial %}
-                <div class="order-card">
+                <div class="prod-card">
+
                     <span class="status-tag status-{{ h.estatus.lower().replace(' ', '') }}">
                         {{ h.estatus }}
                     </span>
-                    
+
                     <div class="product-info">
-                        <span>#{{ h.id }} — Solicitado a las {{ h.fecha_solicitud.strftime('%H:%M') if h.fecha_solicitud else '00:00' }}</span>
+                        <span>#{{ h.id }} — {{ h.fecha_solicitud.strftime('%H:%M') if h.fecha_solicitud else '00:00' }}</span>
                         <h3>{{ h.producto.nombre }}</h3>
                     </div>
 
                     <div class="order-footer">
-                        <div class="qty-display">{{ h.cantidad_solicitada }} <small style="font-size: 12px;">unid.</small></div>
-                        
+                        <div class="qty-display">
+                            {{ h.cantidad_solicitada }} <small style="font-size:12px;">unid.</small>
+                        </div>
+
                         <div class="action-btns">
                             {% if h.estatus != 'Completada' and (current_user.has_role('Produccion') or current_user.has_role('Administrador')) %}
-                            <form action="{{ url_for('SolicitudProduccion.actualizar_estatus') }}" method="POST" style="display:inline;">
+                            <form action="{{ url_for('SolicitudProduccion.actualizar_estatus') }}" method="POST">
                                 <input type="hidden" name="id_solicitud" value="{{ h.id }}">
+
                                 {% if h.estatus == 'Pendiente' %}
                                     <input type="hidden" name="nuevo_estatus" value="En Proceso">
-                                    <button type="submit" style="color: var(--secondary); background:none; border:none; cursor:pointer; font-weight:bold;">🥣 Iniciar</button>
+                                    <button type="submit">🥣 Iniciar</button>
+
                                 {% elif h.estatus == 'En Proceso' %}
                                     <input type="hidden" name="nuevo_estatus" value="Completada">
-                                    <button type="submit" style="color: var(--success); background:none; border:none; cursor:pointer; font-weight:bold;">✅ Terminar</button>
+                                    <button type="submit">✅ Terminar</button>
                                 {% endif %}
                             </form>
                             {% endif %}
-                            
+
                             {% if current_user.has_role('Administrador') %}
-                            <a href="{{ url_for('SolicitudProduccion.eliminar_registro', id=h.id) }}" 
-                               style="color: var(--danger); text-decoration: none; font-size: 18px; margin-left: 10px; font-weight:bold;"
-                               onclick="return confirm('¿Eliminar registro?')">×</a>
+                                <a href="{{ url_for('SolicitudProduccion.eliminar_registro', id=h.id) }}"
+                                   onclick="return confirm('¿Eliminar registro?')">×</a>
                             {% endif %}
                         </div>
                     </div>
+
                 </div>
             {% endfor %}
         {% else %}
@@ -79,6 +88,7 @@
                 <p>No hay solicitudes pendientes en este momento.</p>
             </div>
         {% endif %}
+
     </div>
 </div>
 {% endblock %}

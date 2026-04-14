@@ -1,0 +1,31 @@
+.role-badge {
+    background: var(--sky);
+    color: var(--blue);
+    border-radius: 8px;
+    padding: 3px 9px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+
+/* Variantes */
+.role-admin {
+    background: #ffe8d6;
+    color: #e17055;
+}
+
+
+.role-operativo {
+    background: var(--mint);
+    color: var(--deep-teal);
+}
+
+.role-consulta {
+    background: var(--sky);
+    color: var(--blue);
+}
+
+.role-default {
+    background: #eee;
+    color: #555;
+}

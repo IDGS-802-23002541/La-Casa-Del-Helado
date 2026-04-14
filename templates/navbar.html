@@ -1,0 +1,76 @@
+<nav class="navbar">
+
+  <a href="{{ url_for('index') }}" class="nav-brand">
+    <div class="nav-brand-avatar">🍦</div>
+    <div class="nav-brand-text">
+      <span class="nav-brand-name">La Casa del Helado</span>
+      <small class="nav-brand-sub">
+        SISTEMA INTEGRAL
+      </small>
+    </div>
+  </a>
+  
+  <!-- STATUS -->
+  <div class="nav-pos-status">
+    <span class="nav-pos-dot"></span>
+    Turno activo — {{ current_user.nombreUsuario if current_user.is_authenticated else 'Invitado' }}
+  </div>
+
+  <div class="nav-right">
+
+    <div class="nav-date">
+      <div id="fecha" class="nav-date-fecha"></div>
+      <div id="hora" class="nav-date-hora"></div>
+    </div>
+
+    <div class="nav-user-avatar"
+         title="{{ current_user.nombre if current_user.is_authenticated else '' }}">
+      {% if current_user.is_authenticated %}
+        {{ current_user.nombreUsuario[0] | upper }}
+      {% else %}
+        ?
+      {% endif %}
+    </div>
+     {% if rol == 'Mostrador' %}
+      <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+        Cerrar Sesión
+      </a>
+      {% endif %}
+  </div>
+</nav>
+
+  {% if rol == 'Mostrador' %}
+      <!-- BOTTOM -->
+  <div class="nav-pos-bottom">
+
+    <a href="{{ url_for('venta.punto_venta') }}"
+       class="nav-pos-tab {% if request.endpoint == 'venta.punto_venta' %}active{% endif %}">
+      Punto de Venta
+    </a>
+
+    <a href="{{ url_for('SolicitudProduccion.solicitud_produccion') }}"
+       class="nav-pos-tab {% if request.endpoint == 'SolicitudProduccion.solicitud_produccion' %}active{% endif %}">
+      Producción
+    </a>
+    
+    <a href="{{ url_for('compra.compra') }}"
+       class="nav-pos-tab {% if request.endpoint == 'compra.compra' %}active{% endif %}">
+      Compras
+    </a>
+  </div>
+  {% endif %}
+<script>
+  function actualizarHora() {
+    const now = new Date();
+    const dia = String(now.getDate()).padStart(2, '0');
+    const mes = String(now.getMonth() + 1).padStart(2, '0');
+    const anio = now.getFullYear();
+    const horas = String(now.getHours()).padStart(2, '0');
+    const minutos = String(now.getMinutes()).padStart(2, '0');
+    const segundos = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('fecha').textContent = `${dia}/${mes}/${anio}`;
+    document.getElementById('hora').textContent = `${horas}:${minutos}:${segundos}`;
+  }
+  setInterval(actualizarHora, 1000);
+  actualizarHora();
+</script>

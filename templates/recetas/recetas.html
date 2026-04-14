@@ -2,162 +2,135 @@
 {% block title %}Recetas — La Casa del Helado{% endblock %}
 
 {% block body %}
+  <!-- HEADER -->
+  <div class="page-hdr fade-up">
+    <div class="page-hdr-left">
+      <h1>Recetas</h1>
+      <p>Gestión de recetas y sus ingredientes</p>
+    </div>
+    <a href="{{ url_for('recetas.crear') }}" class="btn-primary">
+      <span>＋</span> Nueva receta
+    </a>
+  </div>
 
-  <div class="app-body has-panel">
-
-    <!-- ── SIDEBAR ── -->
-    <aside class="sidebar">
-      <div class="sb-section">Producción</div>
-      <a href="{{ url_for('recetas.index') }}" class="sb-item active">
-        📋 Recetas
-        <span class="sb-badge">{{ total }}</span>
-      </a>
-
-      <div class="sb-divider"></div>
-      <div class="sb-section">Filtrar por estatus</div>
-
-      <a href="{{ url_for('recetas.index', estatus='activo', busqueda=busqueda) }}"
-         class="sb-item {{ 'active-teal' if request.args.get('estatus') == 'activo' }}">
-        ✅ Activas
-      </a>
-      <a href="{{ url_for('recetas.index', estatus='inactivo', busqueda=busqueda) }}"
-         class="sb-item {{ 'active-teal' if request.args.get('estatus') == 'inactivo' }}">
-        ⏸ Inactivas
-      </a>
-    </aside>
-
-    <!-- ── MAIN ── -->
-    <main class="main">
-
-      <div class="page-hdr fade-up">
-        <div class="page-hdr-left">
-          <h1>Recetas</h1>
-          <p>Gestión de recetas y sus ingredientes</p>
-        </div>
-        <a href="{{ url_for('recetas.crear') }}" class="btn-primary">
-          <span>＋</span> Nueva receta
-        </a>
+  <!-- Buscador -->
+  <form method="GET" action="{{ url_for('recetas.index') }}">
+    <div class="toolbar fade-up-1">
+      <div class="search-inp">
+        <span style="color:var(--light-text); font-size:14px;">🔍</span>
+        <input
+          type="text"
+          name="busqueda"
+          placeholder="Buscar receta…"
+          value="{{ busqueda }}"
+        />
       </div>
+      {% if request.args.get('estatus') %}
+        <input type="hidden" name="estatus" value="{{ request.args.get('estatus') }}" />
+      {% endif %}
+      <button type="submit" class="btn-primary-teal"
+              style="padding:8px 16px; border-radius:10px; font-size:12px;">
+        Buscar
+      </button>
+      {% if busqueda %}
+        <a href="{{ url_for('recetas.index') }}" class="btn-cancel"
+            style="padding:8px 14px; border-radius:10px; font-size:12px; text-decoration:none;">
+          Limpiar
+        </a>
+      {% endif %}
+    </div>
+  </form>
 
-      <!-- Buscador -->
-      <form method="GET" action="{{ url_for('recetas.index') }}">
-        <div class="toolbar fade-up-1">
-          <div class="search-inp">
-            <span style="color:var(--light-text); font-size:14px;">🔍</span>
-            <input
-              type="text"
-              name="busqueda"
-              placeholder="Buscar receta…"
-              value="{{ busqueda }}"
-            />
-          </div>
-          {% if request.args.get('estatus') %}
-            <input type="hidden" name="estatus" value="{{ request.args.get('estatus') }}" />
-          {% endif %}
-          <button type="submit" class="btn-primary-teal"
-                  style="padding:8px 16px; border-radius:10px; font-size:12px;">
-            Buscar
-          </button>
-          {% if busqueda %}
-            <a href="{{ url_for('recetas.index') }}" class="btn-cancel"
-               style="padding:8px 14px; border-radius:10px; font-size:12px; text-decoration:none;">
-              Limpiar
-            </a>
-          {% endif %}
-        </div>
-      </form>
-
-      <!-- Tabla -->
-      <div class="table-wrap fade-up-2">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Nombre</th>
-              <th>Producto</th>
-              <th>Cant. Producida</th>
-              <th>Ingredientes</th>
+  <!-- Tabla -->
+  <div class="table-wrap fade-up-2">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nombre</th>
+          <th>Producto</th>
+          <th>Cant. Producida</th>
+          <th>Ingredientes</th>
               <th>Costo de produccion</th>
-              <th>Estatus</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-          {% if recetas %}
-            {% for receta in recetas %}
-            <tr
-              onclick="verDetalle(this)"
-              data-id="{{ receta.id }}"
-              data-nombre="{{ receta.nombre }}"
-              data-producto="{{ receta.producto.nombre if receta.producto else '—' }}"
-              data-unidad="{{ receta.producto.unidadBase if receta.producto else '' }}"
-              data-cantidad="{{ receta.cantidadProducida }}"
-              data-estatus="{{ '1' if receta.estatus else '0' }}"
-              data-url-editar="{{ url_for('recetas.editar', id=receta.id) }}"
-              data-url-desact="{{ url_for('recetas.eliminar', id=receta.id) }}"
-              data-ingredientes="{{ receta.detalles | map(attribute='materiaPrima.nombre') | list | tojson | forceescape }}"
+          <th>Estatus</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% if recetas %}
+        {% for receta in recetas %}
+        <tr
+          onclick="verDetalle(this)"
+          data-id="{{ receta.id }}"
+          data-nombre="{{ receta.nombre }}"
+          data-producto="{{ receta.producto.nombre if receta.producto else '—' }}"
+          data-unidad="{{ receta.producto.unidadBase if receta.producto else '' }}"
+          data-cantidad="{{ receta.cantidadProducida }}"
+          data-estatus="{{ '1' if receta.estatus else '0' }}"
+          data-url-editar="{{ url_for('recetas.editar', id=receta.id) }}"
+          data-url-desact="{{ url_for('recetas.eliminar', id=receta.id) }}"
+          data-ingredientes="{{ receta.detalles | map(attribute='materiaPrima.nombre') | list | tojson | forceescape }}"
               data-costo="{{ receta.costoProduccion if receta.costoProduccion else 0 }}"
-              data-cantidades="{{ receta.detalles | map(attribute='cantidad') | list | tojson | forceescape }}"
-              data-unidades="{{ receta.detalles | map(attribute='unidad') | list | tojson | forceescape }}"
-            >
-              <td style="color:var(--light-text); font-size:11px;">{{ receta.id }}</td>
-              <td style="font-weight:600; color:var(--dark);">{{ receta.nombre }}</td>
-              <td style="color:var(--mid);">
-                {{ receta.producto.nombre if receta.producto else '—' }}
-              </td>
-              <td style="color:var(--mid);">
-                {{ receta.cantidadProducida }}
-                <span style="font-size:10px; color:var(--light-text);">
-                  {{ receta.producto.unidadBase if receta.producto else '' }}
-                </span>
-              </td>
-              <td>
-                <span style="background:var(--lavender); color:var(--purple);
-                            border-radius:8px; padding:3px 9px; font-size:10px; font-weight:700;">
-                  {{ receta.detalles | length }}
-                  ingrediente{{ 's' if receta.detalles | length != 1 }}
-                </span>
-              </td>
+          data-cantidades="{{ receta.detalles | map(attribute='cantidad') | list | tojson | forceescape }}"
+          data-unidades="{{ receta.detalles | map(attribute='unidad') | list | tojson | forceescape }}"
+        >
+          <td class="td-id">{{ receta.id }}</td>
+          <td class="td-nombre">{{ receta.nombre }}</td>
+          <td class="td-muted">
+            {{ receta.producto.nombre if receta.producto else '—' }}
+          </td>
+          <td class="td-muted">
+            {{ receta.cantidadProducida }}
+            <span style="font-size:10px; color:var(--light-text);">
+              {{ receta.producto.unidadBase if receta.producto else '' }}
+            </span>
+          </td>
+          <td>
+            <span class="tag-count">
+              {{ receta.detalles | length }}
+              ingrediente{{ 's' if receta.detalles | length != 1 }}
+            </span>
+          </td>
               <td style="color:var(--dark); font-weight:600;">
                 ${{ "%.2f"|format(receta.costoProduccion) if receta.costoProduccion else '—' }}
               </td>
-              <td>
-                {% if receta.estatus %}
-                  <span class="status-badge s-activo">● Activa</span>
-                {% else %}
-                  <span class="status-badge s-inactivo">● Inactiva</span>
-                {% endif %}
-              </td>
-              <td>
-                <a href="{{ url_for('recetas.editar', id=receta.id) }}"
-                  class="action-btn ab-editar"
-                  onclick="event.stopPropagation()">Editar</a>
-                <a href="{{ url_for('recetas.eliminar', id=receta.id) }}"
-                  class="action-btn ab-desact"
-                  onclick="event.stopPropagation()">Desact.</a>
-              </td>
-            </tr>
-            {% endfor %}
-          {% else %}
-            <tr class="empty-row">
-              <td colspan="7">
-                <div style="display:flex; flex-direction:column; align-items:center; gap:8px; padding:40px;">
-                  <span style="font-size:32px;">🍦</span>
-                  <span style="font-weight:600; color:var(--mid);">No hay recetas registradas</span>
-                  <a href="{{ url_for('recetas.crear') }}" class="btn-primary" style="margin-top:4px;">
-                    Crear primera receta
-                  </a>
-                </div>
-              </td>
-            </tr>
-          {% endif %}
-        </tbody>
-        </table>
-      </div>
+          <td>
+            {% if receta.estatus %}
+              <span class="status-badge s-activo">● Activa</span>
+            {% else %}
+              <span class="status-badge s-inactivo">● Inactiva</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('recetas.editar', id=receta.id) }}"
+              class="action-btn ab-editar"
+              onclick="event.stopPropagation()">Editar</a>
+            <a href="{{ url_for('recetas.eliminar', id=receta.id) }}"
+              class="action-btn ab-desact"
+              onclick="event.stopPropagation()">Desact.</a>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr class="empty-row">
+          <td colspan="7">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px; padding:40px;">
+              <span style="font-size:32px;">🍦</span>
+              <span style="font-weight:600; color:var(--mid);">No hay recetas registradas</span>
+              <a href="{{ url_for('recetas.crear') }}" class="btn-primary" style="margin-top:4px;">
+                Crear primera receta
+              </a>
+            </div>
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+    </table>
+  </div>
+{% endblock %}
 
-    </main>
-
-    <!-- ── PANEL DERECHO (solo lectura) ── -->
+{% block right_panel %}
+  <!-- PANEL DERECHO -->
     <aside class="right-panel">
 
       <div class="panel-hdr-dark">
@@ -231,7 +204,6 @@
 
     </aside>
 
-  </div>
 {% endblock %}
 
 {% block extra_js %}

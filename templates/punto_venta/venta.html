@@ -5,11 +5,11 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/punto_venta.css') }}?v">
 {% endblock %}
-
+{% block layout_class %}no-aside{% endblock %}
 {% block body %}
 
-<div class="main">
-  <div class="left-panel">
+<div class="venta-main">
+  <div class="venta-left-panel">
     
     <div class="mode-switcher">
       <a href="{{ url_for('venta.punto_venta') }}" 
@@ -43,7 +43,7 @@
           {% endfor %}
         </div>
 
-        <div class="product-grid" id="productGrid">
+        <div class="venta-product-grid" id="productGrid">
         {% for p in presentaciones %}
 
           {% set nombre_cat = p.relacion_categoria.nombre | lower if p.relacion_categoria else 'general' %}
@@ -98,7 +98,7 @@
 {% else %}
       {# --- PANEL DE PEDIDOS EN LÍNEA (DISEÑO FIGMA) --- #}
       
-      <div id="panel-ol" style="padding: 25px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; background-color: #F9FAFB;">
+      <div id="panel-ol">
         
         <h1 style="font-weight: 800; color: #111827; font-size: 24px; margin-bottom: 25px; flex-shrink: 0;">Pedidos en línea</h1>
 
@@ -147,7 +147,7 @@
     {% endif %}
   </div>
 
-  <div class="ticket-panel">
+  <div class="venta-ticket-panel">
     <div class="ticket-header">
       <div class="ticket-title">🧾 Ticket <span class="ticket-num">#001</span></div>
       <form action="{{ url_for('venta.limpiar_ticket') }}" method="GET">

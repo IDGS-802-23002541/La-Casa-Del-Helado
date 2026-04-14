@@ -45,6 +45,8 @@ class Usuario(db.Model, UserMixin):
 
     compras = db.relationship('Compra', back_populates='usuario')
 
+    pedidos = db.relationship('Pedido', back_populates='cliente')
+
     @property
     def active(self):
         return self.estatus
@@ -64,7 +66,7 @@ class SolicitudProduccion(db.Model):
     __tablename__ = 'solicitud_produccion'
     id = db.Column(db.Integer, primary_key=True)
     idProducto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False)
-    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False) # El empleado de mostrador
+    idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     cantidad_solicitada = db.Column(db.Integer, nullable=False)
     fecha_solicitud = db.Column(db.DateTime, default=datetime.now)
     estatus = db.Column(db.String(50), default='Pendiente') 
@@ -144,7 +146,7 @@ class MateriaPrima(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
-    unidadBase = db.Column(db.String(20), nullable=False)  # kg, litros, piezas
+    unidadBase = db.Column(db.String(20), nullable=False)
     stockActual = db.Column(db.Numeric(10,2), default=0)
     stockMinimo = db.Column(db.Numeric(10,2), default=0)
     idCategoria=db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
@@ -186,7 +188,6 @@ class Merma(db.Model):
     producto = db.relationship('Producto', backref='mermas')
     usuario = db.relationship('Usuario', backref='mermas')
 
-    # Check constraint
     __table_args__ = (
         db.CheckConstraint(
             '(idMateriaPrima IS NOT NULL AND idProducto IS NULL) OR '
@@ -216,10 +217,12 @@ class DetalleVenta(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     idProducto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False)
     idVenta = db.Column(db.Integer, db.ForeignKey('venta.id'), nullable=False)
+    idPresentacion = db.Column(db.Integer, db.ForeignKey('presentacion_venta.id'), nullable=True)
     cantidad = db.Column(db.Numeric(10, 2), nullable=False)
     precioUnitario = db.Column(db.Numeric(10, 2), nullable=False)
 
     producto = db.relationship('Producto')
+    presentacion = db.relationship('presentacionVenta')
 
 class presentacionVenta(db.Model):
     __tablename__ = "presentacion_venta"
@@ -248,13 +251,13 @@ class Pedido(db.Model):
 
     id= db.Column(db.Integer, primary_key=True)
     folio= db.Column(db.String(20), nullable=False, unique=True, default=lambda: f"PED-{uuid.uuid4().hex[:8].upper()}")
-    nombreCliente= db.Column(db.String(100), nullable=False)
-    telefono= db.Column(db.String(10),  nullable=False)
+    idCliente= db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     fechaPedido= db.Column(db.DateTime, nullable=False, default=datetime.now)
     fechaRecogida= db.Column(db.DateTime, nullable=True)
     estatus= db.Column(db.String(30), nullable=False, default='Pago en proceso')
     total= db.Column(db.Numeric(10, 2), nullable=False)
 
+    cliente = db.relationship('Usuario', back_populates='pedidos')
     detalles = db.relationship('DetallePedido', backref='pedido', cascade='all, delete-orphan')
 
 

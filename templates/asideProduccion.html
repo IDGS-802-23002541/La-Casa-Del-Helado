@@ -1,0 +1,26 @@
+<aside class="sidebar">
+  <!-- OPERACIONES -->
+  <div class="sb-divider"></div>
+  <div class="sb-section">Operaciones</div>
+
+  <a href="{{ url_for('recetas.index') }}"
+    class="nav-link {% if request.endpoint == 'recetas.index' %}active{% endif %}">
+    Recetas
+  </a>
+
+  <a href="{{ url_for('produccion.tablero') }}"
+    class="nav-link {% if request.endpoint == 'produccion.tablero' %}active{% endif %}">
+    Producción
+  </a>
+
+  <a href="{{ url_for('materia.materia') }}"
+      class="nav-link {% if request.endpoint == 'materia.materia' %}active{% endif %}">
+    Materia Prima
+  </a>
+
+  <!-- FOOTER / USER -->
+  <div class="sb-divider"></div>
+  <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+    Cerrar Sesión
+  </a>
+</aside>

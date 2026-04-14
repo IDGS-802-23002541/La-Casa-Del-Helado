@@ -8,256 +8,245 @@
 {% endblock %}
 
 {% block body %}
-<div class="flex h-screen">
-  <aside class="sidebar">
-    <div class="sb-section">Gestión</div>
-    <a href="{{ url_for('compra.compra') }}" class="sb-item active">
-      🛍️ Compra
-      <span class="sb-badge">{{ compras|length }}</span>
-    </a>
-  </aside>
-  <div class="flex-1 bg-cream font-sans text-brand-text overflow-y-auto">
-    <div class="page-body">
+  <!-- HEADER -->
+  <div class="page-hdr fade-up">
+    <div class="page-hdr-left">
+      <h1>Compras</h1>
+      <p>Registro de entradas de materia prima</p>
+    </div>
+  </div>
 
-      <!-- ═══════════════════════════════
-           TABLA DE COMPRAS
-      ════════════════════════════════ -->
-      <div class="table-card">
-        <!-- FILTRO POR FECHA -->
-        <form method="GET" action="{{ url_for('compra.compra') }}" class="filtro-fechas">
-          <label class="field-label">📅 Filtrar por fecha</label>
-          <div class="filtro-grupo">
-            <input
-              type="date"
-              name="fecha"
-              class="input-style"
-              value="{{ request.args.get('fecha', '') }}"
-            />
-          </div>
-          <div class="filtro-acciones">
-            <button type="submit" class="btn-filtrar">🔍 Filtrar</button>
-            {% if request.args.get('fecha') %}
-              <a href="{{ url_for('compra.compra') }}" class="btn-limpiar">✕ Limpiar</a>
-            {% endif %}
-          </div>
-        </form>
-        <div class="table-card-header">
-          <div class="table-card-title">Compras registradas</div>
-          <span class="badge-count">{{ compras|length }} registros</span>
-        </div>
-
-        {% if compras %}
-        <table class="compras-table">
-          <thead>
-            <tr>
-              <th>Factura</th>
-              <th>Proveedor</th>
-              <th>Detalles</th>
-              <th>Fecha</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for c in compras %}
-            <tr>
-              <td>
-                <span class="factura-badge">🧾 {{ c.factura }}</span>
-              </td>
-              <td>
-                <span class="proveedor-name">{{ c.proveedor.razonSocial }}</span>
-              </td>
-              <td>
-                {% for d in c.detalles_compra %}
-                  <span class="detalle-pill">
-                    <span class="qty">{{ d.cantidad }}</span>
-                    {{ d.materiaPrima.nombre }} {{ d.contenidoNeto }}
-                  </span>
-                {% endfor %}
-              </td>
-              <td>
-                <span class="fecha-chip">{{ c.fechaCompra.strftime('%Y-%m-%d') }}</span>
-              </td>
-              <td>
-                <button
-                  onclick="abrirModalEliminar('{{ url_for('compra.eliminar_compra', id=c.id) }}')"
-                  type="button"
-                  class="btn-eliminar"
-                >
-                  ✕ Eliminar
-                </button>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        {% else %}
-        <div class="empty-state">
-          <div class="empty-icon">📋</div>
-          <p>No hay compras registradas aún.</p>
-        </div>
-        {% endif %}
+  <!-- TOOLBAR (FILTRO FECHA) -->
+  <form method="GET" action="{{ url_for('compra.compra') }}">
+    <div class="toolbar fade-up-1">
+      <div class="filtro-fecha-group">
+        <label>📅</label>
+        <input type="date" name="fecha" value="{{ request.args.get('fecha', '') }}">
       </div>
 
-      <!-- ═══════════════════════════════
-           FORMULARIO
-      ════════════════════════════════ -->
-      <form method="POST" class="form-card" id="formularioCompra">
+      <button type="submit" class="btn-primary-teal">
+        Filtrar
+      </button>
 
-        <!-- Header -->
-        <div class="form-header">
-          <h2>Registrar Entrada</h2>
-          <p>Completa los campos para registrar la entrada de mercancía</p>
-        </div>
+      {% if request.args.get('fecha') %}
+        <a href="{{ url_for('compra.compra') }}" class="btn-cancel">
+          Limpiar
+        </a>
+      {% endif %}
 
-        <!-- Body -->
-        <div class="form-body">
+    </div>
+  </form>
+
+  <!-- TABLA -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Factura</th>
+          <th>Proveedor</th>
+          <th>Detalles</th>
+          <th>Fecha</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for c in compras %}
+        <tr>
 
           <!-- FACTURA -->
-          <div>
-            {{ macros.campoCompra(
-                compra_form.factura,
-                clase='input-style',
-                placeholder='FAC-2026-001'
-            ) }}
-          </div>
+          <td>
+            <span class="factura-badge">
+              {{ c.factura }}
+            </span>
+          </td>
 
           <!-- PROVEEDOR -->
-          <div>
-            <label class="field-label">
-              Proveedor <span class="req">*</span>
-            </label>
-            <div class="select-wrap">
-              <select name="idProveedor" class="custom-select">
-                <option value="">— Seleccionar proveedor —</option>
-                {% for id, nombre in compra_form.idProveedor.choices %}
-                  <option value="{{ id }}"
-                    {% if compra_form.idProveedor.data == id %}selected{% endif %}>
-                    {{ nombre }}
-                  </option>
-                {% endfor %}
-              </select>
+          <td>
+            <div class="cell-main">
+              {{ c.proveedor.razonSocial }}
             </div>
-          </div>
+          </td>
 
-          <div class="divider"></div>
+          <!-- DETALLES -->
+          <td>
+            <ul class="detalle-list">
+              {% for d in c.detalles_compra %}
+                <li>
+                  <span class="qty">{{ d.cantidad }} ( {{d.contenidoNeto }} )</span>
+                  {{ d.materiaPrima.nombre }}
+                </li>
+              {% endfor %}
+            </ul>
+          </td>
 
-          <!-- PRODUCTO -->
-          <div>
-            <label class="field-label">
-              Producto <span class="req">*</span>
-            </label>
+          <!-- FECHA -->
+          <td>
+            <span class="cell-muted">
+              {{ c.fechaCompra.strftime('%Y-%m-%d') }}
+            </span>
+          </td>
 
-            {% if errores_detalle %}
-              <div class="bg-red-100 border border-red-400 text-red-700 p-2 rounded text-xs mb-2">
-                {% for error in errores_detalle %}
-                  <div>{{ error }}</div>
-                {% endfor %}
-              </div>
-            {% endif %}
+          <!-- ACCIONES -->
+          <td>
+            <button
+              onclick="abrirModalEliminar('{{ url_for('compra.eliminar_compra', id=c.id) }}')"
+              type="button"
+              class="action-btn ab-eliminar"
+            >
+              Eliminar
+            </button>
+          </td>
 
-            <div style="display:flex; flex-direction:column; gap:0.55rem;">
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-              <!-- Materia Prima -->
-              <div class="select-wrap">
-                <select name="idMateriaPrima" class="custom-select">
-                  <option value="">— Seleccionar producto —</option>
-                  {% for id, nombre in detalle_form.idMateriaPrima.choices %}
-                    <option value="{{ id }}"
-                      {% if request.form.get('idMateriaPrima') == id|string %}selected{% endif %}>
-                      {{ nombre }}
-                    </option>
-                  {% endfor %}
-                </select>
-              </div>
+    {% if not compras %}
+    <div class="empty-state">
+      <p>No hay compras registradas aún.</p>
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}
 
-              <!-- Presentación -->
-              <div class="select-wrap">
-                <select name="contenidoNeto" class="custom-select">
-                  <option value="">— Seleccionar presentación —</option>
-                  {% for p in presentaciones %}
-                    <option value="{{ p[0] }}"
-                      {% if request.form.get('contenidoNeto') == p[0]|string %}selected{% endif %}>
-                      {{ p[1] }}
-                    </option>
-                  {% endfor %}
-                </select>
-              </div>
+{% block right_panel %}
+  <!-- PANEL DERECHO (FORMULARIO) -->
+  <aside class="right-panel">
 
-              <!-- Cantidad -->
-              <input
-                type="number"
-                name="cantidad"
-                value="{{ request.form.get('cantidad', '') }}"
-                step="1"
-                placeholder="Cantidad"
-                class="input-style"
-              />
+    <div class="panel-hdr-dark">
+      <h3>Registrar Entrada</h3>
+      <p>Completa los campos para registrar la entrada de mercancía</p>
+    </div>
 
-              <!-- Precio -->
-              <input
-                type="number"
-                name="precio"
-                value="{{ request.form.get('precio', '') }}"
-                step="0.01"
-                placeholder="Precio $"
-                class="input-style"
-              />
+    <div class="panel-body">
 
-              <!-- Botón agregar -->
-              <button type="submit" name="accion" value="agregar_detalle" class="btn-secondary">
-                + Agregar producto
-              </button>
+      <form method="POST" id="formularioCompra">
 
-            </div>
-          </div>
-
-          <!-- PRODUCTOS AGREGADOS -->
-          {% for d in detalles %}
-            <div class="detalle-item flex justify-between items-center">
-              
-              <div>
-                {{ d.nombre }} — {{ d.cantidad }} {{ d.contenidoNeto }} x ${{ d.precio }}
-              </div>
-
-              <button
-                type="button"
-                onclick="eliminarDetalle({{ loop.index0 }})"
-                class="text-red-500 hover:text-red-700 hover:scale-125 transition"
-              >
-                ✕
-              </button>
-
-            </div>
-          {% endfor %}
+        <!-- FACTURA -->
+        <div class="fg">
+          {{ macros.campoCompra(
+              compra_form.factura,
+              placeholder='FAC-2026-001'
+          ) }}
         </div>
 
-        <!-- Footer -->
-        <div class="form-footer">
+        <!-- PROVEEDOR -->
+        <div class="fg">
+          <label>Proveedor *</label>
+          <select name="idProveedor">
+            <option value="">— Seleccionar proveedor —</option>
+            {% for id, nombre in compra_form.idProveedor.choices %}
+              <option value="{{ id }}"
+                {% if compra_form.idProveedor.data == id %}selected{% endif %}>
+                {{ nombre }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- PRODUCTO -->
+        <div class="fg">
+          <label>Producto *</label>
+
+          {% if errores_detalle %}
+            <div class="error-box">
+              {% for error in errores_detalle %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <!-- Materia Prima -->
+          <select name="idMateriaPrima">
+            <option value="">— Seleccionar producto —</option>
+            {% for id, nombre in detalle_form.idMateriaPrima.choices %}
+              <option value="{{ id }}"
+                {% if request.form.get('idMateriaPrima') == id|string %}selected{% endif %}>
+                {{ nombre }}
+              </option>
+            {% endfor %}
+          </select>
+
+          <!-- Presentación -->
+          <select name="contenidoNeto">
+            <option value="">— Seleccionar presentación —</option>
+            {% for p in presentaciones %}
+              <option value="{{ p[0] }}"
+                {% if request.form.get('contenidoNeto') == p[0]|string %}selected{% endif %}>
+                {{ p[1] }}
+              </option>
+            {% endfor %}
+          </select>
+
+          <!-- Precio -->
+          <input
+            type="number"
+            name="precio"
+            value="{{ request.form.get('precio', '') }}"
+            step="0.01"
+            placeholder="Precio $"
+          />
+
+          <!-- Cantidad -->
+          <input
+            type="number"
+            name="cantidad"
+            value="{{ request.form.get('cantidad', '') }}"
+            step="1"
+            placeholder="Cantidad"
+          />
+
+          <!-- Botón -->
+          <button type="submit" name="accion" value="agregar_detalle" class="btn-primary-teal">
+            + Agregar producto
+          </button>
+        </div>
+
+        <!-- DETALLES AGREGADOS -->
+        {% for d in detalles %}
+          <div class="detalle-item">
+            <div>
+              {{ d.nombre }} — {{ d.cantidad }} {{ d.contenidoNeto }} x ${{ d.precio }}
+            </div>
+
+            <button
+              type="button"
+              onclick="eliminarDetalle({{ loop.index0 }})"
+              class="action-btn ab-eliminar"
+            >
+              ✕
+            </button>
+          </div>
+        {% endfor %}
+
+        <div class="panel-footer">
           <button type="reset" class="btn-cancel" onclick="cancelarCompra()">
             Cancelar
           </button>
-          <button type="submit" name="accion" value="guardar_compra" class="btn-primary">
+          <button type="submit" name="accion" value="guardar_compra" class="btn-save">
             Guardar compra
           </button>
         </div>
-
       </form>
 
     </div>
-  </div>
-</div>
+  </aside>
+{% endblock %}
 
-<!-- MODAL ELIMINAR -->
+<!-- MODAL -->
 <div id="modalEliminar" class="modal-overlay">
   <div class="modal-box">
     <h2>Eliminar compra</h2>
     <p>¿Estás seguro? Esta acción no se puede deshacer.</p>
     <div class="modal-actions">
-      <button type="button" onclick="cerrarModal()" class="btn-cancel" style="flex:1; padding:.7rem;">
+      <button type="button" onclick="cerrarModal()" class="btn-cancel">
         Cancelar
       </button>
-      <button type="submit" form="formEliminar" class="btn-primary"
-        style="flex:1; padding:.7rem; background:linear-gradient(135deg,#e05a5a,#ff6b6b);">
+      <button type="submit" form="formEliminar" class="btn-save">
         Eliminar
       </button>
     </div>
@@ -265,56 +254,87 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
+{% block extra_js %}
 <script>
-  // Carga dinámica de presentaciones al cambiar materia prima
-  document.querySelector('[name="idMateriaPrima"]').addEventListener('change', function () {
-    const idMateria = this.value;
-    
-    if (!idMateria) return; 
+document.addEventListener("DOMContentLoaded", () => {
 
-    fetch(`/get_presentaciones/${idMateria}`)
-      .then(res => res.json())
-      .then(data => {
-        const select = document.querySelector('[name="contenidoNeto"]');
-        select.innerHTML = '<option value="">— Seleccionar —</option>';
-        data.presentaciones.forEach(p => {
-          const option = document.createElement("option");
-          option.value = p[0];
-          option.textContent = p[1];
-          select.appendChild(option);
-        });
-      });
-  });
+  // ─────────────────────────────
+  // CARGA DINÁMICA PRESENTACIONES
+  // ─────────────────────────────
+  const selectMateria = document.querySelector('[name="idMateriaPrima"]');
+  const selectPresentacion = document.querySelector('[name="contenidoNeto"]');
 
-  function abrirModalEliminar(url) {
-    const modal = document.getElementById("modalEliminar");
-    document.getElementById("formEliminar").action = url;
-    modal.classList.add("show");;
-  }
+  if (selectMateria && selectPresentacion) {
+    selectMateria.addEventListener('change', function () {
+      const idMateria = this.value;
 
-  function cerrarModal() {
-    document.getElementById("modalEliminar").classList.remove("show");
-  }
+      if (!idMateria) {
+        selectPresentacion.innerHTML = '<option value="">— Seleccionar presentación —</option>';
+        return;
+      }
 
-  function cancelarCompra() {
-    fetch("/compra/cancelar", { method: "POST" })
-      .then(() => window.location.reload());
-  }
+      fetch(`/get_presentaciones/${idMateria}`)
+        .then(res => res.json())
+        .then(data => {
+          selectPresentacion.innerHTML = '<option value="">— Seleccionar presentación —</option>';
 
-  function eliminarDetalle(index) {
-    fetch("/compra/eliminar_detalle", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ index: index })
-    })
-    .then(res => res.json())
-    .then(() => {
-      location.reload();
+          data.presentaciones.forEach(p => {
+            const option = document.createElement("option");
+            option.value = p[0];
+            option.textContent = p[1];
+            selectPresentacion.appendChild(option);
+          });
+        })
+        .catch(err => console.error("Error cargando presentaciones:", err));
     });
   }
-</script>
 
+});
+
+
+// ─────────────────────────────
+// MODAL ELIMINAR
+// ─────────────────────────────
+function abrirModalEliminar(url) {
+  const modal = document.getElementById("modalEliminar");
+  const form = document.getElementById("formEliminar");
+
+  if (modal && form) {
+    form.action = url;
+    modal.classList.add("show");
+  }
+}
+
+function cerrarModal() {
+  const modal = document.getElementById("modalEliminar");
+  if (modal) modal.classList.remove("show");
+}
+
+
+// ─────────────────────────────
+// CANCELAR COMPRA
+// ─────────────────────────────
+function cancelarCompra() {
+  fetch("/compra/cancelar", { method: "POST" })
+    .then(() => window.location.reload())
+    .catch(err => console.error("Error cancelando compra:", err));
+}
+
+
+// ─────────────────────────────
+// ELIMINAR DETALLE
+// ─────────────────────────────
+function eliminarDetalle(index) {
+  fetch("/compra/eliminar_detalle", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ index: index })
+  })
+  .then(res => res.json())
+  .then(() => location.reload())
+  .catch(err => console.error("Error eliminando detalle:", err));
+}
+</script>
 {% endblock %}
