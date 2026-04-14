@@ -11,3 +11,4 @@ Thumbs.db
 config.py
 
 static/dist/output.css
+errores.log

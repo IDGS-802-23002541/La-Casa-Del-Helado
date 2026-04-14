@@ -19,6 +19,8 @@ from mermas import merma_bp
 from soli_produccion import Soli_Produccion
 from venta_cliente import clientes
 
+import logging
+
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 
@@ -60,3 +62,9 @@ if __name__ == '__main__':
 	with app.app_context():
 		db.create_all()
 	app.run(debug=True)
+	LOG_FILENAME = 'errores.log' 
+    logging.basicConfig(
+        filename=LOG_FILENAME,
+        level=logging.DEBUG,
+        format='%(asctime)s %(levelname)s %(message)s'
+    )

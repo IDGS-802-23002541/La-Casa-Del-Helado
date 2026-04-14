@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 import forms
 
 from flask_security import login_user, logout_user, login_required
@@ -25,6 +25,7 @@ def login_post():
     usuario = Usuario.query.filter_by(nombreUsuario=nombreUsuario).first()
 
     if not usuario or not check_password_hash(usuario.password, password):
+        current_app.logger.warning(f"Intento fallido de login | usuario={nombreUsuario}")
         flash('Usuario y/o contraseña incorrectos')
         return redirect(url_for('auth.login'))
     
@@ -38,7 +39,7 @@ def login_post():
             roles_usuarios.insert().values(usuario_id=usuario.id, rol_id=usuario.idRol)
         )
     db.session.commit()
-
+    current_app.logger.info(f"Login exitoso | usuario_id={usuario.id} | usuario={nombreUsuario}")
     nombre_rol = usuario.rol.nombre if usuario.rol else None
 
     if nombre_rol == 'Administrador':
@@ -53,5 +54,6 @@ def login_post():
 
 @autenticacion_bp.route('/logout')
 def logout():
+    current_app.logger.info(f"Cierre de sesión exitoso :D")
     logout_user()
     return redirect(url_for('auth.login'))
