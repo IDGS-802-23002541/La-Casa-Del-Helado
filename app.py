@@ -18,9 +18,24 @@ from compras import compra_bp
 from mermas import merma_bp
 from soli_produccion import Soli_Produccion
 from venta_cliente import clientes
+from usuarios_online import clientesOn
+#Para la validacion en 2 pasos y el registro de clientes externos
+from flask_mail import Mail, Message
+
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
+
+
+# Configuración de correo 
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'vanesa.reamunoz12@gmail.com' # es mio jaja
+app.config['MAIL_PASSWORD'] = 'rdtn fqgg aqkf kjto'   
+app.config['MAIL_DEFAULT_SENDER'] = ('La Casa del Helado', 'vanesa.reamunoz12@gmail.com')
+
+mail = Mail(app)
 
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -42,6 +57,8 @@ app.register_blueprint(compra_bp)
 app.register_blueprint(merma_bp)
 app.register_blueprint(Soli_Produccion)
 app.register_blueprint(clientes)
+app.register_blueprint(clientesOn)
+
 
 
 @app.route("/", methods=['POST', 'GET'])

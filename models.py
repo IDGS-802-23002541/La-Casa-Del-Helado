@@ -262,6 +262,7 @@ class Pedido(db.Model):
     total= db.Column(db.Numeric(10, 2), nullable=False)
 
     detalles = db.relationship('DetallePedido', backref='pedido', cascade='all, delete-orphan')
+    idClienteExterno = db.Column(db.Integer, db.ForeignKey('cliente_externo.id'), nullable=True)
 
 
 class DetallePedido(db.Model):
@@ -274,3 +275,22 @@ class DetallePedido(db.Model):
     precioUnitario= db.Column(db.Numeric(10, 2), nullable=False)
 
     presentacion = db.relationship('presentacionVenta')
+
+
+
+class ClienteExterno(db.Model):
+    __tablename__ = 'cliente_externo'
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(50), nullable=False)
+    apellido = db.Column(db.String(50), nullable=False)
+    correo = db.Column(db.String(100), nullable=False, unique=True)
+    password = db.Column(db.String(255), nullable=False)
+    telefono = db.Column(db.String(15), nullable=False)
+    fechaRegistro = db.Column(db.DateTime, default=datetime.now)
+    estatus = db.Column(db.Boolean, default=True)
+    
+    pedidos = db.relationship('Pedido', backref='cliente_info')
+
+    def __repr__(self):
+        return f'<ClienteExterno {self.correo}>'
