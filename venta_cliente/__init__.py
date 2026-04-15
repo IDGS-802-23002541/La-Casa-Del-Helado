@@ -218,3 +218,9 @@ def pedido_pago(folio):
         'punto_venta/pago.html',
         pedido=pedido
     )
+
+
+@clientes.route('/mis_pedidos', methods=['GET'])
+@cliente_login_required
+def mis_pedidos():
+    return render_template('punto_venta/mispedidos.html')
