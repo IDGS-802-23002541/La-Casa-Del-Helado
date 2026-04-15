@@ -23,6 +23,7 @@ class DevelopmentConfig(Config):
     SECURITY_PASSWORD_SALT = os.getenv('SECURITY_PASSWORD_SALT')
 
     WTF_CSRF_ENABLED = False  # True en producción
+    SECURITY_UNAUTHORIZED_VIEW = None
     SECURITY_LOGIN_URL = '/fs-login'
     SECURITY_LOGOUT_URL = '/fs-logout'
     SECURITY_REGISTERABLE = False

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from models import db, Pedido, DetallePedido, presentacionVenta
+from flask_security import login_required, roles_accepted, current_user
 from datetime import datetime, timedelta
 import uuid
 from decimal import Decimal
@@ -52,7 +53,9 @@ def validar_horario_recogida(fecha_recogida_dt):
     return True, ""
 
 @clientes.route('/venta_cliente', methods=['GET'])
-def venta_cliente():
+@login_required
+@roles_accepted('Cliente')
+def venta():
     presentaciones = (
         presentacionVenta.query
         .filter_by(estatus=True)
@@ -65,6 +68,8 @@ def venta_cliente():
     )
 
 @clientes.route('/pedido/crear', methods=['POST'])
+@login_required
+@roles_accepted('Cliente')
 def pedido_crear():
     data = request.get_json()
 
@@ -156,6 +161,8 @@ def pedido_crear():
     return jsonify(ok=True, folio=folio, total=float(total)), 201
 
 @clientes.route('/pedido/pagar', methods=['POST'])
+@login_required
+@roles_accepted('Cliente')
 def pedido_pagar():
     data  = request.get_json()
     folio = (data.get('folio') or '').strip()
@@ -186,6 +193,8 @@ def pedido_pagar():
 
 
 @clientes.route('/pedido/cancelar', methods=['POST'])
+@login_required
+@roles_accepted('Cliente')
 def pedido_cancelar():
     data  = request.get_json()
     folio = (data.get('folio') or '').strip()
@@ -204,6 +213,8 @@ def pedido_cancelar():
     return jsonify(ok=True, msg="Pedido cancelado y stock restituido."), 200
 
 @clientes.route('/pedido/pago/<folio>', methods=['GET'])
+@login_required
+@roles_accepted('Cliente')
 def pedido_pago(folio):
     pedido = Pedido.query.filter_by(folio=folio).first_or_404()
 
@@ -215,3 +226,9 @@ def pedido_pago(folio):
         'punto_venta/pago.html',
         pedido=pedido
     )
+
+@clientes.route('/mis_pedidos', methods=['GET'])
+@login_required
+@roles_accepted('Cliente')
+def mis_pedidos():
+    return render_template('punto_venta/mispedidos.html')

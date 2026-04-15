@@ -43,11 +43,13 @@ def login_post():
     nombre_rol = usuario.rol.nombre if usuario.rol else None
 
     if nombre_rol == 'Administrador':
-        return redirect(url_for('usuarios.index'))
+        return redirect(url_for('dash.auth'))
     elif nombre_rol == 'Produccion': 
         return redirect(url_for('recetas.index'))
     elif nombre_rol == 'Mostrador': 
         return redirect(url_for('venta.punto_venta'))
+    elif nombre_rol == 'Cliente': 
+        return redirect(url_for('venta_cliente.venta'))
     else: 
         flash('Tu usuario no tiene un rol asignado', 'error')
         return redirect(url_for('auth.login'))

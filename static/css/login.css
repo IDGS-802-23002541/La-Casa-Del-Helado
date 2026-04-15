@@ -1,0 +1,39 @@
+/* Estilos súper directos */
+
+.field {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.field label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #888;
+    text-transform: uppercase;
+}
+
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--coral), var(--coral-dark));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-login:hover {
+    background: #ff4773;
+}
+
+.error-msg {
+    background: #fff0f3;
+    color: #ff6f91;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 15px;
+}

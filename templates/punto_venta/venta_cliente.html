@@ -21,15 +21,15 @@
   </div>
 
   <div style="display: flex; align-items: center; gap: 15px;">
-    <a href="{{ url_for('clientesOn.logout_cliente') }}" 
+    <a href="{{ url_for('auth.logout') }}" 
        style="text-decoration: none; color: #ff6f91; font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 5px; padding: 8px 12px; border: 2px solid #ffecf1; border-radius: 10px; transition: 0.3s;"
        onmouseover="this.style.backgroundColor='#ffecf1'" onmouseout="this.style.backgroundColor='transparent'">
         Salir
     </a>
   </div>
-  <button class="nav-cart-btn" onclick="abrirModalDatos()">
-    🛒 Mi pedido <span class="nav-badge" id="nav-count">0</span>
-  </button>
+  <a class="nav-cart-btn" href="{{ url_for('venta_cliente.mis_pedidos') }}">
+    Mi pedidos
+  </a>
 </nav>
 
 <!-- HERO -->
@@ -357,7 +357,6 @@ function renderCarrito() {
   const itemsEl  = document.getElementById('ticket-items');
   const emptyEl  = document.getElementById('ticket-empty');
   const totalEl  = document.getElementById('ticket-total');
-  const countEl  = document.getElementById('nav-count');
   const fabEl    = document.getElementById('fab-count');
   const cobrarEl = document.getElementById('btn-cobrar');
   const limEl    = document.getElementById('lim-prods');
@@ -367,7 +366,6 @@ function renderCarrito() {
   const units = ids.reduce((s, id) => s + carrito[id].cantidad, 0);
 
   // contadores
-  countEl.textContent = units;
   fabEl.textContent   = units;
   limEl.textContent   = ids.length;
   limEl.className     = 'limit-val ' + (ids.length >= 5 ? 'warn' : 'ok');
