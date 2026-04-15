@@ -44,14 +44,14 @@ def terminar_produccion(sol_id):
         flash("La solicitud no se puede terminar", "warning")
         return redirect(url_for('produccion.tablero'))
 
-    receta = Receta.query.filter_by(idProducto=solicitud.idProducto).first()
+    receta = Receta.query.get(solicitud.idReceta)
 
     if receta:
         for detalle in receta.detalles:
             materia = MateriaPrima.query.get(detalle.idMateriaPrima)
 
             if materia:
-                cantidad_requerida = decimal.Decimal(str(detalle.cantidad)) * decimal.Decimal(str(solicitud.cantidad_solicitada))
+                cantidad_requerida = decimal.Decimal(str(detalle.cantidad)) * decimal.Decimal(str(solicitud.lotes))
 
                 if materia.stockActual < cantidad_requerida:
                     flash(f"No hay suficiente {materia.nombre}", "danger")
@@ -60,7 +60,7 @@ def terminar_produccion(sol_id):
                 materia.stockActual -= cantidad_requerida
 
     producto = Producto.query.get(solicitud.idProducto)
-    producto.stockActual += decimal.Decimal(str(solicitud.cantidad_solicitada))
+    producto.stockActual += decimal.Decimal(str(solicitud.lotes)) * decimal.Decimal(str(receta.cantidadProducida))
 
     solicitud.estatus = 'Terminado'
     db.session.commit()

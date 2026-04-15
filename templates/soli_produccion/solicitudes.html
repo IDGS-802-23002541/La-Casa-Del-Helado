@@ -18,22 +18,35 @@
 
     <div class="glass-card">
         <form action="{{ url_for('SolicitudProduccion.solicitud_produccion') }}" method="POST" class="form-grid">
-            
+
+            <!-- RECETA -->
             <div class="input-group">
-                <label>Selecciona el sabor o insumo</label>
-                <select name="idProducto" class="custom-input" required>
-                    <option value="">Buscar producto...</option>
-                    {% for p in productos %}
-                        <option value="{{ p.id }}">
-                            {{ p.nombre }} — (Actual: {{ p.stockActual }})
+                <label>Selecciona la receta</label>
+                <select id="receta" name="idReceta" class="custom-input" required>
+                    <option value="">— elige una receta —</option>
+                    {% for r in recetas %}
+                        <option value="{{ r.id }}"
+                                data-ml="{{ r.cantidadProducida }}"
+                                data-producto="{{ r.producto.nombre if r.producto else '—' }}">
+                            {{ r.nombre }} — {{ r.producto.nombre if r.producto else '?' }}
+                            ({{ r.cantidadProducida }} ml/lote)
                         </option>
                     {% endfor %}
                 </select>
             </div>
 
+            <!-- LOTES -->
             <div class="input-group">
-                <label>Cantidad requerida</label>
-                <input type="number" name="cantidad" class="custom-input" value="1" min="1" required>
+                <label>Número de lotes</label>
+                <input type="number" id="lotes" name="lotes"
+                       class="custom-input" value="1" min="1" required>
+            </div>
+
+            <!-- PRODUCCIÓN ESTIMADA -->
+            <div class="input-group">
+                <label>Producción estimada</label>
+                <input type="text" id="resultado" class="custom-input"
+                       disabled placeholder="0 ml">
             </div>
 
             <button type="submit" class="btn-primary-custom">
@@ -43,8 +56,8 @@
         </form>
     </div>
 
+    <!-- HISTORIAL -->
     <div class="status-grid">
-
         {% if historial %}
             {% for h in historial %}
                 <div class="prod-card">
@@ -54,35 +67,15 @@
                     </span>
 
                     <div class="product-info">
-                        <span>#{{ h.id }} — {{ h.fecha_solicitud.strftime('%H:%M') if h.fecha_solicitud else '00:00' }}</span>
+                        <span>#{{ h.id }} — {{ h.fecha_solicitud.strftime('%d/%m %H:%M') if h.fecha_solicitud else '—' }}</span>
                         <h3>{{ h.producto.nombre }}</h3>
+                        <small>{{ h.receta.nombre }}</small>
                     </div>
 
                     <div class="order-footer">
                         <div class="qty-display">
-                            {{ h.cantidad_solicitada }} <small style="font-size:12px;">unid.</small>
-                        </div>
-
-                        <div class="action-btns">
-                            {% if h.estatus != 'Completada' and (current_user.has_role('Produccion') or current_user.has_role('Administrador')) %}
-                            <form action="{{ url_for('SolicitudProduccion.actualizar_estatus') }}" method="POST">
-                                <input type="hidden" name="id_solicitud" value="{{ h.id }}">
-
-                                {% if h.estatus == 'Pendiente' %}
-                                    <input type="hidden" name="nuevo_estatus" value="En Proceso">
-                                    <button type="submit">🥣 Iniciar</button>
-
-                                {% elif h.estatus == 'En Proceso' %}
-                                    <input type="hidden" name="nuevo_estatus" value="Completada">
-                                    <button type="submit">✅ Terminar</button>
-                                {% endif %}
-                            </form>
-                            {% endif %}
-
-                            {% if current_user.has_role('Administrador') %}
-                                <a href="{{ url_for('SolicitudProduccion.eliminar_registro', id=h.id) }}"
-                                   onclick="return confirm('¿Eliminar registro?')">×</a>
-                            {% endif %}
+                            {{ h.lotes }} lote(s) —
+                            {{ (h.receta.cantidadProducida * h.lotes) | round(0) | int }} ml
                         </div>
                     </div>
 
@@ -90,10 +83,33 @@
             {% endfor %}
         {% else %}
             <div class="empty-state">
-                <p>No hay solicitudes pendientes en este momento.</p>
+                <p>No tienes solicitudes recientes.</p>
             </div>
         {% endif %}
-
     </div>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const recetaSel  = document.getElementById('receta');
+    const lotesInp   = document.getElementById('lotes');
+    const resultado  = document.getElementById('resultado');
+
+    function calcularML() {
+        const opt   = recetaSel.selectedOptions[0];
+        const lotes = parseInt(lotesInp.value) || 0;
+
+        if (opt && opt.dataset.ml) {
+            const total = parseFloat(opt.dataset.ml) * lotes;
+            resultado.value = total.toLocaleString('es-MX') + ' ml';
+        } else {
+            resultado.value = '';
+        }
+    }
+
+    recetaSel.addEventListener('change', calcularML);
+    lotesInp.addEventListener('input', calcularML);
+</script>
 {% endblock %}

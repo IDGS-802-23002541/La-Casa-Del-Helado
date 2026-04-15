@@ -88,8 +88,8 @@ def crear():
     return render_template("recetas/crear.html", form=form, materias=materias)
 
 @receta_bp.route("/recetas/editar", methods=["GET", "POST"])
-# @login_required
-# @roles_accepted('Administrador')
+@login_required
+@roles_accepted('Administrador')
 def editar():
     id_rec = request.args.get('id', type=int)
     receta = Receta.query.get_or_404(id_rec)
@@ -145,3 +145,22 @@ def eliminar():
     flash("Receta desactivada correctamente", 'warning')
     return redirect(url_for('recetas.index'))
 
+@receta_bp.route("/recetas/por_producto/<int:id_producto>")
+@login_required
+@roles_accepted('Produccion','Administrador','Mostrador')
+def recetas_por_producto(id_producto):
+    recetas = Receta.query.filter_by(
+        idProducto=id_producto,
+        estatus=True
+    ).all()
+
+    return {
+        "recetas": [
+            {
+                "id": r.id,
+                "nombre": r.nombre,
+                "cantidad": float(r.cantidadProducida)
+            }
+            for r in recetas
+        ]
+    }
