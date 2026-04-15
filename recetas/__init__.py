@@ -145,3 +145,22 @@ def eliminar():
     flash("Receta desactivada correctamente", 'warning')
     return redirect(url_for('recetas.index'))
 
+@receta_bp.route("/recetas/por_producto/<int:id_producto>")
+@login_required
+@roles_accepted('Produccion','Administrador','Mostrador')
+def recetas_por_producto(id_producto):
+    recetas = Receta.query.filter_by(
+        idProducto=id_producto,
+        estatus=True
+    ).all()
+
+    return {
+        "recetas": [
+            {
+                "id": r.id,
+                "nombre": r.nombre,
+                "cantidad": float(r.cantidadProducida)
+            }
+            for r in recetas
+        ]
+    }

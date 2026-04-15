@@ -67,9 +67,12 @@ class SolicitudProduccion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     idProducto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False)
     idUsuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
-    cantidad_solicitada = db.Column(db.Integer, nullable=False)
     fecha_solicitud = db.Column(db.DateTime, default=datetime.now)
     estatus = db.Column(db.String(50), default='Pendiente') 
+    idReceta = db.Column(db.Integer, db.ForeignKey('receta.id'), nullable=False)
+    lotes = db.Column(db.Integer, nullable=False)
+
+    receta = db.relationship('Receta')
 
     producto = db.relationship('Producto', backref='solicitudes')
     usuario = db.relationship('Usuario', backref='solicitudes_creadas')
