@@ -7,6 +7,12 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/compra.css') }}"/>
 {% endblock %}
 
+{% block layout_class %}
+  {% if current_user.rol.nombre == 'Mostrador' %}
+    pos-layout
+  {% endif %}
+{% endblock %}
+
 {% block body %}
   <!-- HEADER -->
   <div class="page-hdr fade-up">
@@ -46,7 +52,10 @@
           <th>Proveedor</th>
           <th>Detalles</th>
           <th>Fecha</th>
-          <th>Acciones</th>
+          {% if current_user.rol.nombre == 'Admin' %}
+            <th>Acciones</th>
+          {% endif %}
+          
         </tr>
       </thead>
 
@@ -87,6 +96,7 @@
             </span>
           </td>
 
+          {% if current_user.rol.nombre == 'Admin' %}
           <!-- ACCIONES -->
           <td>
             <button
@@ -97,6 +107,7 @@
               Eliminar
             </button>
           </td>
+          {% endif %}
 
         </tr>
         {% endfor %}

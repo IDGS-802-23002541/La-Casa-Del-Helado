@@ -8,9 +8,11 @@
       <h1>Recetas</h1>
       <p>Gestión de recetas y sus ingredientes</p>
     </div>
+    {% if current_user.rol.nombre == 'Administrador' %}
     <a href="{{ url_for('recetas.crear') }}" class="btn-primary">
       <span>＋</span> Nueva receta
     </a>
+    {% endif %}
   </div>
 
   <!-- Buscador -->
@@ -51,9 +53,11 @@
           <th>Producto</th>
           <th>Cant. Producida</th>
           <th>Ingredientes</th>
-              <th>Costo de produccion</th>
+          <th>Costo de produccion</th>
           <th>Estatus</th>
-          <th>Acciones</th>
+          {% if current_user.rol.nombre == 'Administrador' %}
+            <th>Acciones</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -70,7 +74,7 @@
           data-url-editar="{{ url_for('recetas.editar', id=receta.id) }}"
           data-url-desact="{{ url_for('recetas.eliminar', id=receta.id) }}"
           data-ingredientes="{{ receta.detalles | map(attribute='materiaPrima.nombre') | list | tojson | forceescape }}"
-              data-costo="{{ receta.costoProduccion if receta.costoProduccion else 0 }}"
+          data-costo="{{ receta.costoProduccion if receta.costoProduccion else 0 }}"
           data-cantidades="{{ receta.detalles | map(attribute='cantidad') | list | tojson | forceescape }}"
           data-unidades="{{ receta.detalles | map(attribute='unidad') | list | tojson | forceescape }}"
         >
@@ -101,6 +105,7 @@
               <span class="status-badge s-inactivo">● Inactiva</span>
             {% endif %}
           </td>
+          {% if current_user.rol.nombre == 'Administrador' %}
           <td>
             <a href="{{ url_for('recetas.editar', id=receta.id) }}"
               class="action-btn ab-editar"
@@ -109,6 +114,7 @@
               class="action-btn ab-desact"
               onclick="event.stopPropagation()">Desact.</a>
           </td>
+          {% endif %}
         </tr>
         {% endfor %}
       {% else %}
@@ -188,6 +194,11 @@
           <div class="fsec" style="margin-top:6px;">Acciones</div>
 
           <div style="display:flex; flex-direction:column; gap:8px;">
+          
+          <div class="fsec" style="margin-top:6px;
+          {% if current_user.rol.nombre != 'Administrador' %}display:none;{% endif %}">Acciones</div>
+          <div style="display:flex; flex-direction:column; gap:8px;
+            {% if current_user.rol.nombre != 'Administrador' %}display:none;{% endif %}">
             <a id="btn-editar" href="#" class="action-btn ab-editar"
               style="text-align:center; display:block; padding:9px;">
               ✎ Editar receta

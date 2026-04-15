@@ -285,6 +285,11 @@
         grid-template-columns: 1fr;
     }
 
+    .app-body.pos-layout {
+        grid-template-columns: 0px 1fr;
+    }
+
+
     /* ══════════════════════════════════════
      SIDEBAR
   ══════════════════════════════════════ */

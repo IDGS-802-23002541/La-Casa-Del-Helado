@@ -49,7 +49,9 @@
           <th>Justificación</th>
           <th>Fecha</th>
           <th>Usuario</th>
-          <th>Acciones</th>
+          {% if current_user.rol.nombre == 'Administrador' %}
+            <th>Acciones</th>
+          {% endif %}
         </tr>
       </thead>
 
@@ -71,7 +73,7 @@
           <td class="justificacion-text">{{ m.justificacion }}</td>
           <td>{{ m.fecha.strftime('%Y-%m-%d') }}</td>
           <td><span class="cell-main">{{ m.usuario.nombreUsuario }}</span></td>
-
+          {% if current_user.rol.nombre == 'Administrador' %}
           <td>
             <button
               onclick="abrirModalEliminar('{{ url_for('merma.eliminar_merma', id=m.id) }}')"
@@ -81,6 +83,7 @@
               Eliminar
             </button>
           </td>
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
@@ -104,8 +107,8 @@
     </div>
 
     <div class="panel-body">
-      <form method="POST" id="formularioMerma">
-
+      <form method="POST" action="{{url_for('merma.merma')}}" id="formularioMerma">
+        <input type="hidden" name="accion" value="guardar_merma">
         <!-- TIPO -->
         <div class="tipo-selector">
 

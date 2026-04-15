@@ -18,6 +18,11 @@
     Materia Prima
   </a>
 
+  <a href="{{ url_for('merma.merma') }}"
+     class="nav-link {% if request.endpoint == 'merma.merma' %}active{% endif %}">
+    Mermas
+  </a>
+
   <!-- FOOTER / USER -->
   <div class="sb-divider"></div>
   <a href="{{ url_for('auth.logout') }}" class="btn-logout">
