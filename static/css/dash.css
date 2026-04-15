@@ -15,22 +15,25 @@
     flex-shrink: 0;
 }
 
+/* ===== CONTENEDOR ===== */
+.dashboard-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* ===== HEADER ===== */
 .dash-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 35px;
-}
-
-.dash-header-left {
-    display: flex;
-    flex-direction: column;
 }
 
 .dash-title {
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 800;
     color: #111827;
+    margin: 0;
 }
 
 .dash-subtitle {
@@ -43,19 +46,27 @@
     font-weight: 600;
 }
 
-/* BOTÓN */
 .dash-actions {
     display: flex;
     align-items: center;
+    gap: 10px;
 }
 
+#filtroTiempo {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background: white;
+}
+
+/* BOTÓN */
 .btn-export {
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: none;
     background: linear-gradient(135deg, #FF8A8A, #FF6B6B);
     color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 12px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(255, 138, 138, 0.4);
     transition: 0.2s;
@@ -66,91 +77,126 @@
 }
 
 /* ===== GRID ===== */
-.dash-grid-top {
+.alert-grid,
+.dash-grid-top,
+.dash-grid {
     display: grid;
+    gap: 25px;
+}
+
+.alert-grid {
+    grid-template-columns: 1fr 1fr;
+}
+
+.dash-grid-top {
     grid-template-columns: 2fr 1fr;
-    gap: 20px;
 }
 
 .dash-grid {
-    display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
 }
 
-/* ===== CARD ===== */
+/* ===== CARDS ===== */
 .card {
-    background: #fff;
-    padding: 20px;
-    border-radius: 18px;
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 
-    display: flex;
-    flex-direction: column;
-
-    min-height: 0;
-}
-
-/* ===== CHARTS ===== */
-.chart-box {
-    position: relative;
-    height: 220px;
+    /* 🔥 IMPORTANTE */
+    display: inline-block;
     width: 100%;
 }
 
+/* TITULOS */
+.card h3 {
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* ===== CHARTS (LA CLAVE 🔥) ===== */
+
+/* ❌ NO fuerces altura */
+/* ❌ NO forces canvas */
+
+/* Contenedor flexible */
+.chart-box {
+    position: relative;
+    width: 100%;
+}
+
+/* Canvas NATURAL */
 .chart-box canvas {
-    width: 100% !important;
-    height: 100% !important;
+    max-width: 100%;
+    height: auto !important;
+    /* 🔥 mantiene proporción */
 }
 
-.card {
-    min-height: 0;
+/* ===== ALERTAS ===== */
+.alert-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
 }
 
-.dash-grid,
-.dash-grid-top {
-    align-items: start;
+.alert-bajo {
+    color: #EF4444;
+    font-weight: bold;
 }
 
-/* ===== TABLA (LA PARTE IMPORTANTE) ===== */
-
-/* Card especial para tabla */
-.table-card {
-    max-height: 400px;
+.alert-medio {
+    color: #F59E0B;
+    font-weight: bold;
 }
 
-/* Contenedor con scroll */
-.table-container {
-    overflow: auto;
-    height: 100%;
+.alert-alto {
+    color: #10B981;
+    font-weight: bold;
 }
 
-/* Tabla normal */
+.text-muted {
+    color: #9CA3AF;
+}
+
+/* ===== TABLA (MEJORADA 🔥) ===== */
 .table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;
+    margin-top: 15px;
+    font-size: 14px;
 }
 
-/* Header sticky (pro) */
 .table th {
-    position: sticky;
-    top: 0;
-    background: #f9fafb;
-    z-index: 1;
-
     text-align: left;
-    padding: 10px;
+    padding: 12px;
     font-size: 13px;
     color: #6B7280;
+    background: #F9FAFB;
+    border-bottom: 1px solid #eee;
 }
 
 .table td {
-    padding: 10px;
-    border-top: 1px solid #eee;
+    padding: 12px;
+    border-bottom: 1px solid #f1f1f1;
 }
 
-/* ===== TEXTO ===== */
-.text-success {
-    color: #10B981;
+/* Hover bonito */
+.table tbody tr:hover {
+    background: #FAFAFA;
+}
+
+/* Zebra */
+.table tbody tr:nth-child(even) {
+    background: #FCFCFC;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+
+    .alert-grid,
+    .dash-grid-top,
+    .dash-grid {
+        grid-template-columns: 1fr;
+    }
 }
