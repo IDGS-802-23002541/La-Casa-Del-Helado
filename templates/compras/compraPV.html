@@ -52,7 +52,7 @@
           <th>Proveedor</th>
           <th>Detalles</th>
           <th>Fecha</th>
-          {% if current_user.rol.nombre == 'Admin' %}
+          {% if current_user.rol.nombre == 'Administrador' %}
             <th>Acciones</th>
           {% endif %}
           
@@ -96,7 +96,7 @@
               </span>
             </td>
 
-          {% if current_user.rol.nombre == 'Admin' %}
+          {% if current_user.rol.nombre == 'Administrador' %}
           <!-- ACCIONES -->
           <td>
             <button

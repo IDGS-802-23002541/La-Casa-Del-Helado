@@ -41,9 +41,9 @@
 
         <!-- Badge estado -->
         <span class="card-badge 
-          {% if p.estatus == 'Pagado' %}badge-local
-          {% elif p.estatus == 'Pago en proceso' %}badge-art
-          {% elif p.estatus == 'Cancelado' %}badge-out
+          {% if p.estatus == 'pagado'or p.estatus == 'Pagado' %}badge-local
+          {% elif p.estatus == 'pago en proceso' %}badge-art
+          {% elif p.estatus == 'cancelado' %}badge-out
           {% else %}badge-ok{% endif %}">
           {{ p.estatus }}
         </span>
