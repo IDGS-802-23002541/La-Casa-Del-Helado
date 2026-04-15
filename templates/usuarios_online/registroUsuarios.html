@@ -1,0 +1,39 @@
+{% extends "layoutCliente.html" %}
+{% block title %}La Casa del Helado{% endblock %}
+
+{% block extra_css%}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/registro_clientes.css') }}">
+{% endblock %}
+
+{% block container %} 
+
+<div class="register-page">
+    <div class="card-small">
+        <h2>Registro</h2>
+        <p>Crea tu cuenta rápido</p>
+
+        <form action="/registro_cliente" method="POST">
+            <label class="form-label">Nombre</label>
+            <input type="text" name="txtNombre" class="form-input" placeholder="Nombre" required>
+            
+            <label class="form-label">Apellido</label>
+            <input type="text" name="txtApellido" class="form-input" placeholder="Apellido" required>
+
+            <label class="form-label">Email</label>
+            <input type="email" name="txtCorreo" class="form-input" placeholder="correo@ejemplo.com" required>
+
+            <label class="form-label">Teléfono</label>
+            <input type="tel" name="txtTelefono" class="form-input" placeholder="4770000000" required>
+
+            <label class="form-label">Contraseña</label>
+            <input type="password" name="txtPassword" class="form-input" placeholder="********" required>
+
+            <button type="submit" class="btn-small">Registrar</button>
+        </form>
+
+        <div class="login-footer">
+            ¿Ya tienes cuenta? <a href="/login_cliente">Entra</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

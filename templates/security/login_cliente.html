@@ -1,0 +1,49 @@
+{% extends "layoutCliente.html" %}
+{% block title %}La Casa del Helado{% endblock %}
+
+{% block extra_css%}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login_cliente.css') }}">
+{% endblock %}
+
+{% block container %} 
+<div class="login-container">
+    
+    <div class="panel-visual">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" style="max-width: 250px;">
+    </div>
+
+    <div class="panel-form">
+        <div class="login-card">
+            <h1 style="margin: 0; color: #333;">¡Bienvenido!</h1>
+            <p style="color: #aaa; font-size: 14px; margin-bottom: 25px;">Ingresa tus datos para comprar</p>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="error-msg">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('clientesOn.login_cliente') }}">
+                <div class="field">
+                    <label>Correo</label>
+                    <input type="email" name="txtCorreo" class="input-style" placeholder="ejemplo@correo.com" required>
+                </div>
+
+                <div class="field">
+                    <label>Contraseña</label>
+                    <input type="password" name="txtPassword" class="input-style" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn-login">ENTRAR</button>
+            </form>
+
+            <div style="margin-top: 20px; font-size: 13px;">
+                ¿Eres nuevo? <a href="{{ url_for('clientesOn.registro_cliente') }}" style="color: #ff6f91; font-weight: bold; text-decoration: none;">Regístrate aquí</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

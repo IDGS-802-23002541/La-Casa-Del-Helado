@@ -1,0 +1,87 @@
+/* Estilos súper directos */
+.login-container {
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Nunito', sans-serif;
+}
+
+.panel-visual {
+    flex: 1;
+    background: #fdfdfd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid #eee;
+}
+
+.panel-form {
+    flex: 1;
+    background: #ff9a9e;
+    /* El color rosa de tu marca */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 360px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.field {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.field label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.input-style {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    outline: none;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: #ff6f91;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-login:hover {
+    background: #ff4773;
+}
+
+.error-msg {
+    background: #fff0f3;
+    color: #ff6f91;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+/* Para que se vea bien en celular */
+@media (max-width: 768px) {
+    .panel-visual {
+        display: none;
+    }
+}

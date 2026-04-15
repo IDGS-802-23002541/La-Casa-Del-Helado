@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import uuid
 from decimal import Decimal
 from sqlalchemy import text
+from flask_security import current_user
 
 clientes = Blueprint(
     'venta_cliente',
@@ -96,13 +97,12 @@ def pedido_crear():
 
         # Crear pedido
         db.session.execute(
-            text("CALL crear_pedido(:folio, :nombre, :telefono, :fecha, :total)"),
+            text("CALL crear_pedido(:folio, :idCliente, :fecha, :total)"),
             {
                 "folio": folio,
-                "nombre": nombre,
-                "telefono": telefono,
+                "idCliente": 1,
                 "fecha": fecha_recogida_dt,
-                "total": 0  # provisional
+                "total": 0
             }
         )
 
@@ -168,7 +168,7 @@ def pedido_pagar():
         db.session.commit()
 
         pedido = db.session.execute(
-            text("SELECT nombreCliente, fechaRecogida, total FROM pedido WHERE folio = :folio"),
+            text("SELECT ce.nombre, p.fechaRecogida, p.total FROM pedido p JOIN cliente_externo ce ON p.idCliente = ce.id WHERE p.folio = :folio"),
             {"folio": folio}
         ).fetchone()
 

@@ -18,6 +18,7 @@ from compras import compra_bp
 from mermas import merma_bp
 from soli_produccion import Soli_Produccion
 from venta_cliente import clientes
+from usuarios_online import clientesOn
 
 import logging
 
@@ -44,6 +45,7 @@ app.register_blueprint(compra_bp)
 app.register_blueprint(merma_bp)
 app.register_blueprint(Soli_Produccion)
 app.register_blueprint(clientes)
+app.register_blueprint(clientesOn)
 
 
 @app.route("/", methods=['POST', 'GET'])
