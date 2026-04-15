@@ -95,9 +95,22 @@
       </div>
       {% endif %}
     </div>
-
+    
+    <!-- MODAL -->
+    <div id="modalEliminar" class="modal-overlay">
+      <div class="modal-box">
+        <h2>Eliminar merma</h2>
+        <p>¿Seguro?</p>
+        <div class="modal-actions">
+          <button type="button" onclick="cerrarModal()" class="btn-cancel">Cancelar</button>
+          <button type="submit" form="formEliminar" class="btn-primary">Eliminar</button>
+        </div>
+        <form id="formEliminar" method="POST"></form>
+      </div>
+    </div>
   </main>
 {% endblock %}
+
 
 {% block right_panel %}
   <!-- PANEL DERECHO -->
@@ -195,18 +208,6 @@
   </aside>
 {% endblock %}
 
-<!-- MODAL -->
-<div id="modalEliminar" class="modal-overlay">
-  <div class="modal-box">
-    <h2>Eliminar merma</h2>
-    <p>¿Seguro?</p>
-    <div class="modal-actions">
-      <button type="button" onclick="cerrarModal()" class="btn-cancel">Cancelar</button>
-      <button type="submit" form="formEliminar" class="btn-primary">Eliminar</button>
-    </div>
-    <form id="formEliminar" method="POST"></form>
-  </div>
-</div>
 
 {% block extra_js %}
 <script>

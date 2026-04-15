@@ -157,7 +157,7 @@
 
           <div class="fg">
             <label class="mf-label">Teléfono *</label>
-            <input type="text" name="telefono" value="{{ proveedor.telefono if proveedor else '' }}" required placeholder="" />
+            <input type="number" name="telefono" value="{{ proveedor.telefono if proveedor else '' }}" required placeholder="" maxlength="10" />
           </div>
 
           <div class="fg">

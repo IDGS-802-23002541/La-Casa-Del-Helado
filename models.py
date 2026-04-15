@@ -112,6 +112,7 @@ class Producto(db.Model):
     stockMinimo = db.Column(db.Numeric(10,2), nullable=False, default = 0)
     costoUnitario = db.Column(db.Numeric(10,2), nullable=False, default = 0)
     idCategoria = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
+    estatus = db.Column(db.Boolean, default=True)
 
     categoria = db.relationship('Categoria', foreign_keys=[idCategoria])
 

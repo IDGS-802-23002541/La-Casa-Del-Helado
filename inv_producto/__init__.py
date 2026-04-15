@@ -39,7 +39,7 @@ def index():
         create_from.idCategoria.data = prod_editar.idCategoria
         presentaciones = presentacionVenta.query.filter_by(idProductoBase=prod_editar.id).all()
     
-    productos = query.all()
+    productos = Producto.query.filter_by(estatus=True)
     categorias = Categoria.query.all()
     total = Producto.query.count()
 
@@ -91,9 +91,14 @@ def eliminar():
     id = request.args.get('id')
     producto = Producto.query.filter_by(id=id).first()
 
-    db.session.delete(producto)
+    if not producto:
+        flash('Producto no encontrado', 'error')
+        return redirect(url_for('producto.index'))
+
+    producto.estatus = False
     db.session.commit()
-    flash('Producto eliminado correctamente')
+
+    flash('Producto desactivado correctamente', 'success')
     return redirect(url_for('producto.index'))
     
 @prod_bp.route("/invproducto/<int:id>/presentaciones/crear", methods=["POST"])

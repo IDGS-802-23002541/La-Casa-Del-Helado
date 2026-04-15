@@ -195,7 +195,7 @@ def pedidos_online():
             "correo": p.correo,
             "total": float(p.total) if p.total else 0.0,
             "lista_productos": lista_items,
-            "estado": estado_db,
+            "estado": estado_db,      
             "estado_texto": texto,
             "estado_color": color
         })
