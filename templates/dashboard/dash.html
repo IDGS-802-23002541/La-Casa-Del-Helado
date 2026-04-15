@@ -212,20 +212,39 @@ const data = {
 /* ===== GRÁFICAS ===== */
 function crearBarra(id, labels, dataset){
   new Chart(document.getElementById(id),{
-    type:'bar',
-    data:{labels,datasets:[{data:dataset,backgroundColor:'#FF8A8A'}]},
-    options:{responsive:true,maintainAspectRatio:true},
-    plugins: [ChartDataLabels],
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: dataset,
+        backgroundColor: '#FF8A8A'
+      }]
+    },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
+      maintainAspectRatio: false, // 👈 evita estiramientos raros
+      scales: {
+        y: {
+          beginAtZero: true,
+          grace: '10%' // 👈 espacio arriba para que no se corte
+        }
+      },
       plugins: {
         legend: { display: false },
         datalabels: {
-            display: false
+          display: true, // 🔥 ESTO ES CLAVE
+          anchor: 'end',
+          align: 'end',
+          color: '#374151',
+          font: {
+            weight: 'bold',
+            size: 12
+          },
+          formatter: (value) => value
         }
       }
-    }
+    },
+    plugins: [ChartDataLabels]
   });
 }
 
@@ -238,8 +257,25 @@ new Chart(document.getElementById('ventasSemana'),{
   type: filtro === 'semana' ? 'bar' : 'line',
   data:{
     labels:data.ventasLabels,
-    datasets:[{data:data.ventasData,backgroundColor:'#FF8A8A'}]
-  }
+    datasets:[{
+      data:data.ventasData,
+      backgroundColor:'#FF8A8A'
+    }]
+  },
+    options:{
+    plugins:{
+      legend:{display:false},
+      datalabels:{
+        display:true,
+        anchor:'end',
+        align:'end',
+        color:'#374151',
+        font:{weight:'bold'},
+        formatter:(v)=>v
+      }
+    }
+  },
+  plugins:[ChartDataLabels]
 });
 
 new Chart(document.getElementById('ventasTipo'),{
@@ -251,22 +287,121 @@ new Chart(document.getElementById('ventasTipo'),{
 });
 
 /* ===== PDF ===== */
-document.getElementById('exportPDF').onclick = function(){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+document.getElementById('exportPDF').addEventListener('click', function () {
 
-  doc.text("Reporte de Ventas", 10, 10);
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
 
-  doc.autoTable({
-    head:[['Producto','Venta','Utilidad']],
-    body:data.utilidadProductos.map(p=>[
-      p.producto,
-      `$${p.venta}`,
-      `$${p.utilidad}`
-    ])
-  });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 25;
+    let yPos = 20;
 
-  doc.save("reporte.pdf");
-};
+    doc.addImage("{{ url_for('static', filename='img/logo.png') }}", 'PNG', margin, yPos, 30, 30);
+
+    doc.setFontSize(20);
+    doc.setTextColor('#FF8A8A');
+    doc.text("La Casa del Helado", pageWidth / 2, yPos + 12, { align: 'center' });
+
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("{{ current_date }}", pageWidth - margin, yPos + 20, { align: 'right' });
+
+    yPos += 40;
+
+    doc.setFontSize(14);
+    doc.text("Ventas", margin, yPos);
+    yPos += 7;
+
+    const barCanvas = document.getElementById('ventasSemana');
+    let imgWidth = pageWidth - 2 * margin;
+    let imgHeight = barCanvas.height * imgWidth / barCanvas.width;
+
+    doc.addImage(barCanvas.toDataURL('image/png'), 'PNG', margin, yPos, imgWidth, imgHeight);
+    yPos += imgHeight + 15;
+
+    if (yPos + 60 > 280) {
+        doc.addPage();
+        yPos = 20;
+    }
+
+    doc.text("Distribución por Categoría", margin, yPos);
+    yPos += 7;
+
+    doc.autoTable({
+        startY: yPos,
+        head: [['Categoría', 'Cantidad']],
+        body: data.distribucionLabels.map((label, i) => [
+            label,
+            data.distribucionData[i]
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [255, 138, 138] }
+    });
+
+    yPos = doc.lastAutoTable.finalY + 15;
+
+    const topCanvas = document.getElementById(
+        filtro === 'semana' ? 'topSemana' : 'topMes'
+    );
+
+    if (topCanvas) {
+        if (yPos + 80 > 280) {
+            doc.addPage();
+            yPos = 20;
+        }
+
+        doc.text("Top Productos", margin, yPos);
+        yPos += 7;
+
+        imgWidth = pageWidth - 2 * margin;
+        imgHeight = topCanvas.height * imgWidth / topCanvas.width;
+
+        doc.addImage(topCanvas.toDataURL('image/png'), 'PNG', margin, yPos, imgWidth, imgHeight);
+        yPos += imgHeight + 15;
+    }
+
+    const topMontoCanvas = document.getElementById(
+        filtro === 'semana' ? 'topSemanaMonto' : 'topMesMonto'
+    );
+
+    if (topMontoCanvas) {
+        if (yPos + 80 > 280) {
+            doc.addPage();
+            yPos = 20;
+        }
+
+        doc.text("Top Ventas", margin, yPos);
+        yPos += 7;
+
+        imgWidth = pageWidth - 2 * margin;
+        imgHeight = topMontoCanvas.height / topMontoCanvas.width * imgWidth;
+
+        doc.addImage(topMontoCanvas.toDataURL('image/png'), 'PNG', margin, yPos, imgWidth, imgHeight);
+        yPos += imgHeight + 15;
+    }
+
+    if (yPos + 60 > 280) {
+        doc.addPage();
+        yPos = 20;
+    }
+
+    doc.text("Utilidad por Producto", margin, yPos);
+    yPos += 7;
+
+    doc.autoTable({
+        startY: yPos,
+        head: [['Producto', 'Venta', 'Utilidad']],
+        body: data.utilidadProductos.map(p => [
+            p.producto,
+            `$${p.venta.toFixed(2)}`,
+            `$${p.utilidad.toFixed(2)}`
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [255, 138, 138] }
+    });
+
+    const fechaArchivo = "{{ current_date|replace('/', '-') }}";
+    doc.save(`${fechaArchivo}_reporte_de_ventas.pdf`);
+});
 </script>
 {% endblock %}
