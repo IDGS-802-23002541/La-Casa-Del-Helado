@@ -16,6 +16,7 @@ def login_cliente():
 
         cliente = ClienteExterno.query.filter_by(correo=correo, estatus=True).first()
 
+        # cliente.password == password
         if cliente and check_password_hash(cliente.password, password):
             # 1. Generar código de seguridad
             codigo_2fa = str(random.randint(100000, 999999))

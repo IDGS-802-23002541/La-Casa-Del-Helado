@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>La Casa del Helado – Pedido en línea</title>
-  <link type="image/png" sizes="16x16" rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
+{% extends "layoutCliente.html" %}
+{% block title %}La Casa del Helado - Pedido en línea{% endblock %}
+
+{% block extra_css%}
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/venta_cliente.css') }}?v">
-</head>
-<body>
+{% endblock %}
 
+{% block container %} 
 <!-- NAVBAR -->
 <nav>
   <div class="nav-brand">
@@ -21,7 +18,7 @@
   </div>
 
   <div style="display: flex; align-items: center; gap: 15px;">
-    <a href="{{ url_for('auth.logout') }}" 
+    <a href="{{ url_for('clientesOn.logout_cliente') }}" 
        style="text-decoration: none; color: #ff6f91; font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 5px; padding: 8px 12px; border: 2px solid #ffecf1; border-radius: 10px; transition: 0.3s;"
        onmouseover="this.style.backgroundColor='#ffecf1'" onmouseout="this.style.backgroundColor='transparent'">
         Salir
@@ -75,7 +72,7 @@
       {% for p in presentaciones %}
         {% set stock_disp = (p.productoBase.stockActual / p.equivalencia) | int %}
         {% set agotado = stock_disp <= 0 %}
-        <button
+        <div
           class="card {% if not agotado %}{% if loop.index % 5 == 1 %}bg-mint{% elif loop.index % 5 == 2 %}bg-yellow{% elif loop.index % 5 == 3 %}bg-peach{% elif loop.index % 5 == 4 %}bg-sky{% else %}bg-lav{% endif %}{% endif %}"
           data-id="{{ p.id }}"
           data-nombre="{{ p.nombre }}"
@@ -112,7 +109,7 @@
               <div class="btn-add disabled">✕</div>
             {% endif %}
           </div>
-        </button>
+        </div>
       {% else %}
         <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--soft);font-weight:700">
           No hay productos disponibles en este momento.
@@ -129,14 +126,14 @@
       <button class="btn-limpiar" onclick="limpiarCarrito()">✕ Limpiar</button>
     </div>
 
-    <div class="ticket-limits">
+    <!-- <div class="ticket-limits">
       <div class="limit-item">
         Productos: <span class="limit-val" id="lim-prods" style="color:var(--mint)">0</span>/5
       </div>
       <div class="limit-item" style="margin-left:auto">
         <span style="font-size:11px;color:var(--soft)">Máx. 20 uds/producto</span>
       </div>
-    </div>
+    </div> -->
 
     <div class="ticket-items" id="ticket-items">
       <div class="ticket-empty" id="ticket-empty">
@@ -160,7 +157,7 @@
 
 <!-- FAB MOBILE -->
 <button class="fab-cart" onclick="abrirModalDatos()">
-  🛒 Ver pedido · <span id="fab-count">0</span> items
+  Ver pedido · <span id="fab-count">0</span> items
 </button>
 
 <!-- TOAST -->
@@ -207,17 +204,17 @@
 <div class="modal-overlay" id="modal-datos">
   <div class="modal">
     <div class="modal-head">
-      <div class="modal-title">👤 Tus datos</div>
+      <div class="modal-title">Tus datos</div>
       <button class="modal-close" onclick="cerrarModal('modal-datos')">✕</button>
     </div>
     <div class="modal-body">
-
+<!-- 
       <div class="form-label">Nombre completo *</div>
       <input type="text" class="form-input" id="inp-nombre" placeholder="Ej. María García López">
 
       <div class="form-label">Teléfono (10 dígitos) *</div>
       <input type="tel" class="form-input" id="inp-telefono" placeholder="Ej. 4771234567"
-             maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')">
+             maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')"> -->
 
       <div class="form-label" style="margin-top:4px">¿Cuándo pasas a recoger?</div>
       <div class="hint-box">
@@ -263,8 +260,6 @@
       </div>
 
       <div style="background:var(--warm);border-radius:10px;padding:12px;margin:12px 0;font-size:13px;font-weight:700;color:var(--mid)">
-        <div>👤 <span id="res-nombre"></span></div>
-        <div style="margin-top:4px">📱 <span id="res-telefono"></span></div>
         <div style="margin-top:4px">📅 <span id="res-fecha"></span></div>
       </div>
 
@@ -275,11 +270,9 @@
     </div>
   </div>
 </div>
+{% endblock %}
 
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- JS                                                  -->
-<!-- ═══════════════════════════════════════════════════ -->
+{% block extra_js %}
 <script>
 /* ── estado del carrito ── */
 const carrito = {};   // { idPresentacion: {nombre, precio, cantidad, emoji} }
@@ -327,7 +320,7 @@ function agregarAlCarrito(card) {
   }
 
   renderCarrito();
-  toast(`"${nombre}" agregado 🎉`, 'success');
+  toast(`"${nombre}" agregado`, 'success');
 }
 
 /* ── cambiar cantidad desde ticket ── */
@@ -359,7 +352,6 @@ function renderCarrito() {
   const totalEl  = document.getElementById('ticket-total');
   const fabEl    = document.getElementById('fab-count');
   const cobrarEl = document.getElementById('btn-cobrar');
-  const limEl    = document.getElementById('lim-prods');
 
   const ids   = Object.keys(carrito);
   const total = ids.reduce((s, id) => s + carrito[id].precio * carrito[id].cantidad, 0);
@@ -367,8 +359,6 @@ function renderCarrito() {
 
   // contadores
   fabEl.textContent   = units;
-  limEl.textContent   = ids.length;
-  limEl.className     = 'limit-val ' + (ids.length >= 5 ? 'warn' : 'ok');
   totalEl.textContent = '$' + total.toFixed(0);
   cobrarEl.disabled   = ids.length === 0;
 
@@ -474,64 +464,65 @@ function abrirModalDatos() {
 
 /* ── modal resumen ── */
 function abrirModalResumen() {
-  const nombre   = document.getElementById('inp-nombre').value.trim();
-  const telefono = document.getElementById('inp-telefono').value.trim();
-  const fecha    = document.getElementById('inp-fecha').value;
-  const hora     = document.getElementById('inp-hora').value;
+  try {
+    const fecha = document.getElementById('inp-fecha').value;
+    const hora  = document.getElementById('inp-hora').value;
 
-  // validaciones
-  document.getElementById('inp-nombre').classList.remove('error');
-  document.getElementById('inp-telefono').classList.remove('error');
+    if (!fecha || !hora) {
+      toast('Selecciona fecha y hora de recogida.', 'error'); 
+      return;
+    }
 
-  if (!nombre) {
-    document.getElementById('inp-nombre').classList.add('error');
-    toast('El nombre es obligatorio.', 'error'); return;
+    const horaNum = parseInt(hora.split(':')[0]);
+    if (horaNum < 13 || horaNum >= 19) {
+      toast('El horario de recogida es de 1:00 PM a 7:00 PM.', 'error'); 
+      return;
+    }
+
+    const ids = Object.keys(carrito);
+    const total = ids.reduce((s, id) => s + carrito[id].precio * carrito[id].cantidad, 0);
+
+    const resumenEl = document.getElementById('resumen-items');
+    if (!resumenEl) {
+      console.error("No existe #resumen-items");
+      return;
+    }
+
+    resumenEl.innerHTML = '';
+
+    ids.forEach(id => {
+      const it  = carrito[id];
+      const div = document.createElement('div');
+      div.className = 'resumen-item';
+      div.innerHTML = `
+        <span>${it.emoji} ${it.nombre} × ${it.cantidad}</span>
+        <span>$${(it.precio * it.cantidad).toFixed(0)}</span>
+      `;
+      resumenEl.appendChild(div);
+    });
+
+    const totalEl = document.getElementById('resumen-total-val');
+    if (totalEl) totalEl.textContent = '$' + total.toFixed(0);
+
+    const [y, m, d] = fecha.split('-');
+    const [hh, min] = hora.split(':');
+    const ampm = parseInt(hh) >= 12 ? 'PM' : 'AM';
+    const h12  = parseInt(hh) > 12 ? parseInt(hh) - 12 : parseInt(hh);
+
+    const fechaEl = document.getElementById('res-fecha');
+    if (fechaEl) {
+      fechaEl.textContent = `${d}/${m}/${y} a las ${h12}:${min} ${ampm}`;
+    }
+
+    cerrarModal('modal-datos');
+
+    const modal = document.getElementById('modal-resumen');
+    if (modal) modal.classList.add('open');
+    else console.error("No existe #modal-resumen");
+
+  } catch (err) {
+    console.error("Error en abrirModalResumen:", err);
   }
-  if (!/^\d{10}$/.test(telefono)) {
-    document.getElementById('inp-telefono').classList.add('error');
-    toast('El teléfono debe tener exactamente 10 dígitos.', 'error'); return;
-  }
-  if (!fecha || !hora) {
-    toast('Selecciona fecha y hora de recogida.', 'error'); return;
-  }
-
-  // validar horario
-  const horaNum = parseInt(hora.split(':')[0]);
-  if (horaNum < 13 || horaNum >= 19) {
-    toast('El horario de recogida es de 1:00 PM a 7:00 PM.', 'error'); return;
-  }
-
-  // llenar resumen
-  const ids = Object.keys(carrito);
-  const total = ids.reduce((s, id) => s + carrito[id].precio * carrito[id].cantidad, 0);
-
-  const resumenEl = document.getElementById('resumen-items');
-  resumenEl.innerHTML = '';
-  ids.forEach(id => {
-    const it  = carrito[id];
-    const div = document.createElement('div');
-    div.className = 'resumen-item';
-    div.innerHTML = `
-      <span>${it.emoji} ${it.nombre} × ${it.cantidad}</span>
-      <span>$${(it.precio * it.cantidad).toFixed(0)}</span>
-    `;
-    resumenEl.appendChild(div);
-  });
-
-  document.getElementById('resumen-total-val').textContent = '$' + total.toFixed(0);
-  document.getElementById('res-nombre').textContent   = nombre;
-  document.getElementById('res-telefono').textContent = telefono;
-
-  // formato fecha legible
-  const [y, m, d] = fecha.split('-');
-  const [hh, min] = hora.split(':');
-  const ampm = parseInt(hh) >= 12 ? 'PM' : 'AM';
-  const h12  = parseInt(hh) > 12 ? parseInt(hh) - 12 : parseInt(hh);
-  document.getElementById('res-fecha').textContent =
-    `${d}/${m}/${y} a las ${h12}:${min} ${ampm}`;
-
-  cerrarModal('modal-datos');
-  document.getElementById('modal-resumen').classList.add('open');
 }
 
 /* ── enviar pedido al backend ── */
@@ -539,9 +530,6 @@ async function enviarPedido() {
   const btn = document.getElementById('btn-enviar');
   btn.disabled  = true;
   btn.innerHTML = '<span class="spinner"></span> Procesando...';
-
-  const nombre   = document.getElementById('inp-nombre').value.trim();
-  const telefono = document.getElementById('inp-telefono').value.trim();
   const fecha    = document.getElementById('inp-fecha').value;
   const hora     = document.getElementById('inp-hora').value;
 
@@ -555,7 +543,7 @@ async function enviarPedido() {
     const res = await fetch('/pedido/crear', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombreCliente: nombre, telefono, fechaRecogida, items })
+      body: JSON.stringify({ fechaRecogida, items })
     });
     const data = await res.json();
 
@@ -584,9 +572,13 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── cerrar modal al click en overlay ── */
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) cerrarModal(overlay.id);
+document.addEventListener('DOMContentLoaded', () => {
+  renderCarrito();
+
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) cerrarModal(overlay.id);
+    });
   });
 });
 
@@ -594,5 +586,4 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
 renderCarrito();
 </script>
 
-</body>
-</html>
+{% endblock %}

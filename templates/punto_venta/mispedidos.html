@@ -1,0 +1,156 @@
+{% extends "layoutCliente.html" %}
+{% block title %}La Casa del Helado - Mis Pedidos{% endblock %}
+
+{% block extra_css%}
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/venta_cliente.css') }}?v">
+{% endblock %}
+
+{% block container %} 
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">🍦</div>
+    <div>
+      <div class="nav-name">La Casa del Helado</div>
+      <div class="nav-sub">Pedidos en línea · Desde 1995</div>
+    </div>
+  </div>
+
+  <a class="nav-cart-btn" href="{{ url_for('venta_cliente.venta') }}">
+    ← Volver
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Mis pedidos 🧾</h1>
+  <p>Consulta el estado de tus pedidos y detalles de recogida.</p>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <div class="product-panel">
+
+    <div class="product-grid">
+
+      {% for p in pedidos %}
+      <div class="card">
+
+        <!-- Badge estado -->
+        <span class="card-badge 
+          {% if p.estatus == 'Pagado' %}badge-local
+          {% elif p.estatus == 'Pago en proceso' %}badge-art
+          {% elif p.estatus == 'Cancelado' %}badge-out
+          {% else %}badge-ok{% endif %}">
+          {{ p.estatus }}
+        </span>
+
+        <div class="card-emoji">🧾</div>
+
+        <div class="card-name">
+          {{ p.folio }}
+        </div>
+
+        <div class="card-sub">
+          📅 {{ p.fechaRecogida.strftime('%d/%m/%Y %I:%M %p') }}
+        </div>
+
+        <div class="card-footer">
+          <span class="card-price">
+            ${{ p.total | int }}
+          </span>
+
+          <button class="btn-add"
+                  onclick="verDetalle('{{ p.id }}')">
+            👁
+          </button>
+        </div>
+
+      </div>
+      {% else %}
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--soft);font-weight:700">
+        No tienes pedidos aún 🥲
+      </div>
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MODAL DETALLE -->
+<div class="modal-overlay" id="modal-detalle">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Detalle del pedido</div>
+      <button class="modal-close" onclick="cerrarModal('modal-detalle')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="resumen-items" id="detalle-items"></div>
+
+      <div class="resumen-total">
+        <span>Total</span>
+        <span id="detalle-total">$0</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function verDetalle(idPedido) {
+  try {
+    const res = await fetch(`/pedido/detalle/${idPedido}`);
+    const data = await res.json();
+
+    if (!data.ok) {
+      toast('Error al obtener detalle', 'error');
+      return;
+    }
+
+    const cont = document.getElementById('detalle-items');
+    cont.innerHTML = '';
+
+    data.detalles.forEach(it => {
+      const div = document.createElement('div');
+      div.className = 'resumen-item';
+      div.innerHTML = `
+        <span>${it.nombre} × ${it.cantidad}</span>
+        <span>$${it.subtotal}</span>
+      `;
+      cont.appendChild(div);
+    });
+
+    document.getElementById('detalle-total').textContent = '$' + data.total;
+
+    document.getElementById('modal-detalle').classList.add('open');
+
+  } catch (e) {
+    toast('Error de conexión', 'error');
+  }
+}
+
+function cerrarModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.remove('open');
+  }
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) {
+      overlay.classList.remove('open');
+    }
+  });
+});
+</script>
+{% endblock %}

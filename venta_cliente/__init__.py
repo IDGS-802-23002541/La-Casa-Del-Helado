@@ -79,13 +79,15 @@ def venta():
 @clientes.route('/pedido/crear', methods=['POST'])
 @cliente_login_required
 def pedido_crear():
+    if not session.get('cliente_id'):
+        return jsonify(ok=False, msg="Sesión inválida"), 500
     data = request.get_json()
     items    = data.get('items', [])
 
     if not items:
-        return jsonify(ok=False, msg="El carrito está vacío."), 400
-    if len(items) > 5:
-        return jsonify(ok=False, msg="Máximo 5 productos diferentes por pedido."), 400
+         return jsonify(ok=False, msg="El carrito está vacío."), 400
+    # if len(items) > 5:
+    #     return jsonify(ok=False, msg="Máximo 5 productos diferentes por pedido."), 400
 
     try:
         fecha_recogida_dt = datetime.fromisoformat(data.get('fechaRecogida', ''))
@@ -123,7 +125,7 @@ def pedido_crear():
             id_pres  = item.get('idPresentacion')
             cantidad = int(item.get('cantidad', 0))
 
-            if cantidad < 1 or cantidad > 20:
+            if cantidad < 1:
                 raise Exception(f"Cantidad inválida para el producto {id_pres}")
 
             db.session.execute(
@@ -225,4 +227,29 @@ def pedido_pago(folio):
 @clientes.route('/mis_pedidos', methods=['GET'])
 @cliente_login_required
 def mis_pedidos():
-    return render_template('punto_venta/mispedidos.html')
+    pedidos = Pedido.query.filter_by(idCliente=session['cliente_id']).all()
+    return render_template('punto_venta/mispedidos.html', pedidos=pedidos)
+
+@clientes.route('/pedido/detalle/<int:id>', methods=['GET'])
+@cliente_login_required
+def detalle_pedido(id):
+    detalles = db.session.execute(text("""
+        SELECT pv.nombre, dp.cantidad, (dp.cantidad * dp.precioUnitario) AS subtotal
+        FROM detalle_pedido dp
+        JOIN presentacion_venta pv ON dp.idPresentacion = pv.id
+        WHERE dp.idPedido = :id
+    """), {"id": id}).fetchall()
+
+    total = sum([float(d[2]) for d in detalles])
+
+    return jsonify(
+        ok=True,
+        detalles=[
+            {
+                "nombre": d[0],
+                "cantidad": d[1],
+                "subtotal": float(d[2])
+            } for d in detalles
+        ],
+        total=total
+    )
