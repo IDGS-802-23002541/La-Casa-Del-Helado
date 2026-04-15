@@ -1,0 +1,151 @@
+/* ============================================================
+   recetas.css — Módulo de Recetas
+   SOLO estilos específicos (sin duplicar base.css / input.css)
+   ============================================================ */
+
+
+/* ─────────────────────────────
+   PADDING DEL MAIN
+   El .main global NO tiene padding propio.
+   Aplica tanto al listado como a crear/editar.
+   ───────────────────────────── */
+
+.main {
+    padding: 18px 20px;
+}
+
+
+/* ─────────────────────────────
+   CREAR / EDITAR
+   El form crece con los ingredientes;
+   el .main ya tiene overflow-y:auto en input.css,
+   solo necesitamos que los hijos no colapsen la altura.
+   ───────────────────────────── */
+
+.main > form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+
+/* ─────────────────────────────
+   TABLA DE INGREDIENTES
+   Limita la altura del tbody para que la tabla
+   interna tenga scroll propio sin romper el layout.
+   ───────────────────────────── */
+
+/* El contenedor .table-wrap interno (el de ingredientes)
+   recibe max-height para que no crezca infinito
+   y el scroll quede en el .main */
+.ingredientes-wrap {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+
+/* ─────────────────────────────
+   CELDAS DE LA TABLA DE INGREDIENTES
+   Los inputs dentro de la tabla no deben
+   tener el width:100% roto por el box-model.
+   ───────────────────────────── */
+
+.fila-ingrediente td {
+    vertical-align: middle;
+    padding: 7px 10px;
+}
+
+.fila-ingrediente select,
+.fila-ingrediente input[type="number"],
+.fila-ingrediente input[type="text"] {
+    width: 100%;
+    min-width: 0; /* evita desborde en grid/flex */
+}
+
+
+/* ─────────────────────────────
+   COLUMNAS DE LA TABLA INTERNA
+   Proporciones: MP ocupa más espacio,
+   cantidad y unidad son compactas.
+   ───────────────────────────── */
+
+.ingredientes-wrap table {
+    table-layout: fixed;
+}
+
+.ingredientes-wrap table th:nth-child(1),
+.ingredientes-wrap table td:nth-child(1) {
+    width: 50%;
+}
+
+.ingredientes-wrap table th:nth-child(2),
+.ingredientes-wrap table td:nth-child(2) {
+    width: 20%;
+}
+
+.ingredientes-wrap table th:nth-child(3),
+.ingredientes-wrap table td:nth-child(3) {
+    width: 20%;
+}
+
+.ingredientes-wrap table th:nth-child(4),
+.ingredientes-wrap table td:nth-child(4) {
+    width: 10%;
+    text-align: center;
+}
+
+
+/* ─────────────────────────────
+   LISTADO — CELDAS ESPECÍFICAS
+   ───────────────────────────── */
+
+.td-id {
+    color: var(--light-text);
+    font-size: 11px;
+    font-weight: 600;
+    width: 40px;
+}
+
+.td-nombre {
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.td-muted {
+    color: var(--mid);
+    font-size: 12px;
+}
+
+
+/* ─────────────────────────────
+   PANEL DERECHO — LISTA DE INGREDIENTES
+   Ya tiene max-height inline en el HTML,
+   reforzamos aquí para consistencia.
+   ───────────────────────────── */
+
+#det-ingredientes-lista {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.det-ingrediente-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: #F8F5FC;
+    font-size: 12px;
+}
+
+.det-ingrediente-nombre {
+    color: var(--dark);
+    font-weight: 500;
+}
+
+.det-ingrediente-qty {
+    color: var(--mid);
+    font-weight: 600;
+    flex-shrink: 0;
+    margin-left: 8px;
+}

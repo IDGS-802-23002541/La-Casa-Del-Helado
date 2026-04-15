@@ -1,0 +1,141 @@
+/* ============================================================
+   login_cliente.css — Login de clientes online
+   La Casa del Helado
+   ============================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background: #FFF8F0;
+    min-height: 100vh;
+}
+
+/* ── Layout principal ── */
+.login-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+}
+
+/* ── Panel izquierdo (visual) ── */
+.panel-visual {
+    background: linear-gradient(135deg, #FFD6D6 0%, #FFF3C4 40%, #B8EDE4 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.panel-visual img {
+    max-width: 280px;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 30px rgba(232, 117, 106, 0.2));
+}
+
+/* ── Panel derecho (formulario) ── */
+.panel-form {
+    background: #F5F0FA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+/* ── Card del formulario ── */
+.login-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 36px rgba(44, 32, 64, 0.12);
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 360px;
+}
+
+/* ── Campos ── */
+.field {
+    text-align: left;
+    margin-bottom: 16px;
+}
+
+.field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #A090B0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.input-style {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid rgba(44, 32, 64, 0.10);
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    color: #1E1830;
+    background: #F8F5FC;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.input-style:focus {
+    border-color: #5CC8BC;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(92, 200, 188, 0.12);
+}
+
+/* ── Botón ── */
+.btn-login {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #E8756A, #C9584D);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(232, 117, 106, 0.4);
+    transition: all 0.2s;
+    margin-top: 8px;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(232, 117, 106, 0.5);
+}
+
+/* ── Mensajes de error ── */
+.error-msg {
+    background: #fff0f3;
+    color: #ff6f91;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    border: 1px solid #ffd6e0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .login-container {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-visual {
+        display: none;
+    }
+
+    .panel-form {
+        padding: 30px 16px;
+    }
+}

@@ -67,7 +67,7 @@ def crear():
         for i in range(len(cantidades)):
             if cantidades[i] and ids_mp[i]:
                 db.session.execute(
-                    db.text("call agregar_detalle(:idReceta,:idMp, :cantidad, :unidad)"),
+                    db.text("call agregar_detalle_receta(:idReceta,:idMp, :cantidad, :unidad)"),
                     {
                         'idReceta':id_receta,
                         'idMp':ids_mp[i],
@@ -75,6 +75,12 @@ def crear():
                         'unidad':unidades[i],
                     }
                 )
+
+        db.session.execute(
+            db.text("call calcular_costo_receta(:idReceta)"),
+            {"idReceta":id_receta}
+        )
+
         db.session.commit()
         flash('Receta creada correctamente', 'success')
         return redirect(url_for('recetas.index'))

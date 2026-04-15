@@ -68,7 +68,7 @@ def verificar_2fa():
             session.pop('codigo_2fa')
             
             flash(f"¡Bienvenido de nuevo, {session['cliente_nombre']}!", "success")
-            return redirect(url_for('clientesOn.venta_cliente'))
+            return redirect(url_for('venta_cliente.venta'))
         else:
             flash("El código no coincide.", "danger")
 

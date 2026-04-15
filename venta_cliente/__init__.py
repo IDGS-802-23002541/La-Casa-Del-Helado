@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session, flash
+from functools import wraps
 from models import db, Pedido, DetallePedido, presentacionVenta
 from flask_security import login_required, roles_accepted, current_user
 from datetime import datetime, timedelta
@@ -12,6 +13,15 @@ clientes = Blueprint(
     __name__,
     template_folder='templates'
 )
+
+def cliente_login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'cliente_id' not in session:
+            flash("Debes iniciar sesión.", "warning")
+            return redirect(url_for('clientesOn.login_cliente'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 HORA_APERTURA = 13   # 1:00 PM
@@ -53,8 +63,7 @@ def validar_horario_recogida(fecha_recogida_dt):
     return True, ""
 
 @clientes.route('/venta_cliente', methods=['GET'])
-@login_required
-@roles_accepted('Cliente')
+@cliente_login_required
 def venta():
     presentaciones = (
         presentacionVenta.query
@@ -68,26 +77,16 @@ def venta():
     )
 
 @clientes.route('/pedido/crear', methods=['POST'])
-@login_required
-@roles_accepted('Cliente')
+@cliente_login_required
 def pedido_crear():
     data = request.get_json()
-
-    # Campos obligatorios del cliente ──
-    nombre   = (data.get('nombreCliente') or '').strip()
-    telefono = (data.get('telefono') or '').strip()
     items    = data.get('items', [])
 
-    if not nombre:
-        return jsonify(ok=False, msg="El nombre es obligatorio."), 400
-    if len(telefono) != 10 or not telefono.isdigit():
-        return jsonify(ok=False, msg="El teléfono debe tener 10 dígitos."), 400
     if not items:
         return jsonify(ok=False, msg="El carrito está vacío."), 400
     if len(items) > 5:
         return jsonify(ok=False, msg="Máximo 5 productos diferentes por pedido."), 400
 
-    # Validamos la fecha recoge 
     try:
         fecha_recogida_dt = datetime.fromisoformat(data.get('fechaRecogida', ''))
     except (ValueError, TypeError):
@@ -105,7 +104,7 @@ def pedido_crear():
             text("CALL crear_pedido(:folio, :idCliente, :fecha, :total)"),
             {
                 "folio": folio,
-                "idCliente": 1,
+                "idCliente": session.get('cliente_id'),
                 "fecha": fecha_recogida_dt,
                 "total": 0
             }
@@ -118,10 +117,8 @@ def pedido_crear():
         ).fetchone()
 
         id_pedido = pedido[0]
-
         total = Decimal('0')
 
-        # Insertar detalles
         for item in items:
             id_pres  = item.get('idPresentacion')
             cantidad = int(item.get('cantidad', 0))
@@ -161,8 +158,7 @@ def pedido_crear():
     return jsonify(ok=True, folio=folio, total=float(total)), 201
 
 @clientes.route('/pedido/pagar', methods=['POST'])
-@login_required
-@roles_accepted('Cliente')
+@cliente_login_required
 def pedido_pagar():
     data  = request.get_json()
     folio = (data.get('folio') or '').strip()
@@ -175,7 +171,7 @@ def pedido_pagar():
         db.session.commit()
 
         pedido = db.session.execute(
-            text("SELECT ce.nombre, p.fechaRecogida, p.total FROM pedido p JOIN cliente_externo ce ON p.idCliente = ce.id WHERE p.folio = :folio"),
+            text("SELECT ce.nombre, p.fechaRecogida, p.total FROM pedido p join cliente_externo ce on p.idCliente = ce.id WHERE p.folio = :folio"),
             {"folio": folio}
         ).fetchone()
 
@@ -193,8 +189,7 @@ def pedido_pagar():
 
 
 @clientes.route('/pedido/cancelar', methods=['POST'])
-@login_required
-@roles_accepted('Cliente')
+@cliente_login_required
 def pedido_cancelar():
     data  = request.get_json()
     folio = (data.get('folio') or '').strip()
@@ -213,22 +208,21 @@ def pedido_cancelar():
     return jsonify(ok=True, msg="Pedido cancelado y stock restituido."), 200
 
 @clientes.route('/pedido/pago/<folio>', methods=['GET'])
-@login_required
-@roles_accepted('Cliente')
+@cliente_login_required
 def pedido_pago(folio):
     pedido = Pedido.query.filter_by(folio=folio).first_or_404()
 
     # Si ya está pagado o cancelado, no mostrar pantalla de pago
     if pedido.estatus != 'Pago en proceso':
-        return redirect(url_for('venta_cliente.venta_cliente'))
+        return redirect(url_for('venta_cliente.venta'))
 
     return render_template(
         'punto_venta/pago.html',
         pedido=pedido
     )
 
+
 @clientes.route('/mis_pedidos', methods=['GET'])
-@login_required
-@roles_accepted('Cliente')
+@cliente_login_required
 def mis_pedidos():
     return render_template('punto_venta/mispedidos.html')

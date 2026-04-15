@@ -53,6 +53,7 @@
           <th>Producto</th>
           <th>Cant. Producida</th>
           <th>Ingredientes</th>
+          <th>Costo de produccion</th>
           <th>Estatus</th>
           {% if current_user.rol.nombre == 'Administrador' %}
             <th>Acciones</th>
@@ -73,6 +74,7 @@
           data-url-editar="{{ url_for('recetas.editar', id=receta.id) }}"
           data-url-desact="{{ url_for('recetas.eliminar', id=receta.id) }}"
           data-ingredientes="{{ receta.detalles | map(attribute='materiaPrima.nombre') | list | tojson | forceescape }}"
+          data-costo="{{ receta.costoProduccion if receta.costoProduccion else 0 }}"
           data-cantidades="{{ receta.detalles | map(attribute='cantidad') | list | tojson | forceescape }}"
           data-unidades="{{ receta.detalles | map(attribute='unidad') | list | tojson | forceescape }}"
         >
@@ -93,6 +95,9 @@
               ingrediente{{ 's' if receta.detalles | length != 1 }}
             </span>
           </td>
+              <td style="color:var(--dark); font-weight:600;">
+                ${{ "%.2f"|format(receta.costoProduccion) if receta.costoProduccion else '—' }}
+              </td>
           <td>
             {% if receta.estatus %}
               <span class="status-badge s-activo">● Activa</span>
@@ -180,6 +185,15 @@
                         max-height:220px; overflow-y:auto;">
             </div>
           </div>
+
+          <div class="fg">
+            <label>Costo de producción</label>
+            <p id="det-costo" style="font-size:13px; font-weight:600; color:var(--dark); margin:0;"></p>
+          </div>
+
+          <div class="fsec" style="margin-top:6px;">Acciones</div>
+
+          <div style="display:flex; flex-direction:column; gap:8px;">
           
           <div class="fsec" style="margin-top:6px;
           {% if current_user.rol.nombre != 'Administrador' %}display:none;{% endif %}">Acciones</div>
@@ -216,6 +230,7 @@
   const producto     = tr.dataset.producto;
   const unidad       = tr.dataset.unidad;
   const cantidad     = tr.dataset.cantidad;
+  const costo = tr.dataset.costo;      
   const activa       = tr.dataset.estatus === '1';
   const urlEditar    = tr.dataset.urlEditar;
   const urlDesact    = tr.dataset.urlDesact;
@@ -228,6 +243,7 @@
   document.getElementById('det-producto').textContent = producto;
   document.getElementById('det-cantidad').textContent =
     cantidad + (unidad ? ' ' + unidad : '');
+  document.getElementById('det-costo').textContent = costo > 0 ? '$' + parseFloat(costo).toFixed(2) : '—';
 
   document.getElementById('det-estatus').innerHTML = activa
     ? '<span class="status-badge s-activo">● Activa</span>'
