@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Mostrador Online{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/punto_venta.css') }}">
+<style>
+    .board-container { 
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 20px; 
+        padding: 20px; 
+        height: calc(100vh - 120px); 
+        background: #F3F4F6; 
+    }
+    .board-column { 
+        background: #ebedef; 
+        border-radius: var(--radius); 
+        padding: 15px; 
+        display: flex; 
+        flex-direction: column; 
+        height: 100%; 
+        overflow-y: auto;
+    }
+    .column-title { 
+        font-weight: 900; 
+        font-size: 14px; 
+        text-transform: uppercase; 
+        margin-bottom: 15px; 
+        color: var(--dark); 
+        border-bottom: 2px solid rgba(0,0,0,0.05);
+        padding-bottom: 8px;
+    }
+    .order-card { 
+        background: white; 
+        border-radius: var(--radius); 
+        padding: 15px; 
+        margin-bottom: 12px; 
+        box-shadow: var(--shadow-card); 
+        border-left: 6px solid #ccc; 
+        cursor: pointer; 
+        transition: transform 0.2s;
+    }
+    .order-card:hover { 
+        transform: translateY(-3px);
+    }
+    .btn-action-form { 
+        width: 100%; 
+        border: none; 
+        padding: 10px; 
+        border-radius: 8px; 
+        font-weight: bold; 
+        cursor: pointer; 
+        margin-top: 10px; 
+        font-family: 'Nunito', sans-serif; 
+        transition: opacity 0.2s;
+    }
+    .btn-action-form:hover {
+        opacity: 0.9;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="venta-main">
+    <div class="venta-left-panel">
+        <div class="mode-switcher">
+            <a href="{{ url_for('venta.punto_venta') }}" class="mode-btn"> Venta directa</a>
+            <a href="{{ url_for('venta.pedidos_online') }}" class="mode-btn active-ol"> Pedidos en línea</a>
+        </div>
+
+        <div class="board-container">
+            <div class="board-column">
+                <div class="column-title"> Por Preparar</div>
+                {% for p in pedidos_ol if p.estado_texto in ['Pendiente', 'Pago en Proceso'] %}
+                <div class="order-card" style="border-color: {{ p.estado_color }};" 
+                     onclick="verDetalles('{{ p.cliente }}', '{{ p.id_formateado }}', '{{ p.telefono }}', '{{ p.total }}', '{{ p.lista_productos|join(',') }}')">
+                    <div style="font-weight: 900; color: var(--dark);">{{ p.cliente }}</div>
+                    <div style="font-size: 11px; color: var(--gray);">Folio: {{ p.id_formateado }}</div>
+                    
+                    <form action="{{ url_for('venta.cambiar_estado_pedido', pedido_id=p.id, nuevo_estado='En preparación') }}" method="POST">
+                        <button type="submit" class="btn-action-form" style="background: var(--coral); color: white;">▶ Iniciar</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="board-column" style="background: var(--sky);">
+                <div class="column-title" style="color: #0369a1;"> Preparando</div>
+                {% for p in pedidos_ol if p.estado_texto == 'En preparación' %}
+                <div class="order-card" style="border-color: #3B82F6;"
+                     onclick="verDetalles('{{ p.cliente }}', '{{ p.id_formateado }}', '{{ p.telefono }}', '{{ p.total }}', '{{ p.lista_productos|join(',') }}')">
+                    <div style="font-weight: 900; color: var(--dark);">{{ p.cliente }}</div>
+                    <div style="font-size: 11px; color: #3B82F6;">En proceso...</div>
+                    
+                    <form action="{{ url_for('venta.cambiar_estado_pedido', pedido_id=p.id, nuevo_estado='Listo para recoger') }}" method="POST">
+                        <button type="submit" class="btn-action-form" style="background: #3B82F6; color: white;">⏹ Terminar</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="board-column" style="background: var(--mint);">
+                <div class="column-title" style="color: #15803d;"> Listos</div>
+                {% for p in pedidos_ol if p.estado_texto == 'Listo para recoger' %}
+                <div class="order-card" style="border-color: var(--green);"
+                     onclick="verDetalles('{{ p.cliente }}', '{{ p.id_formateado }}', '{{ p.telefono }}', '{{ p.total }}', '{{ p.lista_productos|join(',') }}')">
+                    <div style="font-weight: 900; color: var(--dark);">{{ p.cliente }}</div>
+                    <div style="font-size: 11px; color: var(--green); font-weight: bold;">¡Listo para entrega! </div>
+                    
+                    <form action="{{ url_for('venta.cambiar_estado_pedido', pedido_id=p.id, nuevo_estado='Pagado') }}" method="POST">
+                        <button type="submit" class="btn-action-form" style="background: var(--green); color: white;"> Entregar</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="venta-ticket-panel" id="panel-detalles">
+        <div class="ticket-header">
+            <div class="ticket-title">🧾 Detalles del Pedido</div>
+        </div>
+        
+        <div id="detalle-vacio" style="padding: 40px; text-align: center; opacity: 0.4;">
+            <p style="font-size: 50px;">👈</p>
+            <p>Selecciona un pedido para ver los productos.</p>
+        </div>
+
+        <div id="detalle-info" style="display: none; padding: 20px;">
+            <h2 id="det-cliente" style="font-weight: 900; margin-bottom: 5px; color: var(--dark);"></h2>
+            <p id="det-tel" style="font-size: 14px; color: var(--gray); font-weight: 700;"></p>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+            
+            <div style="font-size: 12px; font-weight: 800; color: var(--gray); margin-bottom: 10px; text-transform: uppercase;">Productos:</div>
+            <div id="det-productos" class="ticket-items" style="margin-bottom: 20px;"></div>
+            
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 2px dashed #ddd; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 800; color: var(--dark);">TOTAL:</span>
+                <span id="det-total" style="font-weight: 900; font-size: 24px; color: var(--coral);"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function verDetalles(cliente, folio, tel, total, productosStr) {
+    document.getElementById('detalle-vacio').style.display = 'none';
+    document.getElementById('detalle-info').style.display = 'block';
+    
+    document.getElementById('det-cliente').innerText = cliente;
+    document.getElementById('det-tel').innerText = '📞 ' + tel;
+    document.getElementById('det-total').innerText = '$' + total;
+    
+    const lista = document.getElementById('det-productos');
+    lista.innerHTML = '';
+    
+    // Convertimos el string de productos separado por comas en una lista real
+    const productos = productosStr.split(',');
+    productos.forEach(p => {
+        if(p.trim() !== "") {
+            lista.innerHTML += `
+                <div class="ticket-item" style="background: var(--cream); padding: 8px; border-radius: 8px; margin-bottom: 5px; font-size: 13px; font-weight: 700;">
+                    🍦 ${p}
+                </div>`;
+        }
+    });
+}
+</script>
+{% endblock %}
