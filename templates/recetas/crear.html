@@ -160,7 +160,33 @@
     const opt = select.options[select.selectedIndex];
     const unidad = opt.dataset.unidad || '';
     const fila = select.closest('tr');
-    fila.querySelector('input[name="mp_unidad"]').value = unidad;
+    const inputUnidad = fila.querySelector('input[name="mp_unidad"]');
+    const inputCantidad = fila.querySelector('input[name="mp_cantidad"]');
+
+    inputUnidad.value = unidad;
+    inputUnidad.readOnly = !!unidad;
+
+    if (unidad === 'ml') {
+        inputCantidad.max = 5000;
+    } else if (unidad === 'g') {
+        inputCantidad.max = 2000;
+    } else {
+        inputCantidad.removeAttribute('max');
+    }
+
+    inputCantidad.oninput = () => validarCantidad(inputCantidad);
+  }
+
+  function validarCantidad(input) {
+      const max = parseFloat(input.max);
+      const val = parseFloat(input.value);
+      if (max && val > max) {
+          input.style.borderColor = 'var(--coral)';
+          input.title = `Máximo permitido: ${max}`;
+      } else {
+          input.style.borderColor = '';
+          input.title = '';
+      }
   }
 
   function agregarFila() {
@@ -171,9 +197,9 @@
   }
 
   function eliminarFila(btn) {
-    const tbody = document.getElementById('tbody-ingredientes');
-    if (tbody.querySelectorAll('tr.fila-ingrediente').length === 1) return;
-    btn.closest('tr').remove();
+      const tbody = document.getElementById('tbody-ingredientes');
+      if (tbody.querySelectorAll('tr.fila-ingrediente').length === 1) return;
+      btn.closest('tr').remove();
   }
 </script>
 {% endblock %}

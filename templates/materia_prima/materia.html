@@ -30,7 +30,7 @@
                     <th>Categoría</th>
                     <th>Stock</th>
                     <th>Estado</th>
-                    {% if current_user.rol.nombre == 'Admin' %}
+                    {% if current_user.rol.nombre == 'Administrador' %}
                         <th>Acciones</th>
                     {% endif %}
                 </tr>
@@ -65,7 +65,7 @@
                             <span class="status-badge s-inactivo">● Inactivo</span>
                         {% endif %}
                     </td>
-                    {% if current_user.rol.nombre == 'Admin' %}
+                    {% if current_user.rol.nombre == 'Administrador' %}
                     <td>
                         <button class="action-btn ab-ver btnVer" data-id="{{ mp.id }}">
                             Ver
@@ -132,48 +132,32 @@
   {% elif current_user.rol.nombre == 'Produccion' %}
     {% block layout_class %}no-panel{% endblock %}
   {% endif %}
+  <!-- TARJETA VER -->
+  <div id="overlay"></div>
+  <div id="card">
+      <span id="closeCard">✖</span>
+      <h3 id="cardNombre"></h3>
+      <p><strong>Categoría:</strong> <span id="cardCategoria"></span></p>
+      <p><strong>Stock:</strong> <span id="cardStock"></span></p>
+      <p><strong>Estatus:</strong> <span id="cardEstatus"></span></p>
+  </div>
 {% endblock %}
 
-<!-- TARJETA VER -->
-<div id="overlay"></div>
-<div id="card">
-    <span id="closeCard">✖</span>
-    <h3 id="cardNombre"></h3>
-    <p><strong>Categoría:</strong> <span id="cardCategoria"></span></p>
-    <p><strong>Stock:</strong> <span id="cardStock"></span></p>
-    <p><strong>Estatus:</strong> <span id="cardEstatus"></span></p>
-</div>
 {% block extra_js %}
 <script>
-const materias = JSON.parse('{{ materias_primas | tojson | safe }}');
-let estadoFiltro = "todos";
+const materias = {{ materias_primas | tojson | safe }};
 
 // FILTRAR
 function filtrarTabla() {
     const texto = document.getElementById("search").value.toLowerCase();
     document.querySelectorAll("#materiasTable tbody tr").forEach(row => {
-        const contenido = row.innerText.toLowerCase();
-        const esActivo = !row.classList.contains("inactive-row");
-        let cumpleTexto = contenido.includes(texto);
-        let cumpleEstado = (
-            estadoFiltro === "todos" ||
-            (estadoFiltro === "activos" && esActivo) ||
-            (estadoFiltro === "inactivos" && !esActivo)
-        );
-        row.style.display = (cumpleTexto && cumpleEstado) ? "" : "none";
+        row.style.display = row.innerText.toLowerCase().includes(texto) ? "" : "none";
     });
 }
 
 // BUSCADOR
 document.getElementById("search").addEventListener("keyup", filtrarTabla);
 
-// CHIPS
-const chips = document.querySelectorAll(".filter-chip");
-chips[0].onclick = () => { estadoFiltro="todos"; activarChip(0); filtrarTabla(); };
-chips[1].onclick = () => { estadoFiltro="activos"; activarChip(1); filtrarTabla(); };
-chips[2].onclick = () => { estadoFiltro="inactivos"; activarChip(2); filtrarTabla(); };
-function activarChip(index){ chips.forEach(c=>c.classList.add("inactive-filter")); chips[index].classList.remove("inactive-filter"); }
-activarChip(0);
 
 // TARJETA VER
 const overlay = document.getElementById("overlay");
@@ -223,4 +207,50 @@ document.querySelectorAll(".status-chip").forEach(chip=>{
     };
 });
 </script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+#overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 400;
+}
+
+#card {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    width: 300px;
+    z-index: 401;
+    box-shadow: var(--shadow-lg);
+}
+
+#card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+#card p {
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+#closeCard {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--light-text);
+}
+</style>
 {% endblock %}

@@ -104,7 +104,7 @@
               {% for det in receta.detalles %}
               <tr class="fila-ingrediente">
                 <td>
-                  <select name="mp_id" style="width:100%;">
+                  <select name="mp_id" style="width:100%;"">
                     <option value="">— Selecciona —</option>
                     {% for mp in materias %}
                       <option value="{{ mp.id }}"
@@ -131,7 +131,7 @@
             {% else %}
               <tr class="fila-ingrediente">
                 <td>
-                  <select name="mp_id" style="width:100%;">
+                  <select name="mp_id" style="width:100%;" onchange="actualizarUnidad(this)">
                     <option value="">— Selecciona —</option>
                     {% for mp in materias %}
                       <option value="{{ mp.id }}">{{ mp.nombre }}</option>
@@ -211,6 +211,40 @@
 
 {% block extra_js %}
 <script>
+
+  function actualizarUnidad(select) {
+    const opt = select.options[select.selectedIndex];
+    const unidad = opt.dataset.unidad || '';
+    const fila = select.closest('tr');
+    const inputUnidad = fila.querySelector('input[name="mp_unidad"]');
+    const inputCantidad = fila.querySelector('input[name="mp_cantidad"]');
+
+    inputUnidad.value = unidad;
+    inputUnidad.readOnly = !!unidad;
+
+    if (unidad === 'ml') {
+        inputCantidad.max = 5000;
+    } else if (unidad === 'g') {
+        inputCantidad.max = 2000;
+    } else {
+        inputCantidad.removeAttribute('max');
+    }
+
+    inputCantidad.oninput = () => validarCantidad(inputCantidad);
+  }
+
+  function validarCantidad(input) {
+      const max = parseFloat(input.max);
+      const val = parseFloat(input.value);
+      if (max && val > max) {
+          input.style.borderColor = 'var(--coral)';
+          input.title = `Máximo permitido: ${max}`;
+      } else {
+          input.style.borderColor = '';
+          input.title = '';
+      }
+  }
+
   function agregarFila() {
     const tpl   = document.getElementById('tpl-fila');
     const tbody = document.getElementById('tbody-ingredientes');
@@ -224,13 +258,20 @@
     btn.closest('tr').remove();
   }
 
-  function toggleChip(radio) {
-    document.querySelectorAll('.status-chip').forEach(c => {
-      c.classList.remove('on');
-      c.classList.add('off');
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.fila-ingrediente').forEach(fila => {
+        const inputUnidad = fila.querySelector('input[name="mp_unidad"]');
+        const inputCantidad = fila.querySelector('input[name="mp_cantidad"]');
+        const unidad = inputUnidad.value;
+
+        if (unidad) {
+            inputUnidad.readOnly = true;
+            if (unidad === 'ml') inputCantidad.max = 5000;
+            else if (unidad === 'g') inputCantidad.max = 2000;
+            inputCantidad.oninput = () => validarCantidad(inputCantidad);
+        }
     });
-    radio.closest('.status-chip').classList.remove('off');
-    radio.closest('.status-chip').classList.add('on');
-  }
+  });
+  
 </script>
 {% endblock %}
