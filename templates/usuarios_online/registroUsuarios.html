@@ -1,0 +1,124 @@
+{% block body %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap');
+
+.register-page {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #fff5f7;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.card-small {
+    background: #ffffff;
+    border-radius: 25px;
+    padding: 25px 30px; 
+    width: 100%;
+    max-width: 360px; 
+    box-shadow: 0 10px 25px rgba(255, 154, 158, 0.1);
+    border: 1px solid #ffe4e8;
+}
+
+.card-small h2 {
+    font-family: 'Playfair Display', serif;
+    color: #333;
+    font-size: 24px; /* Título más pequeño */
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.card-small p {
+    color: #999;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 13px;
+}
+
+.form-label {
+    color: #666;
+    font-weight: 500;
+    font-size: 12px;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.form-input {
+    width: 100%;
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    padding: 10px 15px; /* Inputs más delgados */
+    border-radius: 12px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus {
+    border-color: #ff9a9e;
+}
+
+.btn-small {
+    background: #ff9a9e;
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.btn-small:hover {
+    background: #ff858a;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 15px;
+    color: #bbb;
+    font-size: 12px;
+}
+
+.login-footer a {
+    color: #ff9a9e;
+    text-decoration: none;
+    font-weight: 600;
+}
+</style>
+
+<div class="register-page">
+    <div class="card-small">
+        <h2>Registro</h2>
+        <p>Crea tu cuenta rápido</p>
+
+        <form action="/registro_cliente" method="POST">
+            <label class="form-label">Nombre</label>
+            <input type="text" name="txtNombre" class="form-input" placeholder="Nombre" required>
+            
+            <label class="form-label">Apellido</label>
+            <input type="text" name="txtApellido" class="form-input" placeholder="Apellido" required>
+
+            <label class="form-label">Email</label>
+            <input type="email" name="txtCorreo" class="form-input" placeholder="correo@ejemplo.com" required>
+
+            <label class="form-label">Teléfono</label>
+            <input type="tel" name="txtTelefono" class="form-input" placeholder="4770000000" required>
+
+            <label class="form-label">Contraseña</label>
+            <input type="password" name="txtPassword" class="form-input" placeholder="********" required>
+
+            <button type="submit" class="btn-small">Registrar</button>
+        </form>
+
+        <div class="login-footer">
+            ¿Ya tienes cuenta? <a href="/login_cliente">Entra</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
