@@ -59,42 +59,42 @@
         </tr>
       </thead>
 
-      <tbody>
-        {% for c in compras %}
-        <tr>
+        <tbody>
+          {% for c in compras %}
+          <tr>
 
-          <!-- FACTURA -->
-          <td>
-            <span class="factura-badge">
-              {{ c.factura }}
-            </span>
-          </td>
+            <!-- FACTURA -->
+            <td>
+              <span class="factura-badge">
+                {{ c.factura }}
+              </span>
+            </td>
 
-          <!-- PROVEEDOR -->
-          <td>
-            <div class="cell-main">
-              {{ c.proveedor.razonSocial }}
-            </div>
-          </td>
+            <!-- PROVEEDOR -->
+            <td>
+              <div class="cell-main">
+                {{ c.proveedor.razonSocial }}
+              </div>
+            </td>
 
-          <!-- DETALLES -->
-          <td>
-            <ul class="detalle-list">
-              {% for d in c.detalles_compra %}
-                <li>
-                  <span class="qty">{{ d.cantidad }} ( {{d.contenidoNeto }} )</span>
-                  {{ d.materiaPrima.nombre }}
-                </li>
-              {% endfor %}
-            </ul>
-          </td>
+            <!-- DETALLES -->
+            <td>
+              <ul class="detalle-list">
+                {% for d in c.detalles_compra %}
+                  <li>
+                    <span class="qty">{{ d.cantidad }} ( {{d.contenidoNeto }} )</span>
+                    {{ d.materiaPrima.nombre }}
+                  </li>
+                {% endfor %}
+              </ul>
+            </td>
 
-          <!-- FECHA -->
-          <td>
-            <span class="cell-muted">
-              {{ c.fechaCompra.strftime('%Y-%m-%d') }}
-            </span>
-          </td>
+            <!-- FECHA -->
+            <td>
+              <span class="cell-muted">
+                {{ c.fechaCompra.strftime('%Y-%m-%d') }}
+              </span>
+            </td>
 
           {% if current_user.rol.nombre == 'Admin' %}
           <!-- ACCIONES -->
@@ -109,18 +109,19 @@
           </td>
           {% endif %}
 
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
 
-    {% if not compras %}
-    <div class="empty-state">
-      <p>No hay compras registradas aún.</p>
+      {% if not compras %}
+      <div class="empty-state">
+        <p>No hay compras registradas aún.</p>
+      </div>
+      {% endif %}
     </div>
-    {% endif %}
-  </div>
-{% endblock %}
+
+  </main>
 
 {% block right_panel %}
   <!-- PANEL DERECHO (FORMULARIO) -->
