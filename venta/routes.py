@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, session, flash
-from models import db, Producto, Venta, DetalleVenta, Categoria, presentacionVenta
+from models import db, Producto, Venta, DetalleVenta, Categoria, presentacionVenta, Pedido
 from . import venta_bp 
 from datetime import datetime
 from flask_security import login_required, roles_accepted, current_user
@@ -9,7 +9,12 @@ from flask_security import login_required, roles_accepted, current_user
 @roles_accepted('Mostrador')
 def punto_venta():
     vista = 'vd'
-    categorias = Categoria.query.all()
+    categorias = (
+        Categoria.query
+        .join(Producto)
+        .distinct()
+        .all()
+    )
     presentaciones = presentacionVenta.query.filter_by(estatus=True).all()
     carrito = session.get('carrito_pos', [])
     total_v = sum(float(item['subtotal']) for item in carrito)
@@ -35,7 +40,12 @@ def filtrar_productos():
     if categoria_id:
         query = query.join(Producto).filter(Producto.idCategoria == categoria_id)
         
-    presentaciones = query.all()
+    presentaciones = (
+        presentacionVenta.query
+        .filter_by(estatus=True)
+        .join(presentacionVenta.productoBase)
+        .all()
+    )
     categorias = Categoria.query.all()
     carrito = session.get('carrito_pos', [])
     total_v = sum(float(item['subtotal']) for item in carrito)
@@ -137,31 +147,76 @@ def limpiar_ticket():
     return redirect(url_for('venta.punto_venta'))
 
 @venta_bp.route("/pedidos_online", methods=["GET"])
-@login_required
-@roles_accepted('Mostrador')
 def pedidos_online():
-    pedidos_ol = [
-        {
-            'id_formateado': '#PED-0041',
-            'cliente': 'Mariana García',
-            'telefono': '477 123 4567',
-            'lista_productos': ['Cono Doble', 'Paleta de Agua'],
-            'estado_texto': 'En preparación',
-            'estado_color': '#FB923C'
-        },
-        {
-            'id_formateado': '#PED-0040',
-            'cliente': 'Juan P.',
-            'telefono': '477 555 0000',
-            'lista_productos': ['1 Cono de Nuez'],
-            'estado_texto': 'Marcar listo',
-            'estado_color': '#10B981'
-        }
-    ]
-    carrito = session.get('carrito_pos', [])
-    total_v = sum(float(item.get('subtotal', 0)) for item in carrito)
-    return render_template("punto_venta/venta.html", 
-                           pedidos_ol=pedidos_ol, 
-                           total=total_v, 
-                           carrito=carrito, 
-                           vista='ol')
+    # 1. Traemos los datos (Asegúrate de traer el ID)
+    resultados = db.session.execute(db.text("""
+        SELECT 
+            p.id, 
+            p.folio, 
+            c.correo,
+            c.nombre,
+            c.apellido,
+            p.fechaRecogida, 
+            p.total, 
+            p.estatus,
+            c.correo
+        FROM pedido p
+        JOIN cliente_externo c ON c.id = p.idCliente
+        WHERE DATE(p.fechaRecogida) = CURDATE() AND p.estatus != 'cancelado'
+    """)).fetchall()
+
+    pedidos_ol = []
+    
+    # IMPORTANTE: Estos nombres deben ser iguales a los que mandas en los botones
+    estados_config = {
+        "pagado": ("#F59E0B", "Pagado"),
+        "listo_entrega": ("#3B82F6", "Listo para entregar"),
+        "entregado": ("#22C55E", "Entregado"),
+        "cancelado": ("#EF4444", "Cancelado")
+    }
+
+    for p in resultados:
+        productos_db = db.session.execute(db.text("""
+            SELECT pr.nombre, dp.cantidad
+            FROM detalle_pedido dp
+            JOIN presentacion_venta pr ON pr.id = dp.idPresentacion
+            WHERE dp.idPedido = :id
+        """), {"id": p.id}).fetchall()
+
+        lista_items = [f"{n} x{c}" for n, c in productos_db]
+        estado_db = p.estatus.lower()
+        color, texto = estados_config.get(estado_db, ("#6B7280", p.estatus))
+        print("ESTADO:", p.estatus)
+        pedidos_ol.append({
+            "id": p.id,
+            "id_formateado": p.folio,
+            "fechaRecogida": p.fechaRecogida,
+            "cliente": f"{p.nombre} {p.apellido}",
+            "correo": p.correo,
+            "total": float(p.total) if p.total else 0.0,
+            "lista_productos": lista_items,
+            "estado": estado_db,
+            "estado_texto": texto,
+            "estado_color": color
+        })
+
+    return render_template(
+        "punto_venta/pedidos_online.html",
+        pedidos_ol=pedidos_ol,
+        vista='ol'
+    )
+
+@venta_bp.route("/cambiar_estado_pedido/<int:pedido_id>/<string:nuevo_estado>", methods=["POST"])
+def cambiar_estado_pedido(pedido_id, nuevo_estado):
+    try:
+        pedido = Pedido.query.get_or_404(pedido_id)
+        pedido.estatus = nuevo_estado.strip()
+        db.session.commit()
+
+        print(f"DEBUG: Pedido {pedido_id} actualizado a {nuevo_estado}")
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"ERROR CRÍTICO EN VENTAS: {e}")
+    
+    return redirect(url_for('venta.pedidos_online'))

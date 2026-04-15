@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "baseMostrador.html" %}
 
 {% block title %}Mostrador Online{% endblock %}
 
@@ -64,72 +64,86 @@
 {% block body %}
 <div class="venta-main">
     <div class="venta-left-panel">
-        <div class="mode-switcher">
+        <!-- <div class="mode-switcher">
             <a href="{{ url_for('venta.punto_venta') }}" class="mode-btn"> Venta directa</a>
             <a href="{{ url_for('venta.pedidos_online') }}" class="mode-btn active-ol"> Pedidos en línea</a>
-        </div>
+        </div> -->
 
         <div class="board-container">
+
+            <!-- 🟡 PAGADOS -->
             <div class="board-column">
-                <div class="column-title"> Por Preparar</div>
-                {% for p in pedidos_ol if p.estado_texto in ['Pendiente', 'Pago en Proceso'] %}
+                <div class="column-title"> Por preparar</div>
+
+                {% for p in pedidos_ol if p.estado == 'pagado' %}
                 <div class="order-card" style="border-color: {{ p.estado_color }};" 
-                     onclick="verDetalles('{{ p.cliente }}', '{{ p.id_formateado }}', '{{ p.telefono }}', '{{ p.total }}', '{{ p.lista_productos|join(',') }}')">
-                    <div style="font-weight: 900; color: var(--dark);">{{ p.cliente }}</div>
-                    <div style="font-size: 11px; color: var(--gray);">Folio: {{ p.id_formateado }}</div>
-                    
-                    <form action="{{ url_for('venta.cambiar_estado_pedido', pedido_id=p.id, nuevo_estado='En preparación') }}" method="POST">
-                        <button type="submit" class="btn-action-form" style="background: var(--coral); color: white;">▶ Iniciar</button>
+                    onclick="verDetalles('{{ p.cliente }}', '{{ p.correo }}', '{{ p.id_formateado }}', '{{ p.total }}', '{{ p.lista_productos|join(',') }}', '{{ p.fechaRecogida }}')">
+
+                    <div style="font-weight: 900;">{{ p.cliente }}</div>
+                    <div style="font-size: 11px;">{{ p.correo }}</div>
+                    <div style="font-size: 11px;">Folio: {{ p.id_formateado }}</div>
+
+                    <form action="{{ url_for('venta.cambiar_estado_pedido', pedido_id=p.id, nuevo_estado='listo_entrega') }}" method="POST">
+                        <button type="submit" class="btn-action-form" style="background: #F59E0B; color: white;">
+                            Marcar listo
+                        </button>
                     </form>
                 </div>
                 {% endfor %}
             </div>
 
+
+            <!-- 🔵 LISTOS -->
             <div class="board-column" style="background: var(--sky);">
-                <div class="column-title" style="color: #0369a1;"> Preparando</div>
-                {% for p in pedidos_ol if p.estado_texto == 'En preparación' %}
+                <div class="column-title"> Listos</div>
+
+                {% for p in pedidos_ol if p.estado == 'listo_entrega' %}
                 <div class="order-card" style="border-color: #3B82F6;"
-                     onclick="verDetalles('{{ p.cliente }}', '{{ p.id_formateado }}', '{{ p.telefono }}', '{{ p.total }}', '{{ p.lista_productos|join(',') }}')">
-                    <div style="font-weight: 900; color: var(--dark);">{{ p.cliente }}</div>
-                    <div style="font-size: 11px; color: #3B82F6;">En proceso...</div>
-                    
-                    <form action="{{ url_for('venta.cambiar_estado_pedido', pedido_id=p.id, nuevo_estado='Listo para recoger') }}" method="POST">
-                        <button type="submit" class="btn-action-form" style="background: #3B82F6; color: white;">⏹ Terminar</button>
+                    onclick="verDetalles('{{ p.cliente }}', '{{ p.correo }}', '{{ p.id_formateado }}', '{{ p.total }}', '{{ p.lista_productos|join(',') }}', '{{ p.fechaRecogida }}')">
+
+                    <div style="font-weight: 900;">{{ p.cliente }}</div>
+                    <div style="font-size: 11px;">{{ p.correo }}</div>
+                    <div style="font-size: 11px; color:#3B82F6;">Listo para entregar</div>
+
+                    <form action="{{ url_for('venta.cambiar_estado_pedido', pedido_id=p.id, nuevo_estado='entregado') }}" method="POST">
+                        <button type="submit" class="btn-action-form" style="background: #3B82F6; color: white;">
+                            Entregar
+                        </button>
                     </form>
                 </div>
                 {% endfor %}
             </div>
 
+
+            <!-- 🟢 ENTREGADOS -->
             <div class="board-column" style="background: var(--mint);">
-                <div class="column-title" style="color: #15803d;"> Listos</div>
-                {% for p in pedidos_ol if p.estado_texto == 'Listo para recoger' %}
-                <div class="order-card" style="border-color: var(--green);"
-                     onclick="verDetalles('{{ p.cliente }}', '{{ p.id_formateado }}', '{{ p.telefono }}', '{{ p.total }}', '{{ p.lista_productos|join(',') }}')">
-                    <div style="font-weight: 900; color: var(--dark);">{{ p.cliente }}</div>
-                    <div style="font-size: 11px; color: var(--green); font-weight: bold;">¡Listo para entrega! </div>
-                    
-                    <form action="{{ url_for('venta.cambiar_estado_pedido', pedido_id=p.id, nuevo_estado='Pagado') }}" method="POST">
-                        <button type="submit" class="btn-action-form" style="background: var(--green); color: white;"> Entregar</button>
-                    </form>
+                <div class="column-title"> Entregados</div>
+
+                {% for p in pedidos_ol if p.estado == 'entregado' %}
+                <div class="order-card" style="border-color: var(--green);">
+                    <div style="font-weight: 900;">{{ p.cliente }}</div>
+                    <div style="font-size: 11px;">{{ p.correo }}</div>
+                    <div style="font-size: 11px;">✔ Entregado</div>
                 </div>
                 {% endfor %}
             </div>
+
         </div>
     </div>
     
     <div class="venta-ticket-panel" id="panel-detalles">
         <div class="ticket-header">
-            <div class="ticket-title">🧾 Detalles del Pedido</div>
+            <div class="ticket-title">Detalles del Pedido</div>
         </div>
         
         <div id="detalle-vacio" style="padding: 40px; text-align: center; opacity: 0.4;">
-            <p style="font-size: 50px;">👈</p>
             <p>Selecciona un pedido para ver los productos.</p>
         </div>
 
         <div id="detalle-info" style="display: none; padding: 20px;">
             <h2 id="det-cliente" style="font-weight: 900; margin-bottom: 5px; color: var(--dark);"></h2>
             <p id="det-tel" style="font-size: 14px; color: var(--gray); font-weight: 700;"></p>
+            <p id="det-fecha" style="font-size: 14px; color: var(--gray); font-weight: 700;"></p>
             <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
             
             <div style="font-size: 12px; font-weight: 800; color: var(--gray); margin-bottom: 10px; text-transform: uppercase;">Productos:</div>
@@ -144,18 +158,18 @@
 </div>
 
 <script>
-function verDetalles(cliente, folio, tel, total, productosStr) {
+function verDetalles(cliente, correo, folio, total, productosStr, fechaRecogida) {
     document.getElementById('detalle-vacio').style.display = 'none';
     document.getElementById('detalle-info').style.display = 'block';
     
     document.getElementById('det-cliente').innerText = cliente;
-    document.getElementById('det-tel').innerText = '📞 ' + tel;
+    document.getElementById('det-tel').innerText = correo;
+    document.getElementById('det-fecha').innerText = formatearFecha(fechaRecogida);
     document.getElementById('det-total').innerText = '$' + total;
     
     const lista = document.getElementById('det-productos');
     lista.innerHTML = '';
     
-    // Convertimos el string de productos separado por comas en una lista real
     const productos = productosStr.split(',');
     productos.forEach(p => {
         if(p.trim() !== "") {
@@ -165,6 +179,22 @@ function verDetalles(cliente, folio, tel, total, productosStr) {
                 </div>`;
         }
     });
+}
+
+function formatearFecha(fechaStr) {
+    const fecha = new Date(fechaStr);
+
+    const dia = fecha.getDate().toString().padStart(2, '0');
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    const anio = fecha.getFullYear();
+
+    let horas = fecha.getHours();
+    const minutos = fecha.getMinutes().toString().padStart(2, '0');
+    const ampm = horas >= 12 ? 'PM' : 'AM';
+
+    horas = horas % 12 || 12;
+
+    return `${dia}/${mes}/${anio} ${horas}:${minutos} ${ampm}`;
 }
 </script>
 {% endblock %}

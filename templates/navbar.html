@@ -48,6 +48,11 @@
       Punto de Venta
     </a>
 
+    <a href="{{ url_for('venta.pedidos_online') }}"
+       class="nav-pos-tab {% if request.endpoint == 'venta.pedidos_online' %}active{% endif %}">
+      Pedidos en Línea
+    </a>
+
     <a href="{{ url_for('SolicitudProduccion.solicitud_produccion') }}"
        class="nav-pos-tab {% if request.endpoint == 'SolicitudProduccion.solicitud_produccion' %}active{% endif %}">
       Producción
