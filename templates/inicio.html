@@ -1,18 +1,46 @@
-{% extends "layout.html"%} {% block container %}
+{% extends "layoutCliente.html" %}
+{% block title %}La Casa del Helado{% endblock %}
 
-<p class="text-2xl">HTML de inicio</p>
+{% block extra_css%}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/inicio.css') }}">
+{% endblock %}
 
-<a
-  href="#"
-  class="bg-neutral-primary-soft block max-w-sm p-6 border border-default rounded-base shadow-xs hover:bg-neutral-secondary-medium"
->
-  <h5 class="mb-3 text-2xl font-semibold tracking-tight text-heading leading-8">
-    Noteworthy technology acquisitions 2021
-  </h5>
-  <p class="text-body">
-    Here are the biggest technology acquisitions of 2025 so far, in reverse
-    chronological order.
-  </p>
-</a>
+{% block container %} 
+  <div class="main-container">
+    <div class="bg-visual">
+      <div class="blob blob1"></div>
+      <div class="blob blob2"></div>
+      <div class="blob blob3"></div>
+    </div>
 
+    <nav class="navbar">
+      <ul class="nav-links">
+        <li>
+          <a href="/login" class="btn-soft">Iniciar sesión</a>
+        </li>
+      </ul>
+    </nav>
+
+    <section class="hero">
+      <img class="img-float top-left" src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG20998.png">
+      <img class="img-float middle-left" src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG21000.png">
+      <img class="img-float bottom-left" src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG20994.png">
+
+      <img class="img-float top-right" src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG20998.png">
+      <img class="img-float middle-right" src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG21000.png">
+      <img class="img-float bottom-right" src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG20994.png">
+
+      <img src="https://pngimg.com/uploads/ice_cream/ice_cream_PNG20984.png" class="img-back-center">
+
+      <div class="hero-content">
+        <p>Sabores que Enamoran</p>
+        <h1>
+          Descubre la Magia del <br>
+          Helado Artesanal
+        </h1>
+        <br><br>
+        <a href="/registro_cliente" class="btn-soft">Ver catálogo</a>
+      </div>
+    </section>
+  </div>
 {% endblock %}

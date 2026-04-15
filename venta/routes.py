@@ -5,8 +5,8 @@ from datetime import datetime
 from flask_security import login_required, roles_accepted, current_user
 
 @venta_bp.route("/venta", methods=["GET"])
-# @login_required
-# @roles_accepted('Mostrador')
+@login_required
+@roles_accepted('Mostrador')
 def punto_venta():
     vista = 'vd'
     categorias = Categoria.query.all()
@@ -22,8 +22,8 @@ def punto_venta():
                            )
 
 @venta_bp.route("/venta/filtrar", methods=["GET"])
-# @login_required
-# @roles_accepted('Mostrador')
+@login_required
+@roles_accepted('Mostrador')
 def filtrar_productos():
     categoria_id = request.args.get('cat_id', type=int)
     busqueda = request.args.get('q', '').strip()
@@ -50,8 +50,8 @@ def filtrar_productos():
                            vista='vd')
 
 @venta_bp.route("/vender_agregar", methods=["POST"])
-# @login_required
-# @roles_accepted('Mostrador')
+@login_required
+@roles_accepted('Mostrador')
 def vender_agregar():
     id_pres = request.form.get('id')
 
@@ -87,8 +87,8 @@ def vender_agregar():
     return redirect(url_for('venta.punto_venta'))
 
 @venta_bp.route("/finalizar_venta", methods=["POST"])
-# @login_required
-# @roles_accepted('Mostrador')
+@login_required
+@roles_accepted('Mostrador')
 def finalizar_venta():
     carrito = session.get('carrito_pos', [])
     if not carrito:
@@ -130,15 +130,15 @@ def finalizar_venta():
     return redirect(url_for('venta.punto_venta'))
 
 @venta_bp.route("/limpiar_ticket")
-# @login_required
-# @roles_accepted('Mostrador')
+@login_required
+@roles_accepted('Mostrador')
 def limpiar_ticket(): 
     session.pop('carrito_pos', None)
     return redirect(url_for('venta.punto_venta'))
 
 @venta_bp.route("/pedidos_online", methods=["GET"])
-# @login_required
-# @roles_accepted('Mostrador')
+@login_required
+@roles_accepted('Mostrador')
 def pedidos_online():
     pedidos_ol = [
         {

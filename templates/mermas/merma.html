@@ -55,18 +55,18 @@
         </tr>
       </thead>
 
-      <tbody>
-        {% for m in mermas %}
-        <tr>
-          <td>
-            {% if m.materia_prima %}
-              <span class="tipo-badge tipo-materia">Materia</span>
-            {% else %}
-              <span class="tipo-badge tipo-producto">Producto</span>
-            {% endif %}
-          </td>
+        <tbody>
+          {% for m in mermas %}
+          <tr>
+            <td>
+              {% if m.materia_prima %}
+                <span class="tipo-badge tipo-materia">Materia</span>
+              {% else %}
+                <span class="tipo-badge tipo-producto">Producto</span>
+              {% endif %}
+            </td>
 
-          <td>{{ m.materia_prima.nombre if m.materia_prima else m.producto.nombre }}</td>
+            <td>{{ m.materia_prima.nombre if m.materia_prima else m.producto.nombre }}</td>
 
           <td><span class="cantidad-chip">{{ m.cantidad }}</span></td>
           <td>{{ m.unidad }}</td>
@@ -89,12 +89,14 @@
       </tbody>
     </table>
 
-    {% if not mermas %}
-    <div class="empty-state">
-      <p>No hay mermas registradas aún.</p>
+      {% if not mermas %}
+      <div class="empty-state">
+        <p>No hay mermas registradas aún.</p>
+      </div>
+      {% endif %}
     </div>
-    {% endif %}
-  </div>
+
+  </main>
 {% endblock %}
 
 {% block right_panel %}
@@ -107,7 +109,7 @@
     </div>
 
     <div class="panel-body">
-      <form method="POST" action="{{url_for('merma.merma')}}" id="formularioMerma">
+      <form method="POST" id="formularioMerma">
         <input type="hidden" name="accion" value="guardar_merma">
         <!-- TIPO -->
         <div class="tipo-selector">

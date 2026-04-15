@@ -2,6 +2,9 @@
 {% set hide_layout = true %}
 
 {% block title %}Iniciar sesión — La Casa del Helado{% endblock %}
+{% block extra_css%}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
 
 {% block content  %}
 <div class="login-wrap">
@@ -31,15 +34,15 @@
       {% endwith %}
 
       <form method="POST" action="{{ url_for('auth.login_post') }}" style="width:100%;">
-        <div class="fg">
+        <div class="field">
           {{ form.nombreUsuario.label }}
           {{ form.nombreUsuario(placeholder="Nombre de usuario") }}
         </div>
-        <div class="fg">
+        <div class="field">
           {{ form.password.label }}
           {{ form.password(placeholder="Contraseña", type="password") }}
         </div>
-        <button type="submit" class="btn-save" style="width:100%; margin-top:8px;">
+        <button type="submit" class="btn-login" style="width:100%; margin-top:8px;">
           Ingresar
         </button>
       </form>

@@ -45,7 +45,7 @@ class Usuario(db.Model, UserMixin):
 
     compras = db.relationship('Compra', back_populates='usuario')
 
-    pedidos = db.relationship('Pedido', back_populates='cliente')
+    # pedidos = db.relationship('Pedido', back_populates='cliente')
 
     @property
     def active(self):
@@ -251,13 +251,13 @@ class Pedido(db.Model):
 
     id= db.Column(db.Integer, primary_key=True)
     folio= db.Column(db.String(20), nullable=False, unique=True, default=lambda: f"PED-{uuid.uuid4().hex[:8].upper()}")
-    idCliente= db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    idCliente= db.Column(db.Integer, db.ForeignKey('cliente_externo.id'), nullable=False)
     fechaPedido= db.Column(db.DateTime, nullable=False, default=datetime.now)
     fechaRecogida= db.Column(db.DateTime, nullable=True)
     estatus= db.Column(db.String(30), nullable=False, default='Pago en proceso')
     total= db.Column(db.Numeric(10, 2), nullable=False)
 
-    cliente = db.relationship('Usuario', back_populates='pedidos')
+    cliente = db.relationship('ClienteExterno', back_populates='pedidos')
     detalles = db.relationship('DetallePedido', backref='pedido', cascade='all, delete-orphan')
 
 
@@ -271,3 +271,20 @@ class DetallePedido(db.Model):
     precioUnitario= db.Column(db.Numeric(10, 2), nullable=False)
 
     presentacion = db.relationship('presentacionVenta')
+
+class ClienteExterno(db.Model):
+    __tablename__ = 'cliente_externo'
+
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(50), nullable=False)
+    apellido = db.Column(db.String(50), nullable=False)
+    correo = db.Column(db.String(100), nullable=False, unique=True)
+    password = db.Column(db.String(255), nullable=False)
+    telefono = db.Column(db.String(15), nullable=False)
+    fechaRegistro = db.Column(db.DateTime, default=datetime.now)
+    estatus = db.Column(db.Boolean, default=True)
+    
+    pedidos = db.relationship('Pedido', backref='cliente_info')
+
+    def __repr__(self):
+        return f'<ClienteExterno {self.correo}>'

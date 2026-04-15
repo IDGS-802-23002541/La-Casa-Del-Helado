@@ -1,0 +1,40 @@
+{% extends "layoutCliente.html" %}
+{% block title %}La Casa del Helado{% endblock %}
+
+{% block extra_css%}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/verificar2fa.css') }}">
+{% endblock %}
+
+{% block container %} 
+<div class="verify-container">
+    <div class="login-card">
+        <div class="login-icon">🔐</div>
+        <h1>Hola, {{ nombre }}</h1> 
+        <p>Por seguridad, ingresa los <strong>6 dígitos</strong> que enviamos a tu correo electrónico.</p>
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="error-msg">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="text" 
+                   name="txtCodigo" 
+                   placeholder="000000" 
+                   maxlength="6" 
+                   required 
+                   class="input-style" 
+                   autocomplete="off"
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '')"> <button type="submit" class="btn-login">VERIFICAR CÓDIGO</button>
+        </form>
+
+        <div style="margin-top: 20px; font-size: 12px; color: #aaa;">
+            ¿No recibiste el código? <br>
+            <a href="{{ url_for('clientesOn.login_cliente') }}" style="color: #ff6f91; text-decoration: none;">Intentar de nuevo</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

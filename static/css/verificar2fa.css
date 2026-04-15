@@ -1,0 +1,82 @@
+.verify-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #ff9a9e;
+    /* El mismo rosa del login */
+    font-family: 'Nunito', sans-serif;
+}
+
+.login-card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 360px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.login-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+h1 {
+    margin: 0;
+    color: #333;
+    font-size: 24px;
+}
+
+p {
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.input-style {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    outline: none;
+    font-size: 24px;
+    /* Números grandes para que se vea claro */
+    text-align: center;
+    letter-spacing: 8px;
+    /* Espaciado entre los números */
+    transition: 0.3s;
+}
+
+.input-style:focus {
+    border-color: #ff6f91;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: #ff6f91;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.btn-login:hover {
+    background: #ff4773;
+}
+
+.error-msg {
+    background: #fff0f3;
+    color: #ff6f91;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 15px;
+}

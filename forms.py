@@ -71,7 +71,6 @@ class MermaForm(Form):
     justificacion = StringField("Justificación", [
         validators.DataRequired(message="El campo es requerido"), 
     ])
-
 class RecetaForm(Form):
     
     nombre = StringField("Nombre", [
