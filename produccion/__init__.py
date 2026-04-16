@@ -3,6 +3,7 @@ from models import db, SolicitudProduccion, Producto, Receta, MateriaPrima
 from flask_security.decorators import roles_accepted, login_required
 import datetime
 import decimal
+from datetime import datetime
 
 produccion_bp = Blueprint(
     'produccion',
@@ -14,9 +15,43 @@ produccion_bp = Blueprint(
 @login_required
 @roles_accepted('Produccion')
 def tablero():
-    pendientes = SolicitudProduccion.query.filter_by(estatus='Pendiente').all()
-    en_proceso = SolicitudProduccion.query.filter_by(estatus='En Proceso').all()
-    terminadas = SolicitudProduccion.query.filter_by(estatus='Terminado').all()
+    fecha = request.args.get("fecha")
+    
+    if fecha:
+        # filtro por fecha seleccionada en el input
+        pendientes = SolicitudProduccion.query.filter(
+            SolicitudProduccion.estatus == 'Pendiente',
+            db.func.date(SolicitudProduccion.fecha_solicitud) == fecha
+        ).all()
+
+        en_proceso = SolicitudProduccion.query.filter(
+            SolicitudProduccion.estatus == 'En Proceso',
+            db.func.date(SolicitudProduccion.fecha_solicitud) == fecha
+        ).all()
+
+        terminadas = SolicitudProduccion.query.filter(
+            SolicitudProduccion.estatus == 'Terminado',
+            db.func.date(SolicitudProduccion.fecha_solicitud) == fecha
+        ).all()
+
+    else:
+        # si no hay filtro, usa el día actual
+        hoy = datetime.now().date()
+
+        pendientes = SolicitudProduccion.query.filter(
+            SolicitudProduccion.estatus == 'Pendiente',
+            db.func.date(SolicitudProduccion.fecha_solicitud) == hoy
+        ).all()
+
+        en_proceso = SolicitudProduccion.query.filter(
+            SolicitudProduccion.estatus == 'En Proceso',
+            db.func.date(SolicitudProduccion.fecha_solicitud) == hoy
+        ).all()
+
+        terminadas = SolicitudProduccion.query.filter(
+            SolicitudProduccion.estatus == 'Terminado',
+            db.func.date(SolicitudProduccion.fecha_solicitud) == hoy
+        ).all()
 
     return render_template(
         "produccion/prod.html",

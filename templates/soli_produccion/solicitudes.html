@@ -29,7 +29,7 @@
                                 data-ml="{{ r.cantidadProducida }}"
                                 data-producto="{{ r.producto.nombre if r.producto else '—' }}">
                             {{ r.nombre }} — {{ r.producto.nombre if r.producto else '?' }}
-                            ({{ r.cantidadProducida }} ml/lote)
+                            ({{ r.cantidadProducida }} {{r.producto.unidadBase}} /lote)
                         </option>
                     {% endfor %}
                 </select>
@@ -46,7 +46,7 @@
             <div class="input-group">
                 <label>Producción estimada</label>
                 <input type="text" id="resultado" class="custom-input"
-                       disabled placeholder="0 ml">
+                       disabled placeholder="0">
             </div>
 
             <button type="submit" class="btn-primary-custom">
@@ -75,7 +75,7 @@
                     <div class="order-footer">
                         <div class="qty-display">
                             {{ h.lotes }} lote(s) —
-                            {{ (h.receta.cantidadProducida * h.lotes) | round(0) | int }} ml
+                            {{ (h.receta.cantidadProducida * h.lotes) | round(0) | int }} {{ h.receta.producto.unidadBase }} 
                         </div>
                     </div>
 
@@ -103,7 +103,7 @@
 
         if (opt && opt.dataset.ml) {
             const total = parseFloat(opt.dataset.ml) * lotes;
-            resultado.value = total.toLocaleString('es-MX') + ' ml';
+            resultado.value = total.toLocaleString('es-MX') ;
         } else {
             resultado.value = '';
         }

@@ -111,20 +111,19 @@ def finalizar_venta():
         # Registramos la venta vinculada al usuario logueado
         # agregando el uso de procedures
         result = db.session.execute(
-            db.text("CALL finalizar_VEnta(:idUsuario, :total, @idVenta)") , {'idUsuario':current_user.id, 'total': total_v}           
+            db.text("CALL finalizar_venta(:idUsuario, :total, @idVenta)") , {'idUsuario':current_user.id, 'total': total_v}           
         )
         id_venta = db.session.execute(db.text("select @idVenta")).scalar()
 
         for item in carrito:
             db.session.execute(
-                db.text("call agregar_detalle_Venta(:idVenta, :idProductoBase, :idPresentacion, :cantidad, :precio, :equivalencia)"),
+                db.text("call agregar_detalle_Venta(:idVenta, :idProductoBase, :idPresentacion, :cantidad, :precio)"),
                 {
                     "idVenta":id_venta,
                     "idProductoBase":item['idProductoBase'],
                     "idPresentacion":item['id'],
                     "cantidad":item['cantidad'],
                     "precio":item['precio'],
-                    "equivalencia":item['equivalencia'],
                 }
             )
           
@@ -169,8 +168,8 @@ def pedidos_online():
     
     # IMPORTANTE: Estos nombres deben ser iguales a los que mandas en los botones
     estados_config = {
-        "pagado": ("#F59E0B", "Pagado"),
-        "listo_entrega": ("#3B82F6", "Listo para entregar"),
+        "pagado": ("#F59E0B", "pagado"),
+        "listo_entrega": ("#3B82F6", "listo_entrega"),
         "entregado": ("#22C55E", "Entregado"),
         "cancelado": ("#EF4444", "Cancelado")
     }
@@ -186,7 +185,7 @@ def pedidos_online():
         lista_items = [f"{n} x{c}" for n, c in productos_db]
         estado_db = p.estatus.lower()
         color, texto = estados_config.get(estado_db, ("#6B7280", p.estatus))
-        print("ESTADO:", p.estatus)
+        #print("ESTADO:", p.estatus)
         pedidos_ol.append({
             "id": p.id,
             "id_formateado": p.folio,

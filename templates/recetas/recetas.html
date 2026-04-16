@@ -190,10 +190,11 @@
             <label>Costo de producción</label>
             <p id="det-costo" style="font-size:13px; font-weight:600; color:var(--dark); margin:0;"></p>
           </div>
-
+          {% if current_user.rol.nombre != 'Administrador' %}
           <div class="fsec" style="margin-top:6px;">Acciones</div>
 
           <div style="display:flex; flex-direction:column; gap:8px;">
+          {% endif %}
           
           <div class="fsec" style="margin-top:6px;
           {% if current_user.rol.nombre != 'Administrador' %}display:none;{% endif %}">Acciones</div>
